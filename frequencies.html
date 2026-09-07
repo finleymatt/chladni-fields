@@ -150,6 +150,13 @@
   .tone .lvl input::-webkit-slider-thumb { background: var(--sound); width: 22px; height: 22px; margin-top: -8px; }
   .tone .lvl input::-moz-range-thumb { background: var(--sound); }
   .tone .badge { position: absolute; top: 12px; right: 12px; }
+  .refs-sup { font-family: var(--font-mono); font-size: 10px; font-weight: 400; margin-left: 6px; letter-spacing: 0; vertical-align: super; line-height: 0; }
+  .refs-sup a { color: var(--sound); text-decoration: none; padding: 0 2px; }
+  .refs-sup a:hover { text-decoration: underline; }
+  .refs { counter-reset: none; }
+  .refs li { scroll-margin-top: 16px; }
+  .refs li:target { color: var(--ink); }
+  .refs li:target a:first-child { text-decoration-thickness: 2px; }
 
   .notes { margin-top: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 5vw, 60px); }
   .notes h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0 0 6px; }
@@ -283,7 +290,7 @@
       </div>
       <div class="row">
         <div class="ctl">
-          <span class="lbl">Binaural beat · headphones</span>
+          <span class="lbl">Binaural beat · headphones <sup class="refs-sup"><a href="#ref-5" title="Study 5">5</a><a href="#ref-6" title="Study 6">6</a><a href="#ref-7" title="Study 7 (gamma)">7</a><a href="#ref-12" title="Schumann">12</a></sup></span>
           <div class="row" style="gap:8px">
             <button class="toggle" id="binBtn" type="button" data-on="0" aria-pressed="false">Off</button>
             <select id="beat" aria-label="Beat rate">
@@ -354,23 +361,31 @@
     <div>
       <h2>Leaving it on for hours — the part that actually matters</h2>
       <ol>
-        <li><b>Volume is the whole game.</b> The WHO's safe-listening ceiling is 80 dB for 40 hours a week; a tone you leave on belongs far below that — if someone talking normally beside you is easy to hear over it, you're fine. This page opens at a low room level on purpose.</li>
+        <li><b>Volume is the whole game.</b><sup class="refs-sup"><a href="#ref-9">9</a></sup> The WHO's safe-listening ceiling is 80 dB for 40 hours a week; a tone you leave on belongs far below that — if someone talking normally beside you is easy to hear over it, you're fine. This page opens at a low room level on purpose.</li>
         <li><b>Low tones wear better than high ones.</b> The ear is most sensitive around 2–5 kHz, and a pure high pitch fatigues faster than a hum. For long sessions stay roughly between 100 and 530 Hz; 852 and 963 Hz are for short sits, softly.</li>
         <li><b>Take the ear off duty.</b> Ten minutes of quiet every hour. The fade-out timer is the easy way to make that happen.</li>
-        <li><b>Binaural means headphones.</b> The beat only exists inside your head, made from the two ears' slightly different tones. Through speakers it's just a faint wobble. Theta and delta beats have the best evidence for easing anxiety.</li>
-        <li><b>Overnight noise is a mixed bag.</b> A 2025 study found pink noise all night cut REM sleep; earplugs protected deep sleep better. Use noise to fall asleep, on the timer, rather than till morning.</li>
-        <li><b>Not treatment.</b> Nothing here diagnoses or treats anything. Skip the 40 Hz beat if you have epilepsy, and don't use any of this while driving.</li>
+        <li><b>Binaural means headphones.</b><sup class="refs-sup"><a href="#ref-5">5</a><a href="#ref-6">6</a></sup> The beat only exists inside your head, made from the two ears' slightly different tones. Through speakers it's just a faint wobble. Theta and delta beats have the best evidence for easing anxiety.</li>
+        <li><b>Overnight noise is a mixed bag.</b><sup class="refs-sup"><a href="#ref-8">8</a></sup> A recent study found pink noise all night cut REM sleep; earplugs protected deep sleep better. Use noise to fall asleep, on the timer, rather than till morning.</li>
+        <li><b>Not treatment.</b> Nothing here diagnoses or treats anything. Skip the 40 Hz beat<sup class="refs-sup"><a href="#ref-7">7</a></sup> if you have epilepsy, and don't use any of this while driving.</li>
       </ol>
     </div>
-    <div>
-      <h2>Where the labels come from</h2>
-      <ul class="src">
-        <li><a href="https://link.springer.com/article/10.1007/s00426-018-1066-8" target="_blank" rel="noopener">Garcia-Argibay et al., 2019</a> — meta-analysis of 22 binaural-beat studies; theta/delta beats reduced anxiety with a medium-to-large effect.</li>
-        <li><a href="https://pubmed.ncbi.nlm.nih.gov/31031095/" target="_blank" rel="noopener">Calamassi &amp; Pomponi, 2019</a> — 33 people, double-blind crossover; the same music at 432 Hz lowered heart rate more than at 440 Hz. A <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11755923/" target="_blank" rel="noopener">2025 cancer-patient trial</a> saw similar cardiovascular shifts.</li>
-        <li><a href="https://www.scirp.org/html/2-8204397_87146.htm" target="_blank" rel="noopener">Akimoto et al., 2018</a> — nine people; 528 Hz music lowered salivary cortisol and raised oxytocin where 440 Hz did not. Tiny sample.</li>
-        <li><a href="https://picower.mit.edu/news/review-evidence-expanding-40hz-gamma-stimulation-promotes-brain-health" target="_blank" rel="noopener">MIT Picower Institute</a> — 40 Hz light-and-sound stimulation in Alzheimer's research; cognition, not calm.</li>
-        <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10722168/" target="_blank" rel="noopener">Overnight pink noise and REM</a>; <a href="https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening" target="_blank" rel="noopener">WHO safe listening</a>.</li>
-      </ul>
+    <div id="studies">
+      <h2>The studies, numbered</h2>
+      <p class="lede" style="font-size:.95rem;margin:0 0 6px">Every tone above carries small numbers linking here. Where a line says <i>pilot</i>, read the sample size before you read the result.</p>
+      <ol class="src refs">
+        <li id="ref-1"><a href="https://pubmed.ncbi.nlm.nih.gov/31031095/" target="_blank" rel="noopener">Calamassi D, Pomponi GP. <i>Explore</i> 2019</a> — 33 healthy adults, double-blind crossover; the same music at 432 Hz lowered heart rate more than at 440 Hz, with slight drops in blood pressure and breathing rate.</li>
+        <li id="ref-2"><a href="https://www.scielo.br/j/jaos/a/kkzqnX5PgqgdKzT3BhHdX7w/?lang=en" target="_blank" rel="noopener">Aravena PC et al. <i>J Appl Oral Sci</i> 2020</a> — randomised trial in patients having a tooth out; music at 432 Hz reduced dental anxiety and salivary cortisol more than 440 Hz.</li>
+        <li id="ref-3"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11755923/" target="_blank" rel="noopener">Sound interventions at 432 vs 443 Hz in cancer patients, <i>BMC Complement Med Ther</i> 2025</a> — randomised crossover; cardiovascular parameters shifted differently under the two tunings.</li>
+        <li id="ref-4"><a href="https://www.scirp.org/html/2-8204397_87146.htm" target="_blank" rel="noopener">Akimoto K et al. <i>Health</i> 2018</a> — nine people; after 528 Hz music, salivary cortisol fell and oxytocin rose, with no change after 440 Hz. A single small session: promising, not settled.</li>
+        <li id="ref-5"><a href="https://link.springer.com/article/10.1007/s00426-018-1066-8" target="_blank" rel="noopener">Garcia-Argibay M et al. <i>Psychol Res</i> 2019</a> — meta-analysis of 22 binaural-beat studies; theta and delta beats reduced anxiety with a medium-to-large effect (Hedges' g ≈ 0.69). The strongest evidence on this page.</li>
+        <li id="ref-6"><a href="https://www.sciencedirect.com/science/article/pii/S096522992500175X" target="_blank" rel="noopener">Binaural beats for perioperative anxiety and pain, systematic review and meta-analysis, 2025</a> — pooled trials around surgery; anxiety reduced, pain effects smaller.</li>
+        <li id="ref-7"><a href="https://picower.mit.edu/news/review-evidence-expanding-40hz-gamma-stimulation-promotes-brain-health" target="_blank" rel="noopener">MIT Picower Institute, 2025 review</a> — 40 Hz light-and-sound stimulation in Alzheimer's research, from mouse models to small human trials. About cognition and brain health, not relaxation; the beat here is a nod to it.</li>
+        <li id="ref-8"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10722168/" target="_blank" rel="noopener">Overnight pink noise and sleep, 2023</a> — all-night pink noise reduced REM sleep and sleep-dependent insight; earplugs protected deep sleep better. Use noise to fall asleep, on a timer.</li>
+        <li id="ref-9"><a href="https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening" target="_blank" rel="noopener">WHO — safe listening</a> — the 80 dB / 40 hours-a-week ceiling behind the volume advice above.</li>
+        <li id="ref-10"><a href="https://en.wikipedia.org/wiki/Solfeggio_frequencies" target="_blank" rel="noopener">The Solfeggio set — where it comes from</a> — nine tones proposed in the 1990s from a numerological reading of a mediaeval hymn; no controlled studies apart from the 528 Hz pilot above. Listed as tradition.</li>
+        <li id="ref-11"><a href="https://en.wikipedia.org/wiki/Hans_Cousto" target="_blank" rel="noopener">Cousto H. <i>The Cosmic Octave</i>, 1978</a> — the “planetary” tones, 136.1 Hz among them, derived by octave-shifting astronomical periods into hearing range. A tuning convention, not a finding.</li>
+        <li id="ref-12"><a href="https://en.wikipedia.org/wiki/Schumann_resonances" target="_blank" rel="noopener">Schumann resonances</a> — the 7.83 Hz resonance of the Earth–ionosphere cavity is real physics; claims about its effect on the body are not supported by controlled studies.</li>
+      </ol>
     </div>
   </section>
 
@@ -409,10 +424,10 @@
 
   /* ---------- the tones ---------- */
   var TONES = [
-    { id: "t432", hz: 432, group: "A", name: "432 Hz · Verdi's A", tier: "pilot", text: "Concert A tuned a touch lower than the modern 440. In a 33-person double-blind pilot the same music at 432 Hz <b>lowered heart rate</b> more than at 440. The best all-day drone here." },
-    { id: "t528", hz: 528, group: "A", name: "528 Hz · the “love” tone", tier: "pilot", text: "The one Solfeggio tone with a study: nine listeners showed <b>lower cortisol and higher oxytocin</b> after 528 Hz music, not after 440. Bright but soft as a pad." },
-    { id: "t174", hz: 174, group: "A", name: "174 Hz · low hum", tier: "tradition", text: "The lowest Solfeggio tone, said to ease pain. What's certain: a hum this low sits under speech and <b>never tires the ear</b>, which makes it the easiest to leave on." },
-    { id: "t136", hz: 136.1, group: "A", name: "136.1 Hz · Om", tier: "tradition", text: "The “earth year” tone from Hans Cousto's planetary octaves, used to tune Indian tambura and many singing bowls. A grounded, chesty drone; the Deep sleep preset's carrier." },
+    { id: "t432", hz: 432, group: "A", name: "432 Hz · Verdi's A", tier: "pilot", refs: [1, 2, 3], text: "Concert A tuned a touch lower than the modern 440. In a 33-person double-blind pilot the same music at 432 Hz <b>lowered heart rate</b> more than at 440. The best all-day drone here." },
+    { id: "t528", hz: 528, group: "A", name: "528 Hz · the “love” tone", tier: "pilot", refs: [4], text: "The one Solfeggio tone with a study: nine listeners showed <b>lower cortisol and higher oxytocin</b> after 528 Hz music, not after 440. Bright but soft as a pad." },
+    { id: "t174", hz: 174, group: "A", name: "174 Hz · low hum", tier: "tradition", refs: [10, 9], text: "The lowest Solfeggio tone, said to ease pain. What's certain: a hum this low sits under speech and <b>never tires the ear</b>, which makes it the easiest to leave on." },
+    { id: "t136", hz: 136.1, group: "A", name: "136.1 Hz · Om", tier: "tradition", refs: [11], text: "The “earth year” tone from Hans Cousto's planetary octaves, used to tune Indian tambura and many singing bowls. A grounded, chesty drone; the Deep sleep preset's carrier." },
     { id: "t285", hz: 285, group: "B", name: "285 Hz", tier: "tradition", text: "Assigned to <b>tissue and safety</b> in the Solfeggio tradition. Warm and unobtrusive; pairs with 174." },
     { id: "t396", hz: 396, group: "B", name: "396 Hz", tier: "tradition", text: "“Liberating from fear.” A full, centred tone close to G; comfortable for long sits." },
     { id: "t417", hz: 417, group: "B", name: "417 Hz", tier: "tradition", text: "“Undoing situations.” Near G♯; blends into 432 as a gentle beating pair." },
@@ -420,8 +435,8 @@
     { id: "t741", hz: 741, group: "B", name: "741 Hz", tier: "tradition", text: "“Expression.” Getting bright — use the Warm pad timbre and short sessions." },
     { id: "t852", hz: 852, group: "B", name: "852 Hz", tier: "tradition", text: "“Intuition.” High and glassy; a short-sit tone, softly." },
     { id: "t963", hz: 963, group: "B", name: "963 Hz", tier: "tradition", text: "“Crown.” The highest of the set. Lovely for a minute over a low drone; not one to leave on." },
-    { id: "brown", hz: 0, kind: "brown", group: "C", name: "Brown noise", tier: "mixed", text: "Deep, rumbling, like surf from a distance. Masks a room well and is the gentlest bed for hours; sleep evidence is thin either way." },
-    { id: "pink", hz: 0, kind: "pink", group: "C", name: "Pink noise", tier: "mixed", text: "Rain-and-river noise, the classic sleep sound. Small older studies liked it; a 2025 study found it cut REM when left on all night. Use the timer." }
+    { id: "brown", hz: 0, kind: "brown", group: "C", name: "Brown noise", tier: "mixed", refs: [8], text: "Deep, rumbling, like surf from a distance. Masks a room well and is the gentlest bed for hours; sleep evidence is thin either way." },
+    { id: "pink", hz: 0, kind: "pink", group: "C", name: "Pink noise", tier: "mixed", refs: [8], text: "Rain-and-river noise, the classic sleep sound. Small older studies liked it; a 2025 study found it cut REM when left on all night. Use the timer." }
   ];
 
   var actx = null, master = null, comp = null, playing = {}, timerHandle = null, timerEnds = 0;
@@ -560,12 +575,16 @@
   }
 
   /* ---------- cards ---------- */
+  function refsHtml(list) {
+    if (!list || !list.length) return "";
+    return '<sup class="refs-sup">' + list.map(function (n) { return '<a href="#ref-' + n + '" title="Study ' + n + '">' + n + '</a>'; }).join("") + '</sup>';
+  }
   function card(t) {
     var el = document.createElement("article"); el.className = "tone"; el.id = "card-" + t.id; el.setAttribute("data-on", "0");
     el.innerHTML =
       '<span class="badge" data-tier="' + t.tier + '">' + t.tier + '</span>' +
       '<div class="hz">' + (t.kind ? '<span style="font-size:1.1rem">' + (t.kind === "brown" ? "brown" : "pink") + '</span>' : t.hz) + (t.kind ? "" : "<small>Hz</small>") + '</div>' +
-      '<h3>' + t.name + '</h3>' +
+      '<h3>' + t.name + refsHtml(t.refs || (t.group === "B" ? [10] : [])) + '</h3>' +
       '<p>' + t.text + '</p>' +
       '<div class="foot"><button class="go" id="go-' + t.id + '" type="button">Play</button>' +
       '<label class="lvl"><input type="range" id="lvl-' + t.id + '" min="0" max="100" value="' + (t.kind ? 45 : 60) + '" aria-label="Level for ' + t.name + '" /><span id="lv-' + t.id + '">' + (t.kind ? 45 : 60) + '</span></label></div>';
