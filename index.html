@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d120e" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#e3e4db" media="(prefers-color-scheme: light)" />
 <title>Chladni Fields</title>
 <meta name="description" content="Famous crop formations and ancient sacred figures translated into tones, shown beside the resonance pattern each frequency would raise on a vibrating plate — or sing your own." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -121,9 +128,24 @@
   }
   .premise b { color: var(--ink); font-weight: 600; }
 
-  .theme-toggle {
+  .masthead-side {
     justify-self: end;
     align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .credit {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+    white-space: nowrap;
+  }
+  .theme-toggle {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: .16em;
@@ -137,19 +159,42 @@
   }
   .theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
 
-  /* ---------- transport ---------- */
+  /* ---------- transport (sits directly above the console it drives) ---------- */
   .transport {
-    margin-top: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px 26px;
-    align-items: flex-end;
-    padding: 16px 18px;
+    margin-top: 14px;
+    padding: 14px 18px 16px;
     background: var(--panel);
     border: 1px solid var(--edge);
+    border-bottom: 0;
     box-shadow: var(--shadow);
-    border-radius: var(--r);
+    border-radius: var(--r) var(--r) 0 0;
   }
+  .transport[data-free="1"] { border-color: var(--sound); box-shadow: inset 0 2px 0 var(--sound), var(--shadow); }
+  .transport-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .transport-head .eyebrow { color: var(--ink); }
+  .transport[data-free="1"] .transport-head .eyebrow { color: var(--sound); }
+  .status {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+  .status[data-live="1"] { color: var(--sound); }
+  .transport-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 22px;
+    align-items: flex-end;
+  }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .ctl { display: flex; flex-direction: column; gap: 6px; }
   .ctl > label, .ctl > .lbl {
     font-family: var(--font-mono);
@@ -158,13 +203,23 @@
     text-transform: uppercase;
     color: var(--muted);
   }
-  .ctl .row { display: flex; align-items: center; gap: 10px; }
+  .ctl--slider { display: grid; grid-template-columns: 1fr; gap: 4px; min-width: 200px; flex: 1 1 200px; max-width: 320px; }
+  .ctl--slider .row { display: grid; grid-template-columns: 1fr 6ch; align-items: center; gap: 10px; }
   .ctl .val {
     font-family: var(--font-mono);
     font-size: 12.5px;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
-    min-width: 6ch;
+    text-align: right;
+  }
+  .hint {
+    margin: 12px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: .03em;
+    color: var(--muted);
+    max-width: 70ch;
   }
   .play, .mic {
     font-family: var(--font-display);
@@ -173,7 +228,8 @@
     letter-spacing: .04em;
     text-transform: uppercase;
     border-radius: var(--r);
-    padding: 11px 26px;
+    padding: 11px 24px;
+    min-height: 44px;
     cursor: pointer;
     transition: filter .12s ease;
   }
@@ -194,6 +250,8 @@
   .mic[data-on="1"] { background: var(--sound); color: var(--plate-bg); }
   .free-only { display: none; }
   .transport[data-free="1"] .free-only { display: flex; }
+  .transport[data-free="1"] .ctl--slider.free-only { display: grid; }
+  .transport[data-free="1"] .hint.free-only { display: block; }
   .transport[data-free="1"] .preset-only { display: none; }
 
   select, input[type="range"] { font-family: var(--font-mono); accent-color: var(--accent); }
@@ -204,10 +262,24 @@
     border: 1px solid var(--edge);
     border-radius: var(--r);
     padding: 8px 10px;
+    min-height: 40px;
   }
-  input[type="range"] { width: 128px; }
-  input[type="range"].wide { width: 200px; }
+  input[type="range"] { width: 100%; min-width: 0; height: 28px; margin: 0; }
   .free-only input[type="range"] { accent-color: var(--sound); }
+  .cta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--sound);
+    background: transparent;
+    border: 1px solid var(--sound);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .cta:hover { background: var(--sound); color: var(--plate-bg); }
 
   /* ---------- formation strips ---------- */
   .strip-head {
@@ -396,15 +468,17 @@
 
   /* ---------- console ---------- */
   .console {
-    margin-top: 14px;
+    margin-top: 0;
     display: grid;
     grid-template-columns: 1fr 116px 1fr;
     border: 1px solid var(--edge);
     background: var(--panel);
     box-shadow: var(--shadow);
-    border-radius: var(--r);
+    border-radius: 0 0 var(--r) var(--r);
     overflow: hidden;
+    scroll-margin-top: 12px;
   }
+  .transport[data-free="1"] + .console { border-color: var(--sound); }
   .panel { position: relative; min-width: 0; }
   .panel--field { border-right: 1px solid var(--edge); }
   .panel--plate { border-left: 1px solid var(--edge); }
@@ -672,10 +746,24 @@
     .lower { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
-    .masthead { grid-template-columns: 1fr; }
-    .theme-toggle { justify-self: start; }
+    .wrap { padding-bottom: 40px; }
+    .masthead { grid-template-columns: 1fr; gap: 14px; }
+    .masthead-side { justify-self: start; flex-direction: row; align-items: center; gap: 14px; }
+    .strip { grid-auto-columns: 118px; }
+    .transport { padding: 12px 12px 14px; }
+    .transport-row { gap: 12px 16px; }
+    .btn-row { width: 100%; }
+    .btn-row .play, .btn-row .mic { flex: 1 1 auto; min-width: 0; }
+    .ctl--slider { min-width: 0; max-width: none; flex-basis: 100%; }
+    .ctl:not(.ctl--slider):not(.btn-wrap) { flex: 1 1 40%; }
+    .ctl select { width: 100%; }
+    .gutter { padding: 12px; gap: 8px; }
+    .gutter dl { grid-template-columns: repeat(3, auto); }
+    .meter { padding: 14px 12px 12px; }
     .bar b { font-size: 7.5px; }
-    input[type="range"].wide { width: 150px; }
+    .lower { margin-top: 32px; }
+    .dossier .facts div { grid-template-columns: 96px 1fr; }
+    footer { font-size: 10.5px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -683,6 +771,8 @@
     .bar i { transition: none; }
   }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <h2 class="sr-only">Chladni Fields: famous crop formations and ancient sacred figures, each converted into a fundamental frequency and a set of partials, shown next to the Chladni nodal pattern that frequency would raise on a vibrating plate. A free plate mode lets you set a tone or sing into a microphone and watch the pattern form.</h2>
@@ -700,52 +790,11 @@
         Or skip the field entirely and <b>raise your own</b> — by tone, or by voice.
       </p>
     </div>
-    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+    <div class="masthead-side">
+      <p class="credit">Designed by Matt Finley</p>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+    </div>
   </header>
-
-  <div class="transport" id="transport" role="group" aria-label="Playback" data-free="0">
-    <div class="ctl">
-      <label for="playBtn">Transport</label>
-      <button class="play" id="playBtn" type="button" data-on="0">Play tone</button>
-    </div>
-    <div class="ctl free-only">
-      <span class="lbl">Or</span>
-      <button class="mic" id="micBtn" type="button" data-on="0">Use microphone</button>
-    </div>
-    <div class="ctl free-only">
-      <label for="freqSel">Tone</label>
-      <div class="row">
-        <input type="range" id="freqSel" class="wide" min="40" max="1200" step="1" value="220" />
-        <span class="val" id="freqVal">220 Hz</span>
-      </div>
-    </div>
-    <div class="ctl preset-only">
-      <label for="modeSel">Sustain</label>
-      <select id="modeSel">
-        <option value="drone">Drone — hold</option>
-        <option value="pluck">Struck — decay</option>
-      </select>
-    </div>
-    <div class="ctl">
-      <label for="timbreSel">Voice</label>
-      <select id="timbreSel">
-        <option value="pure">Pure — sine stack</option>
-        <option value="reed">Reed — triangle</option>
-        <option value="bowed">Bowed — like a plate</option>
-      </select>
-    </div>
-    <div class="ctl free-only">
-      <label for="sharpSel">Line sharpness</label>
-      <div class="row">
-        <input type="range" id="sharpSel" min="6" max="60" step="1" value="26" />
-        <span class="val" id="sharpVal">26</span>
-      </div>
-    </div>
-    <div class="ctl">
-      <label for="volSel">Level</label>
-      <input type="range" id="volSel" min="0" max="100" value="70" aria-label="Level" />
-    </div>
-  </div>
 
   <div class="strip-head">
     <p class="eyebrow">Crop formations</p>
@@ -755,11 +804,78 @@
 
   <div class="strip-head">
     <p class="eyebrow">Ancient figures&nbsp;·&nbsp;and your own</p>
-    <p class="eyebrow" aria-hidden="true">Egypt · Mesopotamia · India</p>
+    <button class="cta" id="ctaFree" type="button">Raise your own tone ▸</button>
   </div>
   <div class="strip" id="stripAncient" role="tablist" aria-label="Ancient figures and free plate"></div>
 
-  <section class="console" aria-label="Reading">
+  <div class="transport" id="transport" role="group" aria-label="Playback" data-free="0">
+    <div class="transport-head">
+      <p class="eyebrow" id="transportLbl">Playback</p>
+      <p class="status" id="status" data-live="0">stopped · press Play</p>
+    </div>
+    <div class="transport-row">
+      <div class="ctl btn-wrap">
+        <span class="lbl">Source</span>
+        <div class="btn-row">
+          <button class="play" id="playBtn" type="button" data-on="0">Play tone</button>
+          <button class="mic free-only" id="micBtn" type="button" data-on="0">Use microphone</button>
+        </div>
+      </div>
+      <div class="ctl ctl--slider free-only">
+        <label for="freqSel">Tone freq</label>
+        <div class="row">
+          <input type="range" id="freqSel" min="40" max="1200" step="1" value="220" />
+          <span class="val" id="freqVal">220</span>
+        </div>
+      </div>
+      <div class="ctl ctl--slider free-only">
+        <label for="smoothSel">Smoothing</label>
+        <div class="row">
+          <input type="range" id="smoothSel" min="0.5" max="0.98" step="0.01" value="0.86" />
+          <span class="val" id="smoothVal">0.86</span>
+        </div>
+      </div>
+      <div class="ctl ctl--slider free-only">
+        <label for="sharpSel">Line sharp</label>
+        <div class="row">
+          <input type="range" id="sharpSel" min="6" max="60" step="1" value="26" />
+          <span class="val" id="sharpVal">26</span>
+        </div>
+      </div>
+      <div class="ctl ctl--slider free-only">
+        <label for="gainSel">Gain</label>
+        <div class="row">
+          <input type="range" id="gainSel" min="0.5" max="5" step="0.1" value="2.2" />
+          <span class="val" id="gainVal">2.2</span>
+        </div>
+      </div>
+      <div class="ctl preset-only">
+        <label for="modeSel">Sustain</label>
+        <select id="modeSel">
+          <option value="drone">Drone — hold</option>
+          <option value="pluck">Struck — decay</option>
+        </select>
+      </div>
+      <div class="ctl">
+        <label for="timbreSel">Voice</label>
+        <select id="timbreSel">
+          <option value="pure">Pure — sine stack</option>
+          <option value="reed">Reed — triangle</option>
+          <option value="bowed">Bowed — like a plate</option>
+        </select>
+      </div>
+      <div class="ctl ctl--slider">
+        <label for="volSel">Level</label>
+        <div class="row">
+          <input type="range" id="volSel" min="0" max="100" value="70" />
+          <span class="val" id="volVal">70</span>
+        </div>
+      </div>
+    </div>
+    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Thirty modes on a 112² grid; the microphone is analysed in your browser and never recorded.</p>
+  </div>
+
+  <section class="console" id="console" aria-label="Reading">
     <div class="panel panel--field">
       <span class="panel-tag" id="fieldTag">Formation · aerial</span>
       <canvas class="stage" id="fieldCanvas" width="600" height="600"></canvas>
@@ -1159,7 +1275,10 @@
   var transportEl = $("#transport");
   var playBtn = $("#playBtn"), micBtn = $("#micBtn"), modeSel = $("#modeSel"), timbreSel = $("#timbreSel"), volSel = $("#volSel");
   var freqSel = $("#freqSel"), freqVal = $("#freqVal"), sharpSel = $("#sharpSel"), sharpVal = $("#sharpVal");
+  var smoothSel = $("#smoothSel"), smoothVal = $("#smoothVal"), gainSel = $("#gainSel"), gainVal = $("#gainVal"), volVal = $("#volVal");
+  var statusEl = $("#status"), consoleEl = $("#console");
   var scanEl = $("#scan");
+  function setStatus(text, live) { statusEl.textContent = text; statusEl.setAttribute("data-live", live ? "1" : "0"); }
 
   var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
   function hexToRgb(h) {
@@ -1735,9 +1854,12 @@
   }
   function updatePlayLabel() {
     var free = isFree();
-    if (!playing) playBtn.textContent = "Play tone";
+    if (!playing) playBtn.textContent = free ? "Test tone" : "Play tone";
     else playBtn.textContent = (!free && modeSel.value === "pluck") ? "Strike again" : "Stop";
     playBtn.setAttribute("data-on", playing ? "1" : "0");
+    if (micOn) setStatus("microphone live — sing!", true);
+    else if (playing) setStatus(free ? "test tone running · " + Math.round(parseFloat(freqSel.value)) + " Hz" : "playing · " + Math.round(current.reading.f0) + " Hz fundamental", true);
+    else setStatus(free ? "ready — drag Tone freq, press Test tone, or use the microphone" : "stopped · press Play", false);
   }
 
   function startVoice() {
@@ -1812,13 +1934,15 @@
         micTd = new Float32Array(micAn.fftSize); micFfd = new Float32Array(micAn.frequencyBinCount);
         micSrc.connect(micAn);   // analysis only — never routed to the speakers
         micOn = true;
-        micBtn.textContent = "Microphone live — sing";
+        micBtn.textContent = "Stop microphone";
         micBtn.setAttribute("data-on", "1");
+        updatePlayLabel();
         $("#dosLede").textContent = "Microphone live. Sing, hum or whistle — low notes make big lazy loops, high notes fine filigree. Nothing is recorded or sent anywhere; the audio is analysed in your browser and discarded.";
       })
       .catch(function (err) {
         micBtn.textContent = "Use microphone";
-        $("#dosLede").textContent = "Microphone not available (" + (err && err.name ? err.name : "blocked") + "). Allow it in the browser's site permissions, or use the tone slider instead.";
+        setStatus("microphone not available (" + (err && err.name ? err.name : "blocked") + ") — allow it in site permissions, or use the slider", false);
+        $("#dosLede").textContent = "Microphone not available (" + (err && err.name ? err.name : "blocked") + "). Allow it in the browser's site permissions, or use the tone slider instead. Note that browsers only offer the microphone on https pages.";
       });
   }
   function stopMic() {
@@ -1828,6 +1952,7 @@
     micBtn.textContent = "Use microphone";
     micBtn.setAttribute("data-on", "0");
     if (isFree()) $("#dosLede").textContent = FREE.lede;
+    updatePlayLabel();
   }
 
   /* pitch: normalised autocorrelation on the mic buffer */
@@ -1909,7 +2034,7 @@
     tSeed += 0.008;
     var live = (micOn && micAn) || (playing && analyser);
     var an = micOn ? micAn : analyser, data = micOn ? micFfd : ffd;
-    var total = 0, i, sm = 0.86;
+    var total = 0, i, sm = parseFloat(smoothSel.value);
     if (live) {
       an.getFloatFrequencyData(data);
       var nyq = SAMPLE_RATE / 2, DB_FLOOR = -90, DB_CEIL = -20;
@@ -1975,7 +2100,7 @@
     avgSettle = sumS / particles.length;
   }
   function renderFreeBitmap() {
-    var s = COL.soundRgb, sharp = parseFloat(sharpSel.value), gain = 2.2, d = freeImg.data;
+    var s = COL.soundRgb, sharp = parseFloat(sharpSel.value), gain = parseFloat(gainSel.value), d = freeImg.data;
     for (var i = 0; i < FG * FG; i++) {
       var line = Math.exp(-sharp * Math.abs(field[i]) * gain), o = i * 4;
       d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235);
@@ -2123,13 +2248,16 @@
     Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { drawChipGlyph(c); });
   }
 
-  function selectFormation(f) {
+  function selectFormation(f, scrollTo) {
     var wasFree = isFree();
     current.f = f;
     var free = isFree();
     if (wasFree && !free && micOn) stopMic();
     current.reading = free ? freeReading() : computeReading(f);
     transportEl.setAttribute("data-free", free ? "1" : "0");
+    $("#transportLbl").textContent = free ? "Your own tone · free plate" : "Playback";
+    if (scrollTo && !reduceMotion) transportEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    else if (scrollTo) transportEl.scrollIntoView();
     $("#fieldTag").textContent = free ? "Formation your tone would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
     $("#plateTag").textContent = free ? "Free plate · audio-reactive" : "Chladni plate · nodal lines";
     $("#fcName").textContent = f.name;
@@ -2197,7 +2325,7 @@
     var m = f.date.match(/(\d{3,4})\s*BC/i) || f.date.match(/\b(\d{4})\b/);
     yr.textContent = f.id === "free" ? "live · mic or tone" : (m ? (/(BC)/i.test(f.date) ? "c. " + m[1] + " BC" : m[1]) : "—");
     btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
-    btn.addEventListener("click", function () { selectFormation(f); });
+    btn.addEventListener("click", function () { selectFormation(f, f.id === "free" || window.innerWidth < 900); });
     wrap.appendChild(btn);
     if (f.id !== "free") {
       var info = document.createElement("button");
@@ -2232,9 +2360,13 @@
     if (isFree()) { current.reading = freeReading(); refreshMeter(); }
     if (playing) startVoice();
   });
+  $("#ctaFree").addEventListener("click", function () { selectFormation(FREE, true); });
+  smoothSel.addEventListener("input", function () { smoothVal.textContent = parseFloat(smoothSel.value).toFixed(2); });
+  gainSel.addEventListener("input", function () { gainVal.textContent = parseFloat(gainSel.value).toFixed(1); });
   freqSel.addEventListener("input", function () {
     var f = parseFloat(freqSel.value);
-    freqVal.textContent = f + " Hz";
+    freqVal.textContent = f;
+    if (playing && isFree()) setStatus("test tone running · " + f + " Hz", true);
     if (isFree()) {
       current.reading = freeReading(); refreshMeter();
       if (!micOn) {
@@ -2246,7 +2378,7 @@
     }
   });
   sharpSel.addEventListener("input", function () { sharpVal.textContent = sharpSel.value; });
-  volSel.addEventListener("input", function () { if (actx && master) master.gain.setTargetAtTime(volTarget(), actx.currentTime, 0.05); });
+  volSel.addEventListener("input", function () { volVal.textContent = volSel.value; if (actx && master) master.gain.setTargetAtTime(volTarget(), actx.currentTime, 0.05); });
 
   var rz;
   window.addEventListener("resize", function () {
@@ -2333,3 +2465,5 @@
   boot();
 })();
 </script>
+</body>
+</html>
