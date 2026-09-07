@@ -872,7 +872,7 @@
         </div>
       </div>
     </div>
-    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Fifteen plate modes on a 112² grid; the microphone is analysed in your browser and never recorded.</p>
+    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Fifteen plate modes on a 160² grid; the microphone is analysed in your browser and never recorded.</p>
   </div>
 
   <section class="console" id="console" aria-label="Reading">
@@ -1977,7 +1977,7 @@
 
   /* ============================ CHLADNI PLATE — preset (single mode) ============================ */
   var plateBmp = null, particles = [], avgSettle = 0;
-  var PN = reduceMotion ? 900 : 1300;
+  var PN = 1300;
 
   function zAt(x, y, n, m) { return Math.sin(n * Math.PI * x) * Math.sin(m * Math.PI * y) - Math.sin(m * Math.PI * x) * Math.sin(n * Math.PI * y); }
   function gradAt(x, y, n, m) {
@@ -2026,7 +2026,7 @@
     MODES.forEach(function (o) { o.fn = (o.f - fMin) / (fMax - fMin); o.hz = 60 * Math.pow(1500 / 60, o.fn); });
   })();
   var W = new Float32Array(MODES.length);
-  var FG = 112, field = new Float32Array(FG * FG), cosT = [];
+  var FG = 160, field = new Float32Array(FG * FG), cosT = [];
   (function () { for (var k = 0; k <= MODES_N; k++) { var row = new Float32Array(FG); for (var i = 0; i < FG; i++) row[i] = Math.cos(k * Math.PI * (i + 0.5) / FG); cosT.push(row); } })();
   var freeBmpCv = document.createElement("canvas"); freeBmpCv.width = FG; freeBmpCv.height = FG;
   var freeBmpCtx = freeBmpCv.getContext("2d"), freeImg = freeBmpCtx.createImageData(FG, FG);
@@ -2049,7 +2049,8 @@
         total += W[i];
       }
     } else {
-      // no audio yet: shape the plate from the slider alone, using a virtual harmonic spectrum of the chosen tone
+      // no audio yet: shape the plate from the slider alone, using a virtual harmonic spectrum of the
+      // chosen tone, over a slow idle drift so the plate is never still (as on a real bowed plate)
       var f = parseFloat(freqSel.value), t = timbreSel.value;
       for (i = 0; i < MODES.length; i++) {
         var a = 0;
@@ -2059,7 +2060,8 @@
           var d = Math.log(MODES[i].hz / (f * h));
           a += ha * Math.exp(-(d * d) / (2 * 0.13 * 0.13));
         }
-        W[i] = sm * W[i] + (1 - sm) * Math.min(1, a);
+        var drift = 0.22 * (0.5 + 0.5 * Math.sin(tSeed * 0.9 + i * 1.7));
+        W[i] = sm * W[i] + (1 - sm) * Math.max(Math.min(1, a), drift);
         total += W[i];
       }
     }
@@ -2244,7 +2246,7 @@
     }
     requestAnimationFrame(loop);
   }
-  function fmtSpan(m) { return m >= 10 ? Math.round(m) + " m" : m >= 1 ? m.toFixed(1) + " m" : Math.round(m * 100) + " cm"; }
+  function fmtSpan(m) { return m >= 10 ? Math.round(m) + " m" : m >= 1 ? m.toFixed(1) + " m" : m >= 0.01 ? Math.round(m * 100) + " cm" : "under 1 cm"; }
 
   /* ============================ WIRING ============================ */
   var current = { f: null, reading: null };
@@ -2307,11 +2309,6 @@
     $("#dosSrc").hidden = free;
     if (playing) startVoice();
     updatePlayLabel();
-    if (reduceMotion) {
-      if (free) { for (var k = 0; k < 40; k++) { updateWeights(); } computeFreeField(); renderFreeBitmap(); for (var k2 = 0; k2 < 260; k2++) stepFreeParticles(); }
-      else for (var k3 = 0; k3 < 260; k3++) stepParticles(0);
-      drawPlate(0); drawScope();
-    }
   }
 
   function drawChipGlyph(btn) {
@@ -2468,9 +2465,14 @@
     scopeDim = fitScope();
     buildStrips();
     buildMeter();
-    selectFormation(FORMATIONS.filter(function (f) { return f.id === "milkhill"; })[0]);
-    if (!reduceMotion) requestAnimationFrame(loop);
-    else { drawPlate(0); drawScope(); }
+    // ?mode=free opens straight onto the free plate; ?f=<id> onto a figure (shareable links, and test hooks)
+    var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ""); });
+    var start = q.mode === "free" ? FREE : (FORMATIONS.filter(function (f) { return f.id === (q.f || "milkhill"); })[0] || FORMATIONS[0]);
+    if (q.freq && FREE === start) { freqSel.value = q.freq; freqVal.textContent = freqSel.value; }
+    selectFormation(start);
+    // The plate is the content, not decoration: it always runs. Reduced-motion only drops the
+    // scanline sweep and the smooth scroll (see loop / selectFormation).
+    requestAnimationFrame(loop);
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { renderFormation(); });
   boot();
