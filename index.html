@@ -228,27 +228,159 @@
     scrollbar-width: thin;
   }
   .chip {
-    display: grid;
-    grid-template-rows: 84px auto auto;
-    gap: 3px;
-    text-align: left;
+    position: relative;
     background: var(--panel);
     border: 1px solid var(--edge);
     border-radius: var(--r);
-    padding: 10px 10px 11px;
-    cursor: pointer;
-    color: var(--ink);
     transition: border-color .14s ease, background .14s ease;
   }
   .chip:hover { border-color: var(--muted); }
-  .chip[aria-pressed="true"] {
+  .chip[data-on="1"] {
     border-color: var(--accent);
     background: var(--panel-2);
   }
   .chip--free { border-style: dashed; }
-  .chip--free[aria-pressed="true"] { border-color: var(--sound); border-style: solid; }
+  .chip--free[data-on="1"] { border-color: var(--sound); border-style: solid; }
   .chip--free .chip-year { color: var(--sound); }
+  .chip-main {
+    display: grid;
+    grid-template-rows: 84px auto auto;
+    gap: 3px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r);
+    padding: 10px 10px 11px;
+    cursor: pointer;
+    color: var(--ink);
+    font: inherit;
+  }
   .chip canvas { width: 100%; height: 84px; display: block; }
+  .chip-info {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--edge);
+    background: var(--panel);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .chip-info:hover, .chip[data-on="1"] .chip-info { color: var(--accent); border-color: var(--accent); }
+  .chip--free .chip-info { display: none; }
+
+  /* ---------- source dialog ---------- */
+  .info {
+    border: 1px solid var(--edge);
+    border-radius: var(--r);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 0;
+    width: min(920px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    box-shadow: var(--shadow);
+  }
+  .info::backdrop { background: rgba(8, 12, 8, .62); backdrop-filter: blur(2px); }
+  .info-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--edge);
+    background: var(--panel-2);
+  }
+  .info-close {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .info-close:hover { color: var(--ink); border-color: var(--muted); }
+  .info-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 0;
+    overflow: auto;
+    max-height: calc(100vh - 110px);
+  }
+  .info-fig {
+    margin: 0;
+    background: var(--plate-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 260px;
+  }
+  .info-fig img, .info-fig canvas { display: block; width: 100%; height: auto; max-height: 460px; object-fit: contain; flex: 1 1 auto; }
+  .info-fig canvas { aspect-ratio: 1 / 1; background: var(--panel); }
+  .info-fig[data-mode="img"] canvas { display: none; }
+  .info-fig[data-mode="draw"] img { display: none; }
+  .info-fig figcaption {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: .03em;
+    color: var(--muted);
+    padding: 8px 12px 10px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--edge);
+  }
+  .info-fig figcaption a { color: var(--muted); }
+  .info-text { padding: 18px 20px 22px; border-left: 1px solid var(--edge); }
+  .info-text h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.45rem;
+    line-height: 1.05;
+    margin: 4px 0 8px;
+    text-wrap: balance;
+  }
+  .info-blurb { margin: 0 0 6px; font-size: .98rem; }
+  .info-about { margin: 0; color: var(--muted); font-style: italic; font-size: .95rem; }
+  .info-text .facts { margin-top: 14px; border-top: 1px solid var(--edge); }
+  .info-text .facts div { display: grid; grid-template-columns: 112px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--edge); }
+  .info-text .facts dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+  .info-text .facts dd { margin: 0; font-size: .95rem; font-variant-numeric: tabular-nums; }
+  .info-links { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+  .info-links li { font-size: .95rem; }
+  .info-links a { color: var(--accent); }
+  .info-links small { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); letter-spacing: .04em; margin-left: 6px; }
+  .info-text .eyebrow { margin-top: 18px; }
+  .dossier .src-btn {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+  }
+  .dossier .src-btn[hidden] { display: none; }
+  @media (max-width: 720px) {
+    .info-body { grid-template-columns: 1fr; }
+    .info-text { border-left: 0; border-top: 1px solid var(--edge); }
+  }
   .chip-name {
     font-family: var(--font-display);
     font-weight: 600;
@@ -687,6 +819,7 @@
         <div><dt>Form</dt><dd id="dosForm">—</dd></div>
         <div><dt>Span (used)</dt><dd id="dosSpan">—</dd></div>
       </dl>
+      <button class="src-btn" id="dosSrc" type="button">ⓘ&nbsp;Original image, location &amp; sources</button>
     </div>
   </section>
 
@@ -695,6 +828,33 @@
     <span>Web Audio · additive synthesis · analytic Chladni model</span>
   </footer>
 </div>
+
+<dialog class="info" id="infoDlg" aria-labelledby="infoName">
+  <div class="info-head">
+    <p class="eyebrow" id="infoEyebrow">Source</p>
+    <button class="info-close" id="infoClose" type="button">Close</button>
+  </div>
+  <div class="info-body">
+    <figure class="info-fig" id="infoFig" data-mode="draw">
+      <img id="infoImg" alt="" loading="lazy" referrerpolicy="no-referrer" />
+      <canvas id="infoCanvas" width="480" height="480"></canvas>
+      <figcaption id="infoCap"></figcaption>
+    </figure>
+    <div class="info-text">
+      <h2 id="infoName">—</h2>
+      <p class="info-blurb" id="infoBlurb"></p>
+      <p class="info-about" id="infoAbout" hidden></p>
+      <dl class="facts">
+        <div><dt>Location</dt><dd id="infoLoc">—</dd></div>
+        <div><dt>Coordinates</dt><dd><a id="infoLatLon" href="#" target="_blank" rel="noopener">—</a></dd></div>
+        <div><dt>Reported</dt><dd id="infoDate">—</dd></div>
+        <div><dt>Form</dt><dd id="infoForm">—</dd></div>
+      </dl>
+      <p class="eyebrow" id="infoLinksLbl">Original photographs &amp; sources</p>
+      <ul class="info-links" id="infoLinks"></ul>
+    </div>
+  </div>
+</dialog>
 
 <script>
 (function () {
@@ -708,7 +868,7 @@
     {
       id: "altonbarnes", group: "crop", name: "Alton Barnes Pictogram", place: "East Field, Alton Barnes, Wiltshire, England",
       date: "Reported 12 July 1990", form: "Dumbbell pictogram with keys",
-      diameter: 120, sym: 2, spiral: false, density: 0.5,
+      diameter: 180, sym: 2, spiral: false, density: 0.5,
       rings: [0.15, 0.5, 0.85],
       draw: { kind: "pictogram" },
       lede: "The formation that made the phenomenon a headline: ringed circles strung along a long axis with rectangular 'keys' branching off, in the East Field below the Alton Barnes white horse. Its bar-like geometry gives a two-fold, open tone."
@@ -732,15 +892,15 @@
     {
       id: "juliaset", group: "crop", name: "Julia Set", place: "Beside Stonehenge, Wiltshire, England",
       date: "Reported 7 July 1996", form: "Logarithmic spiral · 151 circles",
-      diameter: 45, sym: 1, spiral: true, density: 0.7,
+      diameter: 279, sym: 1, spiral: true, density: 0.7,
       rings: [0.22, 0.55, 0.88],
       draw: { kind: "spiral", arms: 1, count: 151, turns: 2.45, csize: 0.05, dir: 1 },
-      lede: "A single sweep of 151 circles curling in on itself like the fractal it was named for, laid in a field of wheat next to the stones. Witnesses reported it filled in under an hour on a bright afternoon beside a busy road."
+      lede: "A single sweep of 151 circles curling in on itself like the fractal it was named for, more than nine hundred feet along its spine, laid in a field of wheat opposite the stones. A pilot who had flown over an empty field reported it there on his return under an hour later."
     },
     {
       id: "windmill", group: "crop", name: "Windmill Hill", place: "Near Avebury, Wiltshire, England",
       date: "Reported 29 July 1996", form: "Triple spiral · 194 circles",
-      diameter: 82, sym: 3, spiral: true, density: 0.8,
+      diameter: 115, sym: 3, spiral: true, density: 0.8,
       rings: [0.16, 0.44, 0.72, 0.96],
       draw: { kind: "spiral", arms: 3, count: 194, turns: 0.72, csize: 0.05, dir: -1 },
       lede: "A triskelion — three spiral arms of shrinking circles turning about a common centre, 194 in all. A more organic cousin of the geometric formations, close to the great henge at Avebury."
@@ -756,7 +916,7 @@
     {
       id: "tawsmead", group: "crop", name: "Tawsmead Seven-fold", place: "Tawsmead Copse, near Alton Barnes, Wiltshire, England",
       date: "Reported 9 August 1998", form: "Seven-fold star with crescents",
-      diameter: 75, sym: 7, spiral: false, density: 0.8,
+      diameter: 90, sym: 7, spiral: false, density: 0.8,
       rings: [0.2, 0.45, 0.7, 0.95],
       draw: { kind: "sevenfold" },
       lede: "Seven crescents around a seven-pointed star in a ring — a symmetry no compass-and-straightedge construction reaches exactly, which made its precision the talking point. Seven-fold symmetry rings the seventh partial, a note the harmonic series otherwise leaves faint."
@@ -764,10 +924,10 @@
     {
       id: "milkhill", group: "crop", name: "Milk Hill", place: "Alton Barnes, Wiltshire, England",
       date: "Reported 12 August 2001", form: "Six-arm spiral · 409 circles",
-      diameter: 238, sym: 6, spiral: true, density: 0.95,
+      diameter: 268, sym: 6, spiral: true, density: 0.95,
       rings: [0.10, 0.30, 0.52, 0.74, 0.95],
       draw: { kind: "spiral", arms: 6, count: 409, turns: 0.58, csize: 0.052, dir: 1 },
-      lede: "The largest formation most people can name — six curved arms of graded circles, each arm its own small galaxy. Surveyors counted four hundred and nine circles across roughly two hundred and forty metres of standing wheat."
+      lede: "The largest formation most people can name — six curved arms of graded circles, each arm its own small galaxy. Surveyors counted four hundred and nine circles across some two hundred and seventy metres of standing wheat."
     },
     {
       id: "chilbolton", group: "crop", name: "Arecibo Reply", place: "By the Chilbolton radio telescope, Hampshire, England",
@@ -797,7 +957,7 @@
     {
       id: "hackpen", group: "crop", name: "Hackpen Hill Cube", place: "Hackpen Hill, near Broad Hinton, Wiltshire, England",
       date: "Reported 26 August 2012", form: "Isometric cube lattice",
-      diameter: 100, sym: 6, spiral: false, density: 0.85,
+      diameter: 120, sym: 6, spiral: false, density: 0.85,
       rings: [0.25, 0.5, 0.75, 1.0],
       draw: { kind: "cube" },
       lede: "A hexagonal field of rhombuses that flips, as you look at it, between a stack of cubes and a flat tiling — an optical illusion some three hundred feet across. Six-fold in outline, three-fold in depth."
@@ -805,7 +965,7 @@
     {
       id: "ansty", group: "crop", name: "Ansty Mandala", place: "Ansty, near Salisbury, Wiltshire, England",
       date: "Reported 12 August 2016", form: "Eight-fold interlaced star",
-      diameter: 80, sym: 8, spiral: false, density: 0.95,
+      diameter: 137, sym: 8, spiral: false, density: 0.95,
       rings: [0.12, 0.3, 0.5, 0.72, 0.9],
       draw: { kind: "ansty" },
       lede: "An intricate eight-fold star built from interlaced bands and rings of small triangles, in the manner of Islamic geometric tiling; one of the most elaborate formations of its decade. Eight-fold symmetry lifts the octave partials."
@@ -876,6 +1036,116 @@
     date: "live", form: "Audio-reactive free plate", diameter: 0, sym: 0, spiral: false, density: 0.7, rings: [],
     draw: { kind: "free" },
     lede: "The plate is following sound now, not a figure. Drag the tone slider and press Play, or switch on the microphone and sing, hum, whistle. Thirty plate modes each light up in proportion to how much of the spectrum lands on them; the sand settles on whatever the mix holds still. The formation on the left is the one your loudest mode would lay in a field."
+  };
+
+  /* Source material per figure. Photographs are embedded only where an open licence exists
+     (Wikimedia Commons); the crop-circle aerials are copyrighted work and are linked, not copied. */
+  var INFO = {
+    altonbarnes: { lat: 51.3615, lon: -1.8455, sources: [
+      { t: "The Croppie — Three Circles: 1990", u: "https://thecroppie.com/2025/06/01/three-circles-1990/" },
+      { t: "The Croppie — The ten most iconic crop circles", u: "https://thecroppie.com/2023/07/10/the-ten-most-iconic-crop-circles/" },
+      { t: "Crop Circle Connector — Alton Barnes travelogue", u: "https://www.cropcircleconnector.com/Travelogue/altonbarnes99.html" }
+    ] },
+    barbury: { lat: 51.4885, lon: -1.7825, sources: [
+      { t: "The Croppie — Three Circles: 1991", u: "https://thecroppie.com/2025/11/01/three-circles-1991/" },
+      { t: "Great Dreams — the Barbury Castle triangle of 1991", u: "http://greatdreams.com/crop/barbury/barbury.htm" }
+    ] },
+    mandelbrot: { lat: 52.0760, lon: 0.1770, sources: [
+      { t: "Science Photo Library — aerial by David Parker", u: "https://www.sciencephoto.com/media/177576/view/crop-formation-in-form-of-mandelbrot-set" },
+      { t: "The Croppie — Three Circles: 1991", u: "https://thecroppie.com/2025/11/01/three-circles-1991/" }
+    ] },
+    juliaset: { lat: 51.1795, lon: -1.8300, sources: [
+      { t: "Temporary Temples — Stonehenge Julia Set, overhead (Steve Alexander)", u: "https://temporarytemples.co.uk/product/stonehenge-julia-set-1996-overhead" },
+      { t: "Colin Andrews — the eyewitness account", u: "https://colinandrews.net/JuliaSetStory.html" },
+      { t: "Skeptical Inquirer — Revisiting the 'Stonehenge Surprise'", u: "https://skepticalinquirer.org/2022/05/revisiting-the-stonehenge-surprise-the-best-case-for-crop-circles/" }
+    ] },
+    windmill: { lat: 51.4380, lon: -1.8720, sources: [
+      { t: "Temporary Temples — 1996 season", u: "https://temporarytemples.co.uk/crop-circles/1996-crop-circles" },
+      { t: "Crop Circle Connector — Three views of the same fractal", u: "https://www.cropcircleconnector.com/Millennium/kris96a.html" }
+    ] },
+    etchilhampton: { lat: 51.3480, lon: -1.9580, sources: [
+      { t: "Temporary Temples — 1997 season", u: "https://temporarytemples.co.uk/crop-circles/1997-crop-circles" }
+    ] },
+    tawsmead: { lat: 51.3520, lon: -1.8300, sources: [
+      { t: "Temporary Temples — Tawsmead Copse, 9 August 1998", u: "https://temporarytemples.co.uk/crop-circles/1998-crop-circles/1998_08_09_tawsmead-copse-west-stowell-wiltshire-wheat-p-35mm" },
+      { t: "Bert Janssen — geometry and construction lines", u: "https://www.cropcircleconnector.com/Bert/bert98a.html" }
+    ] },
+    milkhill: { lat: 51.3770, lon: -1.8500, sources: [
+      { t: "Temporary Temples — 2001 season", u: "https://temporarytemples.co.uk/crop-circles/2001-crop-circles" },
+      { t: "Flickr — Milk Hill, 12 August 2001", u: "https://www.flickr.com/photos/104898036@N07/10259166653" },
+      { t: "Live Science — crop circle gallery", u: "https://www.livescience.com/15344-creepy-crop-circles-gallery.html" }
+    ] },
+    chilbolton: { lat: 51.1445, lon: -1.4375,
+      img: { file: "Chilbolton crop circle.png", credit: "Pixel matrix by IdS", license: "Public domain", kind: "diagram" },
+      sources: [
+      { t: "Wikimedia Commons — the grid as a vector diagram", u: "https://commons.wikimedia.org/wiki/File:Chilbolton_crop_circle.svg" },
+      { t: "Crop Signals — the Chilbolton 'Arecibo response'", u: "https://cropsignals.app/signals/chilbolton-observatory-arecibo-response/" },
+      { t: "Skeptical Inquirer — a not-so-convincing case", u: "https://skepticalinquirer.org/2014/09/crop-circles-a-not-so-convincing-case/" }
+    ] },
+    crabwood: { lat: 51.0690, lon: -1.3620, sources: [
+      { t: "Temporary Temples — 2002 season (listed as Sparsholt 'Alien Face')", u: "https://temporarytemples.co.uk/crop-circles/2002-crop-circles" },
+      { t: "The Galactic Mind — the 2002 face and disc formation", u: "https://www.thegalacticmind.com/the-2002-alien-face-and-disc-crop-formation/" }
+    ] },
+    pi: { lat: 51.4885, lon: -1.7825,
+      img: { file: "Barbury Crop Circle en.PNG", credit: "Diagram by Marco94", license: "Public domain", kind: "diagram" },
+      sources: [
+      { t: "Temporary Temples — Barbury Castle 'Pi', 2008 (Steve Alexander)", u: "https://temporarytemples.co.uk/product/barbury-castle-pi-2008" },
+      { t: "Plus magazine — Pi appears in crop circle", u: "https://plus.maths.org/pi-appears-crop-circle" },
+      { t: "Crop Circle Archives — reported 1 June 2008", u: "https://www.cropcirclearchives.co.uk/archives/2008/barbury/barbury2008a.html" }
+    ] },
+    hackpen: { lat: 51.4780, lon: -1.8050, sources: [
+      { t: "Temporary Temples — Hackpen Hill 'Temporal Cube', 2012", u: "https://temporarytemples.co.uk/product/hackpen-hill-temporal-cube-2012" },
+      { t: "Michael Glickman — The squares and cubes of 2012", u: "https://www.michaelglickmancropcircles.com/blog/the-squares-cubes-of-2012-part-2/" }
+    ] },
+    ansty: { lat: 51.0210, lon: -2.0610, sources: [
+      { t: "Temporary Temples — Ansty, 12 August 2016", u: "https://temporarytemples.co.uk/project/ansty-wilts-12th-august-2016" },
+      { t: "Crop Circle Connector — Ansty 2016", u: "https://www.cropcircleconnector.com/2016/Ansty/Ansty2016a.html" },
+      { t: "Lucy Pringle — Ansty", u: "https://cropcircles.lucypringle.co.uk/ansty/" }
+    ] },
+    sriyantra: { lat: 42.66, lon: -118.35,
+      about: "Spotted from the air by an Idaho Air National Guard pilot on 10 August 1990 and aired by Boise television a month later. Artist Bill Witherspoon later said he and friends had scored it with a garden cultivator over ten days, as a work of land art; the story is still told both ways.",
+      sources: [
+      { t: "Oregon Desert Mystery — research and photographs", u: "http://www.oregondesertmystery.com/research.html" },
+      { t: "Iowa Source — interview with Bill Witherspoon", u: "https://www.iowasource.com/2019/05/07/sri-yantra-mystery-an-interview-with-bill-witherspoon/" }
+    ] },
+
+    flower: { lat: 26.1845, lon: 31.9185,
+      about: "Several of these figures are drawn — not carved — in red ochre on the granite columns of the Osireion, the cenotaph behind the temple of Seti I at Abydos. They are often called ancient, but pigment can't be dated directly; many scholars read them as graffiti of the Roman period, a design the Greek world knew too.",
+      img: { file: "Temple-of-Osiris Flower-of-Life 02.jpg", credit: "Photograph by Ray Flowers", license: "CC BY-SA 3.0" },
+      sources: [
+      { t: "Wikipedia — The Osireion", u: "https://en.wikipedia.org/wiki/Osireion" },
+      { t: "Wikipedia — Overlapping circles grid", u: "https://en.wikipedia.org/wiki/Overlapping_circles_grid" }
+    ] },
+    horus: { lat: 40.7794, lon: -73.9632,
+      about: "The wedjat is the healed eye of the falcon god Horus — torn out by Seth, restored by Thoth — worn as an amulet for protection and wholeness across two and a half thousand years. Its markings copy a falcon's face: brow, cheek stripe, teardrop. Reading its parts as fractions from a half down to a sixty-fourth is a modern gloss on Old Kingdom grain measures, but it has stuck. The amulet shown is in the Metropolitan Museum, New York.",
+      img: { file: "Wedjat Eye Amulet MET 11.215.128.jpg", credit: "The Metropolitan Museum of Art, c. 1390–1353 BC", license: "CC0" },
+      sources: [
+      { t: "Wikipedia — Eye of Horus", u: "https://en.wikipedia.org/wiki/Eye_of_Horus" }
+    ] },
+    ishtar: { lat: 48.8606, lon: 2.3376,
+      about: "This star is carved on the kudurru — boundary stone — of the Kassite king Meli-Shipak, twelfth century BC, found at Susa and now in the Louvre. It sits in a row of divine emblems beside the sun disc of Shamash and the crescent of Sin. Eight points for Venus, the planet of Inanna–Ishtar, whose returns the Babylonians tracked in an eight-year cycle.",
+      img: { file: "Kudurru Melishipak Louvre Sb23 Ishtar-star.jpg", credit: "Photograph by Marie-Lan Nguyen, detail of Louvre Sb 23", license: "Public domain" },
+      sources: [
+      { t: "Wikipedia — Star of Ishtar", u: "https://en.wikipedia.org/wiki/Star_of_Ishtar" }
+    ] },
+    shamash: { lat: 33.0583, lon: 44.2550,
+      about: "A limestone tablet from the temple of the sun god at Sippar, c. 860 BC, now in the British Museum. King Nabu-apla-iddina is led before the enthroned Shamash; the great disc on the altar between them — four straight rays, four wavy — is the god's emblem. The text records the restoration of the god's cult image after it had been lost.",
+      img: { file: "Tablet of Shamash relief.jpg", credit: "Photograph by Prioryman, British Museum", license: "CC BY-SA 4.0" },
+      sources: [
+      { t: "Wikipedia — Tablet of Shamash", u: "https://en.wikipedia.org/wiki/Tablet_of_Shamash" }
+    ] },
+    imago: { lat: 33.0583, lon: 44.2550,
+      about: "A clay tablet about twelve centimetres across, from Sippar, sixth century BC, in the British Museum. Babylon is the oblong across the Euphrates; a ring named the 'Bitter River' surrounds the known lands, and beyond it point the triangular nagû — far regions, seven of eight surviving — with notes such as 'where the sun is not seen'.",
+      img: { file: "Map of the World from Sippar, Iraq, 6th century BCE. British Museum.jpg", credit: "Photograph by Osama Shukir Muhammed Amin", license: "CC BY-SA 4.0" },
+      sources: [
+      { t: "Wikipedia — Babylonian Map of the World", u: "https://en.wikipedia.org/wiki/Babylonian_Map_of_the_World" }
+    ] },
+    giza: { lat: 29.9792, lon: 31.1342,
+      about: "Eduard Spelterini photographed the plateau from a balloon in November 1904 — the earliest aerial view of the pyramids, a century before satellite plans. Khufu's pyramid is at the right; its base is 230 m a side, its faces once cased in polished Tura limestone, and it is aligned to true north within a twentieth of a degree.",
+      img: { file: "Spelterini Pyramids.jpg", credit: "Photograph by Eduard Spelterini, 21 November 1904", license: "Public domain" },
+      sources: [
+      { t: "Wikipedia — Great Pyramid of Giza", u: "https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza" }
+    ] }
   };
 
   /* ============================ DOM ============================ */
@@ -1890,7 +2160,12 @@
     seedParticles();
     avgSettle = 0;
     refreshMeter();
-    Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { c.setAttribute("aria-pressed", c.dataset.id === f.id ? "true" : "false"); });
+    Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) {
+      var on = c.dataset.id === f.id;
+      c.dataset.on = on ? "1" : "0";
+      c.querySelector(".chip-main").setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    $("#dosSrc").hidden = free;
     if (playing) startVoice();
     updatePlayLabel();
     if (reduceMotion) {
@@ -1910,9 +2185,11 @@
     drawFormation(mctx, gs, f, true); mctx.restore();
   }
   function makeChip(f, host) {
+    var wrap = document.createElement("div");
+    wrap.className = "chip" + (f.id === "free" ? " chip--free" : "");
+    wrap.dataset.id = f.id; wrap.dataset.on = "0"; wrap._f = f;
     var btn = document.createElement("button");
-    btn.className = "chip" + (f.id === "free" ? " chip--free" : "");
-    btn.type = "button"; btn.dataset.id = f.id; btn._f = f;
+    btn.className = "chip-main"; btn.type = "button";
     btn.setAttribute("role", "tab"); btn.setAttribute("aria-pressed", "false");
     var cv = document.createElement("canvas");
     var nm = document.createElement("span"); nm.className = "chip-name"; nm.textContent = f.name;
@@ -1921,8 +2198,17 @@
     yr.textContent = f.id === "free" ? "live · mic or tone" : (m ? (/(BC)/i.test(f.date) ? "c. " + m[1] + " BC" : m[1]) : "—");
     btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
     btn.addEventListener("click", function () { selectFormation(f); });
-    host.appendChild(btn);
-    drawChipGlyph(btn);
+    wrap.appendChild(btn);
+    if (f.id !== "free") {
+      var info = document.createElement("button");
+      info.className = "chip-info"; info.type = "button"; info.textContent = "i";
+      info.setAttribute("aria-label", "Original image, location and sources for " + f.name);
+      info.title = "Original image, location & sources";
+      info.addEventListener("click", function (e) { e.stopPropagation(); openInfo(f); });
+      wrap.appendChild(info);
+    }
+    host.appendChild(wrap);
+    drawChipGlyph(wrap);
   }
   function buildStrips() {
     FORMATIONS.filter(function (f) { return f.group === "crop"; }).forEach(function (f) { makeChip(f, stripCrop); });
@@ -1970,6 +2256,66 @@
       redrawAll();
     }, 160);
   });
+
+  /* ============================ SOURCE DIALOG ============================ */
+  var dlg = $("#infoDlg"), infoFig = $("#infoFig"), infoImg = $("#infoImg"), infoCv = $("#infoCanvas"), infoCap = $("#infoCap");
+  function commonsSrc(file) { return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(file.replace(/ /g, "_")) + "?width=720"; }
+  function commonsPage(file) { return "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(file.replace(/ /g, "_")); }
+  function drawInfoSchematic(f) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), S = 480;
+    infoCv.width = S * dpr; infoCv.height = S * dpr;
+    var c = infoCv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFormation(c, S, f, false);
+  }
+  function openInfo(f) {
+    var I = INFO[f.id]; if (!I) return;
+    $("#infoEyebrow").textContent = (f.group === "ancient" ? "Ancient figure" : "Crop formation") + " · original image, location & sources";
+    $("#infoName").textContent = f.name;
+    $("#infoBlurb").textContent = f.lede;
+    var about = $("#infoAbout"); about.textContent = I.about || ""; about.hidden = !I.about;
+    $("#infoLoc").textContent = f.place;
+    $("#infoDate").textContent = f.date;
+    $("#infoForm").textContent = f.form;
+    var ll = $("#infoLatLon");
+    ll.textContent = I.lat.toFixed(4) + ", " + I.lon.toFixed(4) + "  (approx. · open map ↗)";
+    ll.href = "https://www.openstreetmap.org/?mlat=" + I.lat + "&mlon=" + I.lon + "#map=15/" + I.lat + "/" + I.lon;
+    var ul = $("#infoLinks"); ul.innerHTML = "";
+    var srcs = I.sources.slice();
+    if (I.img) srcs.unshift({ t: "Wikimedia Commons — the image shown", u: commonsPage(I.img.file), s: I.img.license });
+    srcs.forEach(function (s) {
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.href = s.u; a.target = "_blank"; a.rel = "noopener"; a.textContent = s.t;
+      li.appendChild(a);
+      if (s.s) { var sm = document.createElement("small"); sm.textContent = s.s; li.appendChild(sm); }
+      ul.appendChild(li);
+    });
+    $("#infoLinksLbl").textContent = f.group === "ancient" ? "Read more" : "Original photographs & sources";
+    drawInfoSchematic(f);
+    infoImg.onerror = null; infoImg.removeAttribute("src");
+    if (I.img) {
+      var isDiagram = I.img.kind === "diagram";
+      infoFig.dataset.mode = "img";
+      infoImg.alt = (isDiagram ? "Diagram of " : "Photograph of ") + f.name;
+      infoCap.innerHTML = "";
+      var capText = document.createTextNode((isDiagram ? "Diagram · " : "") + I.img.credit + " · " + I.img.license + " · via ");
+      var capA = document.createElement("a"); capA.href = commonsPage(I.img.file); capA.target = "_blank"; capA.rel = "noopener"; capA.textContent = "Wikimedia Commons";
+      infoCap.appendChild(capText); infoCap.appendChild(capA);
+      infoImg.onerror = function () {
+        infoFig.dataset.mode = "draw";
+        infoCap.textContent = "The photograph can't load in this viewer — open it on Wikimedia Commons below. Shown instead: the schematic used on this page.";
+      };
+      infoImg.src = commonsSrc(I.img.file);
+    } else {
+      infoFig.dataset.mode = "draw";
+      infoCap.textContent = f.group === "ancient"
+        ? "Schematic used on this page."
+        : "Schematic used on this page. The original aerial photographs are the copyrighted work of the photographers who flew them — follow the links to see them.";
+    }
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+  }
+  $("#infoClose").addEventListener("click", function () { dlg.close(); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  $("#dosSrc").addEventListener("click", function () { if (current.f && !isFree()) openInfo(current.f); });
 
   /* ============================ BOOT ============================ */
   function boot() {
