@@ -76,6 +76,61 @@
     --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(20,26,16,.35);
   }
 
+  /* ---------- DMT: the visionary theme (Alex Grey's palette — violet-black ground, electric magenta, cyan, prismatic light) ---------- */
+  :root[data-vibe="dmt"] {
+    --bg: #07030f;
+    --panel: #10061f;
+    --panel-2: #170a2d;
+    --edge: #3b1e66;
+    --ink: #f5edff;
+    --muted: #b28ae6;
+    --accent: #ff4fd8;
+    --accent-soft: #c94ad1;
+    --sound: #4df3ff;
+    --plate-bg: #05020c;
+    --shadow: 0 0 0 1px rgba(255,79,216,.12), 0 24px 60px -22px rgba(120,60,255,.65);
+  }
+  :root[data-vibe="dmt"][data-theme="light"] {
+    --bg: #f1e9ff;
+    --panel: #faf6ff;
+    --panel-2: #f2eaff;
+    --edge: #d5c2f3;
+    --ink: #1b0a30;
+    --muted: #6d47a6;
+    --accent: #d417a8;
+    --accent-soft: #b02fa6;
+    --sound: #0a9fb5;
+    --plate-bg: #12061f;
+    --shadow: 0 0 0 1px rgba(212,23,168,.10), 0 18px 44px -20px rgba(120,60,255,.45);
+  }
+  :root[data-vibe="dmt"] body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 42%),
+      radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--sound) 12%, transparent), transparent 40%),
+      repeating-radial-gradient(circle at 50% 38%, transparent 0 46px, color-mix(in srgb, var(--accent) 7%, transparent) 46px 47px);
+    background-attachment: fixed;
+  }
+  :root[data-vibe="dmt"] .masthead h1 {
+    background: linear-gradient(90deg, #ff4fd8 0%, #b06bff 28%, #4df3ff 55%, #f6e35a 82%, #ff4fd8 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: prism 14s linear infinite;
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 35%, transparent));
+  }
+  :root[data-vibe="dmt"] .masthead h1 .amp { color: transparent; }
+  @keyframes prism { to { background-position: -220% 0; } }
+  :root[data-vibe="dmt"] .console, :root[data-vibe="dmt"] .transport, :root[data-vibe="dmt"] .meter, :root[data-vibe="dmt"] .laws-grid { box-shadow: var(--shadow), inset 0 0 0 1px color-mix(in srgb, var(--sound) 10%, transparent); }
+  :root[data-vibe="dmt"] .play { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent); }
+  :root[data-vibe="dmt"] .mic { box-shadow: 0 0 18px color-mix(in srgb, var(--sound) 40%, transparent); }
+  :root[data-vibe="dmt"] .chip[data-on="1"] { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
+  :root[data-vibe="dmt"] .readf { text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
+  :root[data-vibe="dmt"] .panel--plate canvas.stage { box-shadow: inset 0 0 40px color-mix(in srgb, var(--sound) 18%, transparent); }
+  :root[data-vibe="dmt"] .law--ra h3, :root[data-vibe="dmt"] .laws-head h2 .amp { text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent); }
+  :root[data-vibe="dmt"] .eyebrow { color: color-mix(in srgb, var(--sound) 70%, var(--muted)); }
+  .vibe-toggle[data-on="1"] { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+  @media (prefers-reduced-motion: reduce) { :root[data-vibe="dmt"] .masthead h1 { animation: none; } }
+
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
@@ -134,17 +189,43 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
+    gap: 14px;
   }
+  .side-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
   .credit {
     font-family: var(--font-mono);
     font-size: 10.5px;
     letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--muted);
-    margin: 0;
+    margin: 22px 0 0;
     white-space: nowrap;
   }
+  /* the sigil that jumps to the Law of One: a sun disc with eight rays, breathing slowly in brass */
+  .ra-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 13px 6px 9px;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    color: var(--accent);
+    text-decoration: none;
+    background: transparent;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .ra-jump svg { display: block; animation: breathe 5.5s ease-in-out infinite; }
+  .ra-jump-text { display: flex; flex-direction: column; line-height: 1.05; }
+  .ra-jump-text b { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .02em; color: var(--ink); }
+  .ra-jump-text small { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .ra-jump:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .ra-jump:hover svg { animation-duration: 1.6s; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0 transparent); opacity: .8; }
+    50% { transform: scale(1.12) rotate(22.5deg); filter: drop-shadow(0 0 5px var(--accent)); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ra-jump svg { animation: none; opacity: 1; } }
+  .laws { scroll-margin-top: 16px; }
   .theme-toggle {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -923,7 +1004,8 @@
   @media (max-width: 560px) {
     .wrap { padding-bottom: 40px; }
     .masthead { grid-template-columns: 1fr; gap: 14px; }
-    .masthead-side { justify-self: start; flex-direction: row; align-items: center; gap: 14px; }
+    .masthead-side { justify-self: start; align-items: flex-start; gap: 8px; }
+    .credit { margin-top: 4px; }
     .strip { grid-auto-columns: 118px; }
     .transport { padding: 12px 12px 14px; }
     .transport-row { gap: 12px 16px; }
@@ -946,6 +1028,15 @@
     .bar i { transition: none; }
   }
 </style>
+<script>
+  // theme before first paint: dark by default for everyone; light and the DMT vibe only when chosen
+  (function () {
+    var t = "dark", v = "";
+    try { t = localStorage.getItem("chladni-theme") === "light" ? "light" : "dark"; v = localStorage.getItem("chladni-vibe") === "dmt" ? "dmt" : ""; } catch (e) {}
+    document.documentElement.setAttribute("data-theme", t);
+    if (v) document.documentElement.setAttribute("data-vibe", v);
+  })();
+</script>
 </head>
 <body>
 
@@ -966,8 +1057,21 @@
       </p>
     </div>
     <div class="masthead-side">
+      <div class="side-row">
+        <a class="ra-jump" id="raJump" href="#laws" aria-label="Jump to the Law of One field guide">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 1.8v3.4M12 18.8v3.4M1.8 12h3.4M18.8 12h3.4M4.8 4.8l2.4 2.4M16.8 16.8l2.4 2.4M19.2 4.8l-2.4 2.4M7.2 16.8l-2.4 2.4" />
+            </g>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+          </svg>
+          <span class="ra-jump-text"><b>I am Ra.</b><small>the Law of One ↓</small></span>
+        </a>
+        <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
+        <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
+      </div>
       <p class="credit">Designed by Matt Finley</p>
-      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
     </div>
   </header>
 
@@ -1121,7 +1225,7 @@
     </div>
   </section>
 
-  <section class="laws" aria-labelledby="lawsTitle">
+  <section class="laws" id="laws" aria-labelledby="lawsTitle">
     <div class="laws-head">
       <div>
         <p class="eyebrow">Field guide&nbsp;·&nbsp;the Ra Material</p>
@@ -1367,7 +1471,7 @@
     /* ---------------- ancient figures ---------------- */
     {
       id: "flower", group: "ancient", name: "Flower of Life", place: "Osireion, Abydos, Egypt",
-      date: "Drawn in ochre on granite; dating disputed, often placed in the first millennium BC", form: "Nineteen overlapping circles",
+      date: "Drawn in ochre on granite; dating disputed, often placed in the first millennium BC", year: "date disputed", form: "Nineteen overlapping circles",
       diameter: 0.25, sym: 6, spiral: false, density: 0.9,
       rings: [0.2, 0.4, 0.6, 0.8, 1.0],
       draw: { kind: "flower" },
@@ -1400,7 +1504,7 @@
     },
     {
       id: "imago", group: "ancient", name: "Babylonian World Map", place: "Sippar, Babylonia — now in the British Museum",
-      date: "c. 6th century BC", form: "Disc, ocean ring, radiating regions",
+      date: "c. 6th century BC", year: "6th c. BC", form: "Disc, ocean ring, radiating regions",
       diameter: 0.12, sym: 8, spiral: false, density: 0.5,
       rings: [0.4, 0.7, 0.95],
       draw: { kind: "imago" },
@@ -1568,18 +1672,29 @@
 
   /* ============================ THEME ============================ */
   (function initTheme() {
-    var stored = null;
-    try { stored = localStorage.getItem("chladni-theme"); } catch (e) {}
-    if (stored === "light" || stored === "dark") document.documentElement.setAttribute("data-theme", stored);
-    $("#themeBtn").addEventListener("click", function () {
-      var cur = document.documentElement.getAttribute("data-theme");
-      if (!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      var next = cur === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", next);
+    var root = document.documentElement, themeBtn = $("#themeBtn"), vibeBtn = $("#vibeBtn");
+    if (!root.getAttribute("data-theme")) root.setAttribute("data-theme", "dark");   // the head script normally did this already
+    function paintButtons() {
+      var dark = root.getAttribute("data-theme") !== "light", dmt = root.getAttribute("data-vibe") === "dmt";
+      themeBtn.textContent = dark ? "◐ Light" : "◑ Dark";
+      themeBtn.setAttribute("aria-label", dark ? "Switch to the light theme" : "Switch to the dark theme");
+      vibeBtn.setAttribute("data-on", dmt ? "1" : "0"); vibeBtn.setAttribute("aria-pressed", dmt ? "true" : "false");
+      vibeBtn.textContent = dmt ? "✺ DMT on" : "✺ DMT";
+    }
+    function applyTheme() { paintButtons(); refreshColors(); redrawAll(); }
+    themeBtn.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
       try { localStorage.setItem("chladni-theme", next); } catch (e) {}
-      refreshColors();
-      redrawAll();
+      applyTheme();
     });
+    vibeBtn.addEventListener("click", function () {
+      var on = root.getAttribute("data-vibe") !== "dmt";
+      if (on) root.setAttribute("data-vibe", "dmt"); else root.removeAttribute("data-vibe");
+      try { localStorage.setItem("chladni-vibe", on ? "dmt" : ""); } catch (e) {}
+      applyTheme();
+    });
+    paintButtons();
   })();
 
   /* ============================ CANVAS SIZING ============================ */
@@ -2799,7 +2914,7 @@
     var nm = document.createElement("span"); nm.className = "chip-name"; nm.textContent = f.name;
     var yr = document.createElement("span"); yr.className = "chip-year";
     var m = f.date.match(/(\d{3,4})\s*BC/i) || f.date.match(/\b(\d{4})\b/);
-    yr.textContent = f.id === "free" ? "live · mic or tone" : (m ? (/(BC)/i.test(f.date) ? "c. " + m[1] + " BC" : m[1]) : "—");
+    yr.textContent = f.id === "free" ? "live · mic or tone" : f.year || (m ? (/(BC)/i.test(f.date) ? "c. " + m[1] + " BC" : m[1]) : "—");
     btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
     btn.addEventListener("click", function () { selectFormation(f, f.id === "free" || window.innerWidth < 900); });
     wrap.appendChild(btn);
@@ -2846,6 +2961,13 @@
     var strip = chip.parentElement, target = chip.offsetLeft - (strip.clientWidth - chip.offsetWidth) / 2;
     try { strip.scrollTo({ left: Math.max(0, target), behavior: reduceMotion ? "auto" : "smooth" }); } catch (e) { strip.scrollLeft = Math.max(0, target); }
   }
+  $("#raJump").addEventListener("click", function (e) {
+    e.preventDefault();
+    var laws = $("#laws");
+    laws.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    try { history.replaceState(null, "", "#laws"); } catch (err) {}
+    setTimeout(function () { var h = $("#lawsTitle"); h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }, reduceMotion ? 0 : 600);
+  });
   $("#goGiza").addEventListener("click", function () { selectFormation(FORMATIONS.filter(function (f) { return f.id === "giza"; })[0], true); });
   $("#prevBtn").addEventListener("click", function () { stepFigure(-1); });
   $("#nextBtn").addEventListener("click", function () { stepFigure(1); });
