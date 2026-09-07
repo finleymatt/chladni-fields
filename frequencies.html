@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d120e" />
+<title>Resonance Room · Chladni Fields</title>
+<meta name="description" content="Calming tones to leave on: 432 Hz, 528 Hz, the Solfeggio set, binaural theta, brown noise — with soft timbres, a fade-out timer, and an honest note on what the evidence says." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+<style>
+  :root {
+    --bg: #e3e4db; --panel: #eef0e7; --panel-2: #e8eae0; --edge: #c4c7b4; --ink: #21261d; --muted: #59634c;
+    --accent: #856611; --accent-soft: #9c7c28; --sound: #1f6472; --plate-bg: #0b0e0b;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(20,26,16,.35);
+    --font-display: 'Chakra Petch', 'Bahnschrift', 'DIN Alternate', system-ui, sans-serif;
+    --font-body: 'Spectral', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    --maxw: 1180px; --r: 3px;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d120e; --panel: #151b14; --panel-2: #1b2119; --edge: #2c3326; --ink: #e9e5d7; --muted: #8b9568;
+    --accent: #d3a851; --accent-soft: #b98f3f; --sound: #64bac8; --plate-bg: #090c09;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 24px 50px -24px rgba(0,0,0,.7);
+  }
+  :root[data-vibe="dmt"] {
+    --bg: #07030f; --panel: #10061f; --panel-2: #170a2d; --edge: #3b1e66; --ink: #f5edff; --muted: #b28ae6;
+    --accent: #ff4fd8; --accent-soft: #c94ad1; --sound: #4df3ff; --plate-bg: #05020c;
+    --shadow: 0 0 0 1px rgba(255,79,216,.12), 0 24px 60px -22px rgba(120,60,255,.65);
+  }
+  :root[data-vibe="dmt"][data-theme="light"] {
+    --bg: #f1e9ff; --panel: #faf6ff; --panel-2: #f2eaff; --edge: #d5c2f3; --ink: #1b0a30; --muted: #6d47a6;
+    --accent: #d417a8; --accent-soft: #b02fa6; --sound: #0a9fb5; --plate-bg: #12061f;
+    --shadow: 0 0 0 1px rgba(212,23,168,.10), 0 18px 44px -20px rgba(120,60,255,.45);
+  }
+  :root[data-vibe="dmt"] body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 42%),
+      radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--sound) 12%, transparent), transparent 40%),
+      repeating-radial-gradient(circle at 50% 38%, transparent 0 46px, color-mix(in srgb, var(--accent) 7%, transparent) 46px 47px);
+    background-attachment: fixed;
+  }
+  :root[data-vibe="dmt"] .eyebrow { color: color-mix(in srgb, var(--sound) 70%, var(--muted)); }
+  :root[data-vibe="dmt"] .tone[data-on="1"], :root[data-vibe="dmt"] .deck { box-shadow: var(--shadow), inset 0 0 0 1px color-mix(in srgb, var(--sound) 10%, transparent); }
+  :root[data-vibe="dmt"] .play-all { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent); }
+  .vibe-toggle[data-on="1"] { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; letter-spacing: .003em; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: clamp(14px, 3vw, 32px) clamp(14px, 3.2vw, 40px) 64px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+  /* ---------- site nav (shared design across pages) ---------- */
+  .site-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; padding: 0 0 14px; border-bottom: 1px solid var(--edge); margin-bottom: 26px; }
+  .brand { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -.005em; white-space: nowrap; }
+  .brand .amp { color: var(--accent); font-weight: 500; }
+  .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 8px 10px; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+  .side-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .theme-toggle { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--edge); border-radius: 999px; padding: 7px 12px; cursor: pointer; min-height: 36px; }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
+
+  /* ---------- head ---------- */
+  .head { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px 40px; align-items: end; }
+  h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.02; margin: .2em 0 0; text-wrap: balance; }
+  h1 .amp { color: var(--accent); font-weight: 500; }
+  .lede { max-width: 62ch; color: var(--muted); margin: 12px 0 0; }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .legend { display: grid; gap: 6px; font-size: .92rem; color: var(--muted); }
+  .badge { display: inline-block; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; padding: 3px 7px; border-radius: 2px; border: 1px solid var(--edge); color: var(--muted); vertical-align: middle; }
+  .badge[data-tier="studied"] { border-color: var(--sound); color: var(--sound); }
+  .badge[data-tier="pilot"] { border-color: var(--accent); color: var(--accent); }
+  .badge[data-tier="mixed"] { border-style: dashed; }
+
+  /* ---------- deck: master controls + breathing visual ---------- */
+  .deck { margin-top: 26px; display: grid; grid-template-columns: 300px 1fr; border: 1px solid var(--edge); background: var(--panel); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+  .breath { position: relative; background: var(--plate-bg); min-height: 300px; }
+  .breath canvas { display: block; width: 100%; height: 100%; }
+  .breath .now { position: absolute; left: 14px; bottom: 12px; right: 14px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; color: #cfe9ee; opacity: .85; }
+  .controls { padding: 18px 20px 20px; display: grid; gap: 16px; align-content: start; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: flex-end; }
+  .ctl { display: grid; gap: 6px; }
+  .ctl label, .ctl .lbl { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .ctl--slider { grid-template-columns: 1fr auto; grid-template-areas: "label val" "range range"; gap: 4px 10px; min-width: 200px; flex: 1 1 220px; max-width: 360px; }
+  .ctl--slider label { grid-area: label; }
+  .ctl--slider .val { grid-area: val; font-family: var(--font-mono); font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; }
+  .ctl--slider input { grid-area: range; }
+  select { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); background: var(--panel-2); border: 1px solid var(--edge); border-radius: var(--r); padding: 8px 10px; min-height: 40px; }
+  input[type="range"] { width: 100%; min-width: 0; height: 32px; margin: 0; -webkit-appearance: none; appearance: none; background: transparent; touch-action: pan-y; accent-color: var(--accent); }
+  input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--edge); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer; }
+  input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--edge); }
+  input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); cursor: pointer; }
+  .play-all { font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--plate-bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--r); padding: 11px 24px; min-height: 44px; cursor: pointer; }
+  .play-all[data-on="1"] { background: transparent; color: var(--accent); }
+  .toggle { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--edge); border-radius: 999px; padding: 8px 14px; min-height: 40px; cursor: pointer; }
+  .toggle[data-on="1"] { color: var(--sound); border-color: var(--sound); }
+  .status { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: var(--muted); margin: 0; }
+  .status[data-live="1"] { color: var(--sound); }
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+  .preset { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: var(--panel-2); border: 1px solid var(--edge); border-radius: 999px; padding: 8px 14px; min-height: 40px; cursor: pointer; }
+  .preset:hover { border-color: var(--accent); }
+  .preset small { display: block; font-size: 9.5px; letter-spacing: .08em; text-transform: none; color: var(--muted); }
+  .help { margin: 0; padding: 12px 14px; border: 1px solid var(--sound); border-radius: var(--r); background: color-mix(in srgb, var(--sound) 10%, var(--panel)); font-size: .95rem; line-height: 1.5; display: none; }
+  .help[data-show="1"] { display: block; }
+  .help b { font-family: var(--font-display); color: var(--sound); }
+
+  /* ---------- tone cards ---------- */
+  .group { margin-top: 32px; }
+  .group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .group-head h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; letter-spacing: .02em; margin: 0; }
+  .group-head p { margin: 0; color: var(--muted); font-size: .95rem; max-width: 70ch; }
+  .tones { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .tone { position: relative; background: var(--panel); border: 1px solid var(--edge); border-radius: var(--r); padding: 14px 14px 12px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; transition: border-color .15s ease; }
+  .tone[data-on="1"] { border-color: var(--sound); background: var(--panel-2); }
+  .tone .hz { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .tone .hz small { font-family: var(--font-mono); font-weight: 500; font-size: .6rem; letter-spacing: .18em; color: var(--muted); margin-left: 4px; }
+  .tone h3 { font-family: var(--font-display); font-weight: 600; font-size: 1rem; margin: 0; line-height: 1.15; }
+  .tone p { margin: 0; font-size: .9rem; color: var(--muted); }
+  .tone p b { color: var(--ink); font-weight: 600; }
+  .tone .foot { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin-top: 4px; }
+  .tone .go { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--sound); background: transparent; border: 1px solid var(--sound); border-radius: var(--r); padding: 9px 14px; min-height: 40px; cursor: pointer; }
+  .tone[data-on="1"] .go { background: var(--sound); color: var(--plate-bg); }
+  .tone .lvl { display: grid; grid-template-columns: 1fr 4ch; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .tone .lvl input { accent-color: var(--sound); }
+  .tone .lvl input::-webkit-slider-thumb { background: var(--sound); width: 22px; height: 22px; margin-top: -8px; }
+  .tone .lvl input::-moz-range-thumb { background: var(--sound); }
+  .tone .badge { position: absolute; top: 12px; right: 12px; }
+
+  .notes { margin-top: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 5vw, 60px); }
+  .notes h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0 0 6px; }
+  .notes ol, .notes ul { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 10px; color: var(--muted); font-size: .96rem; }
+  .notes li b { color: var(--ink); font-weight: 600; }
+  .notes .src { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; line-height: 1.7; }
+  .bottom { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--edge); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+  @media (max-width: 900px) { .head { grid-template-columns: 1fr; } .deck { grid-template-columns: 1fr; } .breath { min-height: 220px; } .notes { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .nav-links { width: 100%; overflow-x: auto; flex-wrap: nowrap; } .nav-links a { padding: 8px 8px; } .ctl--slider { max-width: none; flex-basis: 100%; } .tones { grid-template-columns: 1fr; } .site-nav { gap: 10px; } }
+  @media (prefers-reduced-motion: reduce) { .breath canvas { opacity: .9; } }
+</style>
+<script>
+  (function () {
+    var t = "dark", v = "";
+    try { t = localStorage.getItem("chladni-theme") === "light" ? "light" : "dark"; v = localStorage.getItem("chladni-vibe") === "dmt" ? "dmt" : ""; } catch (e) {}
+    document.documentElement.setAttribute("data-theme", t);
+    if (v) document.documentElement.setAttribute("data-vibe", v);
+  })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <nav class="site-nav" aria-label="Site">
+    <a class="brand" href="index.html">Chladni <span class="amp">Fields</span></a>
+    <div class="nav-links">
+      <a href="index.html">Plates</a>
+      <a href="frequencies.html" aria-current="page">Resonance Room</a>
+      <a href="law-of-one.html">The Law of One</a>
+    </div>
+    <div class="side-row">
+      <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
+    </div>
+  </nav>
+
+  <header class="head">
+    <div>
+      <p class="eyebrow">Tones to leave on</p>
+      <h1>The Resonance <span class="amp">Room</span></h1>
+      <p class="lede">
+        Soft, steady tones to sit inside for a while — the frequencies people reach for to settle, sleep or focus.
+        Every tone fades in gently, plays with a warm timbre rather than a raw sine, and can breathe, layer with
+        others, or split into a <b>binaural</b> beat on headphones. A timer fades everything out. The evidence
+        for each is labelled honestly: some of this has small studies behind it, most of it is tradition.
+      </p>
+    </div>
+    <div class="legend">
+      <div><span class="badge" data-tier="studied">studied</span>&nbsp; several controlled studies or a meta-analysis point the same way</div>
+      <div><span class="badge" data-tier="pilot">pilot</span>&nbsp; one or two small studies — promising, not settled</div>
+      <div><span class="badge" data-tier="mixed">mixed</span>&nbsp; evidence goes both ways</div>
+      <div><span class="badge" data-tier="tradition">tradition</span>&nbsp; a practice, not a finding — pleasant, harmless at low volume</div>
+    </div>
+  </header>
+
+  <section class="deck" aria-label="Player">
+    <div class="breath">
+      <canvas id="breathCanvas" width="300" height="300"></canvas>
+      <div class="now" id="nowLine">nothing playing · choose a tone below, or a preset</div>
+    </div>
+    <div class="controls">
+      <div class="row">
+        <div class="ctl">
+          <span class="lbl">Transport</span>
+          <button class="play-all" id="stopAll" type="button" data-on="0">Fade everything out</button>
+        </div>
+        <div class="ctl ctl--slider">
+          <label for="master">Room level</label>
+          <span class="val" id="masterVal">35</span>
+          <input type="range" id="master" min="0" max="100" value="35" />
+        </div>
+        <div class="ctl">
+          <label for="timbre">Timbre</label>
+          <select id="timbre">
+            <option value="warm">Warm pad</option>
+            <option value="pure">Pure sine</option>
+            <option value="bowl">Singing bowl</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <label for="timer">Fade out after</label>
+          <select id="timer">
+            <option value="0">Never</option>
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="60">60 min</option>
+            <option value="90">90 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ctl">
+          <span class="lbl">Binaural beat · headphones</span>
+          <div class="row" style="gap:8px">
+            <button class="toggle" id="binBtn" type="button" data-on="0" aria-pressed="false">Off</button>
+            <select id="beat" aria-label="Beat rate">
+              <option value="2">Delta 2 Hz · sleep</option>
+              <option value="6" selected>Theta 6 Hz · calm</option>
+              <option value="7.83">Schumann 7.83 Hz</option>
+              <option value="10">Alpha 10 Hz · relaxed focus</option>
+              <option value="40">Gamma 40 Hz · alert</option>
+            </select>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Breathing swell</span>
+          <button class="toggle" id="breathBtn" type="button" data-on="1" aria-pressed="true">On · 6 breaths / min</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lbl">Presets</span>
+        <div class="presets">
+          <button class="preset" type="button" data-preset="winddown">Wind down<small>432 warm pad · theta beat · low</small></button>
+          <button class="preset" type="button" data-preset="sleep">Deep sleep<small>136.1 Om · delta beat · brown noise</small></button>
+          <button class="preset" type="button" data-preset="reset">Reset<small>528 pad · 174 hum</small></button>
+          <button class="preset" type="button" data-preset="focus">Focus<small>200 carrier · gamma 40 beat</small></button>
+        </div>
+      </div>
+      <p class="status" id="status" data-live="0">ready · sound starts on your first tap</p>
+      <div class="help" id="help" data-show="0"></div>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="g1">
+    <div class="group-head">
+      <h2 id="g1">Tuning and tone</h2>
+      <p>The two frequencies with the best small-study support, plus the low hums that are easiest on the ear for long stretches.</p>
+    </div>
+    <div class="tones" id="tonesA"></div>
+  </section>
+
+  <section class="group" aria-labelledby="g2">
+    <div class="group-head">
+      <h2 id="g2">The Solfeggio set</h2>
+      <p>Nine tones assigned meanings in the 1970s from a numerological reading of a mediaeval hymn. No controlled evidence apart from 528 Hz — but they sit well together, and the lower ones make good drones.</p>
+    </div>
+    <div class="tones" id="tonesB"></div>
+  </section>
+
+  <section class="group" aria-labelledby="g3">
+    <div class="group-head">
+      <h2 id="g3">Noise</h2>
+      <p>Not a frequency but a bed. Brown noise is the deepest and the kindest for long listening; pink noise is the classic sleep sound, with a recent caveat.</p>
+    </div>
+    <div class="tones" id="tonesC"></div>
+  </section>
+
+  <section class="notes">
+    <div>
+      <h2>Leaving it on for hours — the part that actually matters</h2>
+      <ol>
+        <li><b>Volume is the whole game.</b> The WHO's safe-listening ceiling is 80 dB for 40 hours a week; a tone you leave on belongs far below that — if someone talking normally beside you is easy to hear over it, you're fine. This page opens at a low room level on purpose.</li>
+        <li><b>Low tones wear better than high ones.</b> The ear is most sensitive around 2–5 kHz, and a pure high pitch fatigues faster than a hum. For long sessions stay roughly between 100 and 530 Hz; 852 and 963 Hz are for short sits, softly.</li>
+        <li><b>Take the ear off duty.</b> Ten minutes of quiet every hour. The fade-out timer is the easy way to make that happen.</li>
+        <li><b>Binaural means headphones.</b> The beat only exists inside your head, made from the two ears' slightly different tones. Through speakers it's just a faint wobble. Theta and delta beats have the best evidence for easing anxiety.</li>
+        <li><b>Overnight noise is a mixed bag.</b> A 2025 study found pink noise all night cut REM sleep; earplugs protected deep sleep better. Use noise to fall asleep, on the timer, rather than till morning.</li>
+        <li><b>Not treatment.</b> Nothing here diagnoses or treats anything. Skip the 40 Hz beat if you have epilepsy, and don't use any of this while driving.</li>
+      </ol>
+    </div>
+    <div>
+      <h2>Where the labels come from</h2>
+      <ul class="src">
+        <li><a href="https://link.springer.com/article/10.1007/s00426-018-1066-8" target="_blank" rel="noopener">Garcia-Argibay et al., 2019</a> — meta-analysis of 22 binaural-beat studies; theta/delta beats reduced anxiety with a medium-to-large effect.</li>
+        <li><a href="https://pubmed.ncbi.nlm.nih.gov/31031095/" target="_blank" rel="noopener">Calamassi &amp; Pomponi, 2019</a> — 33 people, double-blind crossover; the same music at 432 Hz lowered heart rate more than at 440 Hz. A <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11755923/" target="_blank" rel="noopener">2025 cancer-patient trial</a> saw similar cardiovascular shifts.</li>
+        <li><a href="https://www.scirp.org/html/2-8204397_87146.htm" target="_blank" rel="noopener">Akimoto et al., 2018</a> — nine people; 528 Hz music lowered salivary cortisol and raised oxytocin where 440 Hz did not. Tiny sample.</li>
+        <li><a href="https://picower.mit.edu/news/review-evidence-expanding-40hz-gamma-stimulation-promotes-brain-health" target="_blank" rel="noopener">MIT Picower Institute</a> — 40 Hz light-and-sound stimulation in Alzheimer's research; cognition, not calm.</li>
+        <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10722168/" target="_blank" rel="noopener">Overnight pink noise and REM</a>; <a href="https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening" target="_blank" rel="noopener">WHO safe listening</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="bottom">
+    <span>Web Audio · generated live, nothing streamed or recorded</span>
+    <span>Designed by Matt Finley</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+
+  /* ---------- theme ---------- */
+  (function () {
+    var root = document.documentElement, themeBtn = $("#themeBtn"), vibeBtn = $("#vibeBtn");
+    function paint() {
+      var dark = root.getAttribute("data-theme") !== "light", dmt = root.getAttribute("data-vibe") === "dmt";
+      themeBtn.textContent = dark ? "◐ Light" : "◑ Dark";
+      vibeBtn.setAttribute("data-on", dmt ? "1" : "0"); vibeBtn.setAttribute("aria-pressed", dmt ? "true" : "false");
+      vibeBtn.textContent = dmt ? "✺ DMT on" : "✺ DMT";
+      refreshColors();
+    }
+    themeBtn.addEventListener("click", function () { var next = root.getAttribute("data-theme") === "light" ? "dark" : "light"; root.setAttribute("data-theme", next); try { localStorage.setItem("chladni-theme", next); } catch (e) {} paint(); });
+    vibeBtn.addEventListener("click", function () { var on = root.getAttribute("data-vibe") !== "dmt"; if (on) root.setAttribute("data-vibe", "dmt"); else root.removeAttribute("data-vibe"); try { localStorage.setItem("chladni-vibe", on ? "dmt" : ""); } catch (e) {} paint(); });
+    window.__paintTheme = paint;
+  })();
+  var COL = {};
+  function refreshColors() {
+    var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+    function rgb(h) { h = h.replace("#", ""); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+    COL.accent = rgb(css("--accent")); COL.sound = rgb(css("--sound")); COL.bg = css("--plate-bg");
+  }
+  refreshColors();
+
+  /* ---------- the tones ---------- */
+  var TONES = [
+    { id: "t432", hz: 432, group: "A", name: "432 Hz · Verdi's A", tier: "pilot", text: "Concert A tuned a touch lower than the modern 440. In a 33-person double-blind pilot the same music at 432 Hz <b>lowered heart rate</b> more than at 440. The best all-day drone here." },
+    { id: "t528", hz: 528, group: "A", name: "528 Hz · the “love” tone", tier: "pilot", text: "The one Solfeggio tone with a study: nine listeners showed <b>lower cortisol and higher oxytocin</b> after 528 Hz music, not after 440. Bright but soft as a pad." },
+    { id: "t174", hz: 174, group: "A", name: "174 Hz · low hum", tier: "tradition", text: "The lowest Solfeggio tone, said to ease pain. What's certain: a hum this low sits under speech and <b>never tires the ear</b>, which makes it the easiest to leave on." },
+    { id: "t136", hz: 136.1, group: "A", name: "136.1 Hz · Om", tier: "tradition", text: "The “earth year” tone from Hans Cousto's planetary octaves, used to tune Indian tambura and many singing bowls. A grounded, chesty drone; the Deep sleep preset's carrier." },
+    { id: "t285", hz: 285, group: "B", name: "285 Hz", tier: "tradition", text: "Assigned to <b>tissue and safety</b> in the Solfeggio tradition. Warm and unobtrusive; pairs with 174." },
+    { id: "t396", hz: 396, group: "B", name: "396 Hz", tier: "tradition", text: "“Liberating from fear.” A full, centred tone close to G; comfortable for long sits." },
+    { id: "t417", hz: 417, group: "B", name: "417 Hz", tier: "tradition", text: "“Undoing situations.” Near G♯; blends into 432 as a gentle beating pair." },
+    { id: "t639", hz: 639, group: "B", name: "639 Hz", tier: "tradition", text: "“Connection.” Near E♭ an octave up; keep it low in the mix over a 174 or 136 drone." },
+    { id: "t741", hz: 741, group: "B", name: "741 Hz", tier: "tradition", text: "“Expression.” Getting bright — use the Warm pad timbre and short sessions." },
+    { id: "t852", hz: 852, group: "B", name: "852 Hz", tier: "tradition", text: "“Intuition.” High and glassy; a short-sit tone, softly." },
+    { id: "t963", hz: 963, group: "B", name: "963 Hz", tier: "tradition", text: "“Crown.” The highest of the set. Lovely for a minute over a low drone; not one to leave on." },
+    { id: "brown", hz: 0, kind: "brown", group: "C", name: "Brown noise", tier: "mixed", text: "Deep, rumbling, like surf from a distance. Masks a room well and is the gentlest bed for hours; sleep evidence is thin either way." },
+    { id: "pink", hz: 0, kind: "pink", group: "C", name: "Pink noise", tier: "mixed", text: "Rain-and-river noise, the classic sleep sound. Small older studies liked it; a 2025 study found it cut REM when left on all night. Use the timer." }
+  ];
+
+  var actx = null, master = null, comp = null, playing = {}, timerHandle = null, timerEnds = 0;
+  var unlockEl = null;
+  function unlockAudio() {
+    try {
+      if (!unlockEl) {
+        var rate = 8000, n = 4000, bytes = new Uint8Array(44 + n), dv = new DataView(bytes.buffer);
+        function str(o, s) { for (var i = 0; i < s.length; i++) bytes[o + i] = s.charCodeAt(i); }
+        str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt "); dv.setUint32(16, 16, true);
+        dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate, true);
+        dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); str(36, "data"); dv.setUint32(40, n, true);
+        for (var k = 0; k < n; k++) bytes[44 + k] = 128;
+        unlockEl = document.createElement("audio"); unlockEl.setAttribute("playsinline", ""); unlockEl.loop = true; unlockEl.volume = 0.01;
+        unlockEl.src = "data:audio/wav;base64," + btoa(String.fromCharCode.apply(null, bytes));
+      }
+      var p = unlockEl.play(); if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+    if (actx && actx.state !== "running") { var r = actx.resume(); if (r && r.catch) r.catch(function () {}); }
+  }
+  function ensureCtx() {
+    if (actx) return;
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    comp = actx.createDynamicsCompressor(); comp.threshold.value = -18; comp.knee.value = 12; comp.ratio.value = 3; comp.attack.value = 0.05; comp.release.value = 0.4;
+    master = actx.createGain(); master.gain.value = masterTarget();
+    master.connect(comp); comp.connect(actx.destination);
+  }
+  function masterTarget() { return Math.pow(parseFloat($("#master").value) / 100, 1.8) * 0.9; }
+  function toneLevel(t) { var el = document.getElementById("lvl-" + t.id); return Math.pow(parseFloat(el.value) / 100, 2) * (t.kind ? 0.25 : 0.32); }
+
+  var noiseBuf = {};
+  function noiseBuffer(kind) {
+    if (noiseBuf[kind]) return noiseBuf[kind];
+    var len = actx.sampleRate * 4, buf = actx.createBuffer(2, len, actx.sampleRate);
+    for (var ch = 0; ch < 2; ch++) {
+      var d = buf.getChannelData(ch), last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (var i = 0; i < len; i++) {
+        var w = Math.random() * 2 - 1;
+        if (kind === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+        else { // pink: Paul Kellet's filter
+          b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980;
+          d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
+        }
+      }
+    }
+    noiseBuf[kind] = buf; return buf;
+  }
+
+  function startTone(t) {
+    ensureCtx(); unlockAudio();
+    if (playing[t.id]) return;
+    var now = actx.currentTime, g = actx.createGain(); g.gain.setValueAtTime(0.0001, now);
+    var v = { t: t, gain: g, nodes: [], lfo: null };
+    if (t.kind) {
+      var src = actx.createBufferSource(); src.buffer = noiseBuffer(t.kind); src.loop = true; src.connect(g); src.start(); v.nodes.push(src);
+    } else {
+      var timbre = $("#timbre").value, bin = $("#binBtn").getAttribute("data-on") === "1", beat = parseFloat($("#beat").value);
+      var partials = timbre === "pure" ? [[1, 1]] : timbre === "bowl" ? [[1, 1], [1.003, 0.55], [2.71, 0.08], [2, 0.12]] : [[1, 1], [2, 0.18], [3, 0.07], [0.5, 0.12]];
+      var ears = bin ? [[-1, -beat / 2], [1, beat / 2]] : [[0, 0]];
+      ears.forEach(function (ear) {
+        var pan = actx.createStereoPanner ? actx.createStereoPanner() : null; if (pan) pan.pan.value = ear[0];
+        partials.forEach(function (p) {
+          var o = actx.createOscillator(); o.type = "sine"; o.frequency.value = (t.hz + ear[1]) * p[0];
+          var pg = actx.createGain(); pg.gain.value = p[1] * (bin ? 0.7 : 1) / partials.length * 1.4;
+          o.connect(pg); if (pan) { pg.connect(pan); } else { pg.connect(g); } o.start(); v.nodes.push(o);
+        });
+        if (pan) pan.connect(g);
+      });
+    }
+    g.connect(master);
+    var target = toneLevel(t);
+    g.gain.linearRampToValueAtTime(target, now + 3.0);
+    if ($("#breathBtn").getAttribute("data-on") === "1" && !t.kind) {
+      var lfo = actx.createOscillator(), lg = actx.createGain(); lfo.frequency.value = 0.1; lg.gain.value = target * 0.28;
+      lfo.connect(lg); lg.connect(g.gain); lfo.start(); v.lfo = lfo;
+    }
+    playing[t.id] = v;
+    document.getElementById("card-" + t.id).setAttribute("data-on", "1");
+    document.getElementById("go-" + t.id).textContent = "Stop";
+    armTimer(); paintStatus(); healthCheck();
+  }
+  function stopTone(id, fadeSec) {
+    var v = playing[id]; if (!v) return;
+    var now = actx.currentTime, f = fadeSec == null ? 2.5 : fadeSec;
+    try { v.gain.gain.cancelScheduledValues(now); v.gain.gain.setValueAtTime(Math.max(0.0001, v.gain.gain.value), now); v.gain.gain.exponentialRampToValueAtTime(0.0001, now + f); } catch (e) {}
+    setTimeout(function () { v.nodes.forEach(function (n) { try { n.stop(); n.disconnect(); } catch (e) {} }); if (v.lfo) try { v.lfo.stop(); } catch (e) {} try { v.gain.disconnect(); } catch (e) {} }, f * 1000 + 100);
+    delete playing[id];
+    document.getElementById("card-" + id).setAttribute("data-on", "0");
+    document.getElementById("go-" + id).textContent = "Play";
+    paintStatus();
+  }
+  function stopAll(fadeSec) { Object.keys(playing).forEach(function (id) { stopTone(id, fadeSec); }); if (timerHandle) { clearTimeout(timerHandle); timerHandle = null; } paintStatus(); }
+  function restartPlaying() { var ids = Object.keys(playing); ids.forEach(function (id) { stopTone(id, 1.2); }); setTimeout(function () { ids.forEach(function (id) { var t = TONES.filter(function (x) { return x.id === id; })[0]; if (t) startTone(t); }); }, 300); }
+  function armTimer() {
+    var mins = parseFloat($("#timer").value);
+    if (timerHandle) { clearTimeout(timerHandle); timerHandle = null; }
+    if (!mins) { timerEnds = 0; return; }
+    timerEnds = Date.now() + mins * 60000;
+    timerHandle = setTimeout(function () { stopAll(12); setStatus("faded out — the timer ended. Give your ears ten minutes.", false); }, mins * 60000);
+  }
+  function setStatus(text, live) { var s = $("#status"); s.textContent = text; s.setAttribute("data-live", live ? "1" : "0"); }
+  function paintStatus() {
+    var ids = Object.keys(playing);
+    if (!ids.length) { setStatus("ready · sound starts on your first tap", false); $("#stopAll").setAttribute("data-on", "0"); $("#nowLine").textContent = "nothing playing · choose a tone below, or a preset"; return; }
+    var names = ids.map(function (id) { var t = playing[id].t; return t.kind ? t.name.toLowerCase() : t.hz + " Hz"; });
+    var bin = $("#binBtn").getAttribute("data-on") === "1";
+    var extra = (bin ? " · binaural " + $("#beat").value + " Hz" : "") + (timerEnds ? " · fades in " + Math.max(1, Math.round((timerEnds - Date.now()) / 60000)) + " min" : "");
+    setStatus("playing " + names.join(" + ") + extra, true);
+    $("#stopAll").setAttribute("data-on", "1");
+    $("#nowLine").textContent = names.join("  ·  ") + extra;
+  }
+  function healthCheck() {
+    setTimeout(function () {
+      if (!actx || !Object.keys(playing).length) return;
+      var h = $("#help");
+      if (actx.state !== "running") { var r = actx.resume(); if (r && r.catch) r.catch(function () {}); h.innerHTML = "<b>Sound hasn't started</b> (audio state: " + actx.state + "). Tap the tone again. On iPhone also check the <b>ring/silent switch</b> on the left edge and the volume."; h.setAttribute("data-show", "1"); }
+      else if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !h.getAttribute("data-shown")) { h.setAttribute("data-shown", "1"); h.innerHTML = "<b>iPhone:</b> if you hear nothing, flip the <b>ring/silent switch</b> on the left edge to ring and check the volume — iOS mutes web audio on silent."; h.setAttribute("data-show", "1"); }
+    }, 1200);
+  }
+
+  /* ---------- cards ---------- */
+  function card(t) {
+    var el = document.createElement("article"); el.className = "tone"; el.id = "card-" + t.id; el.setAttribute("data-on", "0");
+    el.innerHTML =
+      '<span class="badge" data-tier="' + t.tier + '">' + t.tier + '</span>' +
+      '<div class="hz">' + (t.kind ? '<span style="font-size:1.1rem">' + (t.kind === "brown" ? "brown" : "pink") + '</span>' : t.hz) + (t.kind ? "" : "<small>Hz</small>") + '</div>' +
+      '<h3>' + t.name + '</h3>' +
+      '<p>' + t.text + '</p>' +
+      '<div class="foot"><button class="go" id="go-' + t.id + '" type="button">Play</button>' +
+      '<label class="lvl"><input type="range" id="lvl-' + t.id + '" min="0" max="100" value="' + (t.kind ? 45 : 60) + '" aria-label="Level for ' + t.name + '" /><span id="lv-' + t.id + '">' + (t.kind ? 45 : 60) + '</span></label></div>';
+    document.getElementById("tones" + t.group).appendChild(el);
+    el.querySelector(".go").addEventListener("click", function () { if (playing[t.id]) stopTone(t.id); else startTone(t); });
+    el.querySelector("input").addEventListener("input", function (e) {
+      document.getElementById("lv-" + t.id).textContent = e.target.value;
+      var v = playing[t.id]; if (v && actx) { var target = toneLevel(t); v.gain.gain.setTargetAtTime(target, actx.currentTime, 0.1); }
+    });
+  }
+  TONES.forEach(card);
+
+  /* ---------- controls ---------- */
+  $("#master").addEventListener("input", function () { $("#masterVal").textContent = $("#master").value; if (master) master.gain.setTargetAtTime(masterTarget(), actx.currentTime, 0.05); });
+  $("#timbre").addEventListener("change", function () { if (Object.keys(playing).length) restartPlaying(); });
+  $("#timer").addEventListener("change", function () { if (Object.keys(playing).length) armTimer(); paintStatus(); });
+  $("#binBtn").addEventListener("click", function () { var on = this.getAttribute("data-on") !== "1"; this.setAttribute("data-on", on ? "1" : "0"); this.setAttribute("aria-pressed", on ? "true" : "false"); this.textContent = on ? "On" : "Off"; if (Object.keys(playing).length) restartPlaying(); });
+  $("#beat").addEventListener("change", function () { if ($("#binBtn").getAttribute("data-on") === "1" && Object.keys(playing).length) restartPlaying(); });
+  $("#breathBtn").addEventListener("click", function () { var on = this.getAttribute("data-on") !== "1"; this.setAttribute("data-on", on ? "1" : "0"); this.setAttribute("aria-pressed", on ? "true" : "false"); this.textContent = on ? "On · 6 breaths / min" : "Off"; if (Object.keys(playing).length) restartPlaying(); });
+  $("#stopAll").addEventListener("click", function () { stopAll(2.5); });
+  var PRESETS = {
+    winddown: { tones: ["t432"], bin: true, beat: "6", timbre: "warm", master: 30 },
+    sleep: { tones: ["t136", "brown"], bin: true, beat: "2", timbre: "warm", master: 28 },
+    reset: { tones: ["t528", "t174"], bin: false, beat: "6", timbre: "warm", master: 35 },
+    focus: { tones: ["t285"], bin: true, beat: "40", timbre: "pure", master: 32 }
+  };
+  Array.prototype.forEach.call(document.querySelectorAll(".preset"), function (b) {
+    b.addEventListener("click", function () {
+      var p = PRESETS[b.getAttribute("data-preset")];
+      ensureCtx(); unlockAudio();
+      stopAll(1.0);
+      $("#timbre").value = p.timbre; $("#beat").value = p.beat; $("#master").value = p.master; $("#masterVal").textContent = p.master;
+      var bb = $("#binBtn"); bb.setAttribute("data-on", p.bin ? "1" : "0"); bb.setAttribute("aria-pressed", p.bin ? "true" : "false"); bb.textContent = p.bin ? "On" : "Off";
+      if (master) master.gain.setTargetAtTime(masterTarget(), actx.currentTime, 0.05);
+      setTimeout(function () { p.tones.forEach(function (id) { startTone(TONES.filter(function (t) { return t.id === id; })[0]); }); }, 350);
+    });
+  });
+  setInterval(paintStatus, 30000);
+
+  /* ---------- breathing visual ---------- */
+  var cv = $("#breathCanvas"), cx = cv.getContext("2d"), t0 = performance.now();
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function fit() { var dpr = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect(); cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr); cx.setTransform(dpr, 0, 0, dpr, 0, 0); return r; }
+  var box = fit();
+  window.addEventListener("resize", function () { box = fit(); });
+  function draw(now) {
+    var w = box.width, h = box.height, c = [w / 2, h / 2], R = Math.min(w, h) * 0.42;
+    cx.fillStyle = COL.bg; cx.fillRect(0, 0, w, h);
+    var breathOn = $("#breathBtn").getAttribute("data-on") === "1";
+    var phase = reduce ? 0.5 : (0.5 + 0.5 * Math.sin((now - t0) / 10000 * Math.PI * 2 - Math.PI / 2)); // 10 s cycle = 6 breaths a minute
+    var ids = Object.keys(playing), s = COL.sound, a = COL.accent;
+    // quiet guide rings
+    cx.strokeStyle = "rgba(" + s.join(",") + ",0.12)"; cx.lineWidth = 1;
+    for (var i = 1; i <= 4; i++) { cx.beginPath(); cx.arc(c[0], c[1], R * i / 4, 0, Math.PI * 2); cx.stroke(); }
+    // one ring per playing tone, radius from pitch, swelling with the breath
+    ids.forEach(function (id, k) {
+      var t = playing[id].t, base = t.kind ? 0.95 : Math.min(0.95, Math.max(0.2, (Math.log(t.hz) - Math.log(100)) / (Math.log(1000) - Math.log(100)) * 0.75 + 0.2));
+      var r = R * base * (breathOn ? 0.9 + 0.12 * phase : 1);
+      var glow = t.kind ? a : s;
+      cx.strokeStyle = "rgba(" + glow.join(",") + "," + (0.55 + 0.4 * phase) + ")"; cx.lineWidth = t.kind ? 8 : 2.2;
+      cx.shadowColor = "rgba(" + glow.join(",") + ",0.7)"; cx.shadowBlur = 10 + 14 * phase;
+      cx.beginPath(); cx.arc(c[0], c[1], r, 0, Math.PI * 2); cx.stroke();
+      cx.shadowBlur = 0;
+    });
+    // centre: the breath itself
+    var cr = R * 0.08 * (breathOn ? 0.7 + 0.6 * phase : 1);
+    cx.fillStyle = "rgba(" + a.join(",") + "," + (ids.length ? 0.9 : 0.35) + ")";
+    cx.beginPath(); cx.arc(c[0], c[1], cr, 0, Math.PI * 2); cx.fill();
+    if (ids.length && breathOn) {
+      cx.fillStyle = "rgba(233,229,215,.7)"; cx.font = "10px " + getComputedStyle(document.body).getPropertyValue("--font-mono");
+      cx.textAlign = "center"; cx.fillText(phase > 0.5 ? "breathe in" : "breathe out", c[0], c[1] + R + 16);
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

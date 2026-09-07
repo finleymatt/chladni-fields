@@ -156,6 +156,16 @@
     margin: 0;
   }
 
+  /* ---------- site nav (shared design across pages) ---------- */
+  .site-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; padding: 0 0 14px; border-bottom: 1px solid var(--edge); margin-bottom: 22px; }
+  .brand { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -.005em; white-space: nowrap; }
+  .brand .amp { color: var(--accent); font-weight: 500; }
+  .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 8px 10px; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+  @media (max-width: 560px) { .nav-links { width: 100%; overflow-x: auto; flex-wrap: nowrap; } .nav-links a { padding: 8px 8px; } .site-nav { gap: 10px; } }
+
   /* ---------- masthead ---------- */
   .masthead {
     display: grid;
@@ -1043,6 +1053,19 @@
 <div class="wrap">
   <h2 class="sr-only">Chladni Fields: famous crop formations and ancient sacred figures, each converted into a fundamental frequency and a set of partials, shown next to the Chladni nodal pattern that frequency would raise on a vibrating plate. A free plate mode lets you set a tone or sing into a microphone and watch the pattern form.</h2>
 
+  <nav class="site-nav" aria-label="Site">
+    <a class="brand" href="index.html">Chladni <span class="amp">Fields</span></a>
+    <div class="nav-links">
+      <a href="index.html" aria-current="page">Plates</a>
+      <a href="frequencies.html">Resonance Room</a>
+      <a href="law-of-one.html">The Law of One</a>
+    </div>
+    <div class="side-row">
+      <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
+    </div>
+  </nav>
+
   <header class="masthead">
     <div>
       <p class="eyebrow">Cymatics&nbsp;·&nbsp;field register</p>
@@ -1068,8 +1091,14 @@
           </svg>
           <span class="ra-jump-text"><b>I am Ra.</b><small>the Law of One →</small></span>
         </a>
-        <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
-        <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
+        <a class="ra-jump" href="frequencies.html" aria-label="Open the Resonance Room">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <circle cx="12" cy="12" r="3" /><circle cx="12" cy="12" r="6.5" opacity=".7" /><circle cx="12" cy="12" r="10" opacity=".4" />
+            </g>
+          </svg>
+          <span class="ra-jump-text"><b>Resonance Room</b><small>tones to leave on →</small></span>
+        </a>
       </div>
       <p class="credit">Designed by Matt Finley</p>
     </div>

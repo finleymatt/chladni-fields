@@ -55,6 +55,14 @@
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
   .eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin: 0; }
 
+  .site-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; padding: 0 0 14px; border-bottom: 1px solid var(--edge); margin-bottom: 26px; }
+  .brand { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -.005em; white-space: nowrap; }
+  .brand .amp { color: var(--accent); font-weight: 500; }
+  .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 8px 10px; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+  @media (max-width: 560px) { .nav-links { width: 100%; overflow-x: auto; flex-wrap: nowrap; } .nav-links a { padding: 8px 8px; } }
   .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
   .back, .theme-toggle {
     display: inline-flex; align-items: center; gap: 8px;
@@ -109,8 +117,13 @@
 </head>
 <body>
 <div class="wrap">
-  <nav class="top" aria-label="Page">
-    <a class="back" href="index.html">← <b>Back to the plates</b></a>
+  <nav class="site-nav" aria-label="Site">
+    <a class="brand" href="index.html">Chladni <span class="amp">Fields</span></a>
+    <div class="nav-links">
+      <a href="index.html">Plates</a>
+      <a href="frequencies.html">Resonance Room</a>
+      <a href="law-of-one.html" aria-current="page">The Law of One</a>
+    </div>
     <div class="side-row">
       <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
       <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
