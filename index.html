@@ -872,7 +872,7 @@
         </div>
       </div>
     </div>
-    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Thirty modes on a 112² grid; the microphone is analysed in your browser and never recorded.</p>
+    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Fifteen plate modes on a 112² grid; the microphone is analysed in your browser and never recorded.</p>
   </div>
 
   <section class="console" id="console" aria-label="Reading">
@@ -922,7 +922,7 @@
         <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
         <li><b>Then the plate.</b><span>The fundamental is fed to a square-plate Chladni model. The nodal lines it draws are the still places — where the sand would gather.</span></li>
       </ol>
-      <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then the plate stops following a figure and follows sound: thirty plate modes are each weighted by how much of the live spectrum falls at their frequency, and the sand settles on whatever the mix holds still. Drag the tone slider and play, or use the microphone and sing — low notes make big lazy loops, high notes fine filigree. On the left, the formation your tone would lay is drawn from the loudest mode.</p>
+      <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then the plate stops following a figure and follows sound: fifteen plate modes are each weighted by how much of the live spectrum falls at their frequency, and the sand settles on whatever the mix holds still. Drag the tone slider and play, or use the microphone and sing — low notes make big lazy loops, high notes fine filigree. On the left, the formation your tone would lay is drawn from the loudest mode.</p>
     </div>
 
     <div class="dossier">
@@ -1151,7 +1151,7 @@
     id: "free", group: "free", name: "Your own tone", place: "Set a tone, or sing",
     date: "live", form: "Audio-reactive free plate", diameter: 0, sym: 0, spiral: false, density: 0.7, rings: [],
     draw: { kind: "free" },
-    lede: "The plate is following sound now, not a figure. Drag the tone slider and press Play, or switch on the microphone and sing, hum, whistle. Thirty plate modes each light up in proportion to how much of the spectrum lands on them; the sand settles on whatever the mix holds still. The formation on the left is the one your loudest mode would lay in a field."
+    lede: "The plate is following sound now, not a figure. Drag the tone slider and press Play, or switch on the microphone and sing, hum, whistle. Fifteen plate modes each light up in proportion to how much of the spectrum lands on them; the sand settles on whatever the mix holds still. The formation on the left is the one your loudest mode would lay in a field."
   };
 
   /* Source material per figure. Photographs are embedded only where an open licence exists
@@ -2018,7 +2018,9 @@
   /* ============================ CHLADNI PLATE — free (audio-weighted superposition) ============================ */
   var MODES_N = 6, MODES = [];
   (function () {
-    for (var m = 1; m <= MODES_N; m++) for (var n = 1; n <= MODES_N; n++) if (m !== n) MODES.push({ m: m, n: n, f: Math.sqrt(m * m + n * n) });
+    // one of each (m,n)/(n,m) pair only: the antisymmetric term for (n,m) is the exact
+    // negative of the one for (m,n), and equal weights on both would cancel to a flat plate
+    for (var m = 2; m <= MODES_N; m++) for (var n = 1; n < m; n++) MODES.push({ m: m, n: n, f: Math.sqrt(m * m + n * n) });
     var fMin = Infinity, fMax = 0;
     MODES.forEach(function (o) { fMin = Math.min(fMin, o.f); fMax = Math.max(fMax, o.f); });
     MODES.forEach(function (o) { o.fn = (o.f - fMin) / (fMax - fMin); o.hz = 60 * Math.pow(1500 / 60, o.fn); });
@@ -2055,13 +2057,22 @@
           var ha = t === "pure" ? (h === 1 ? 1 : 0) : t === "reed" ? (h % 2 ? 1 / (h * h) : 0) : 1 / h;
           if (!ha) continue;
           var d = Math.log(MODES[i].hz / (f * h));
-          a += ha * Math.exp(-(d * d) / (2 * 0.09 * 0.09));
+          a += ha * Math.exp(-(d * d) / (2 * 0.13 * 0.13));
         }
         W[i] = sm * W[i] + (1 - sm) * Math.min(1, a);
         total += W[i];
       }
     }
-    if (total > 0.0001) { var norm = Math.min(1, 3.0 / total); if (norm < 1) for (i = 0; i < MODES.length; i++) W[i] *= norm; }
+    // exposure stays constant, only the pattern responds: loudest mode is always 1,
+    // and the sum is capped so a broad spectrum doesn't wash the plate out
+    var mx = 0;
+    for (i = 0; i < MODES.length; i++) if (W[i] > mx) mx = W[i];
+    if (mx > 1e-6) {
+      var up = 1 / mx;
+      total *= up;
+      var cap = total > 3 ? 3 / total : 1;
+      for (i = 0; i < MODES.length; i++) W[i] *= up * cap;
+    }
     var bi = 0; for (i = 1; i < MODES.length; i++) if (W[i] > W[bi]) bi = i;
     if (MODES[bi].m !== dominant.m || MODES[bi].n !== dominant.n) { dominant = { m: MODES[bi].m, n: MODES[bi].n }; onDominantChange(); }
   }
