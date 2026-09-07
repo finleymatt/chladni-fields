@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex" />
+<title>Preview cards (render source)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+<style>
+  /* Source for the link-preview images and icons. Render with a headless browser at 1200x630 (cards) or 512x512 (icon). */
+  html, body { margin: 0; background: #0d120e; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; background: #0d120e; color: #e9e5d7; font-family: 'Spectral', Georgia, serif; }
+  .card .grid { position: absolute; inset: 0; background-image: radial-gradient(circle at 78% 50%, rgba(100,186,200,.10), transparent 38%), repeating-radial-gradient(circle at 78% 50%, transparent 0 58px, rgba(139,149,104,.10) 58px 59px); }
+  .text { position: absolute; left: 72px; top: 0; bottom: 0; width: 560px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: .24em; text-transform: uppercase; color: #8b9568; }
+  .eyebrow b { color: #d3a851; font-weight: 500; }
+  h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 74px; line-height: .98; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+  h1 .amp { color: #d3a851; font-weight: 500; }
+  h1.small { font-size: 60px; }
+  p { margin: 0; font-size: 24px; line-height: 1.45; color: #b3b9a0; max-width: 30ch; }
+  p b { color: #e9e5d7; font-weight: 600; }
+  .url { font-family: 'IBM Plex Mono', monospace; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: #d3a851; margin-top: 8px; }
+  canvas.fig { position: absolute; right: 60px; top: 55px; width: 520px; height: 520px; }
+  .rule { position: absolute; left: 72px; right: 72px; bottom: 44px; height: 1px; background: #2c3326; }
+  .icon { width: 512px; height: 512px; background: #0d120e; display: grid; place-items: center; }
+  .icon canvas { width: 512px; height: 512px; }
+</style>
+</head>
+<body>
+<script>
+(function () {
+  var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ""); });
+  var card = q.card || "plates";
+  var BRASS = [211, 168, 81], CYAN = [100, 186, 200], MUTED = [139, 149, 104];
+  function rgba(c, a) { return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"; }
+
+  function drawSpiral(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.44, arms = 6, count = 409, turns = 0.58, csize = 0.052, per = Math.round(count / arms);
+    for (var a = 0; a < arms; a++) {
+      var a0 = (a / arms) * Math.PI * 2;
+      for (var i = 0; i < per; i++) {
+        var t = i / (per - 1), ang = a0 + t * turns * Math.PI * 2, rad = 0.05 + 0.93 * t, cr = R * (csize * (1 - 0.62 * t) + 0.006);
+        ctx.beginPath(); ctx.arc(cx + Math.cos(ang) * rad * R, cy + Math.sin(ang) * rad * R, cr, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(BRASS, 0.14); ctx.fill(); ctx.strokeStyle = rgba(BRASS, 0.9); ctx.lineWidth = 1.6; ctx.stroke();
+      }
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.03, 0, Math.PI * 2); ctx.fillStyle = rgba(BRASS, 1); ctx.fill();
+  }
+  function drawPlate(ctx, S) {
+    // a (3,5) Chladni figure in cyan behind, as on the plates page
+    var G = 220, img = ctx.createImageData(G, G), d = img.data, n = 3, m = 5;
+    for (var y = 0; y < G; y++) for (var x = 0; x < G; x++) {
+      var X = x / (G - 1), Y = y / (G - 1);
+      var z = Math.abs(Math.sin(n * Math.PI * X) * Math.sin(m * Math.PI * Y) - Math.sin(m * Math.PI * X) * Math.sin(n * Math.PI * Y));
+      var line = Math.pow(Math.max(0, 1 - z / 0.16), 1.6), i = (y * G + x) * 4;
+      d[i] = CYAN[0]; d[i + 1] = CYAN[1]; d[i + 2] = CYAN[2]; d[i + 3] = Math.round(line * 120);
+    }
+    var off = document.createElement("canvas"); off.width = G; off.height = G; off.getContext("2d").putImageData(img, 0, 0);
+    ctx.save(); ctx.globalAlpha = 0.9; ctx.drawImage(off, 0, 0, S, S); ctx.restore();
+    ctx.strokeStyle = rgba(BRASS, 0.35); ctx.lineWidth = 2; ctx.strokeRect(1, 1, S - 2, S - 2);
+  }
+  function drawRings(ctx, S) {
+    var c = S / 2, R = S * 0.44;
+    ctx.strokeStyle = rgba(CYAN, 0.14); ctx.lineWidth = 1;
+    for (var i = 1; i <= 4; i++) { ctx.beginPath(); ctx.arc(c, c, R * i / 4, 0, Math.PI * 2); ctx.stroke(); }
+    [[0.36, CYAN, 3], [0.55, CYAN, 3], [0.72, CYAN, 3], [0.95, BRASS, 12]].forEach(function (r) {
+      ctx.shadowColor = rgba(r[1], 0.8); ctx.shadowBlur = 26; ctx.strokeStyle = rgba(r[1], 0.9); ctx.lineWidth = r[2];
+      ctx.beginPath(); ctx.arc(c, c, R * r[0], 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
+    });
+    ctx.fillStyle = rgba(BRASS, 0.95); ctx.beginPath(); ctx.arc(c, c, R * 0.09, 0, Math.PI * 2); ctx.fill();
+  }
+  function drawSigil(ctx, S, withRing) {
+    var c = S / 2, r = S * 0.17;
+    ctx.strokeStyle = rgba(BRASS, 0.95); ctx.lineWidth = S * 0.022; ctx.lineCap = "round";
+    ctx.shadowColor = rgba(BRASS, 0.55); ctx.shadowBlur = S * 0.05;
+    ctx.beginPath(); ctx.arc(c, c, r, 0, Math.PI * 2); ctx.stroke();
+    for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(c + Math.cos(a) * r * 1.5, c + Math.sin(a) * r * 1.5); ctx.lineTo(c + Math.cos(a) * r * 2.35, c + Math.sin(a) * r * 2.35); ctx.stroke(); }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = rgba(BRASS, 1); ctx.beginPath(); ctx.arc(c, c, r * 0.32, 0, Math.PI * 2); ctx.fill();
+    if (withRing) { ctx.strokeStyle = rgba(BRASS, 0.3); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c, c, r * 2.7, 0, Math.PI * 2); ctx.stroke(); }
+  }
+
+  var CARDS = {
+    plates: { eyebrow: "Cymatics · field register", h: 'Chladni <span class="amp">Fields</span>', p: "Famous crop circles and ancient figures translated into <b>sound</b> — beside the pattern each tone raises in sand on a vibrating plate. Or sing, and watch the plate answer.", small: false,
+      fig: function (ctx, S) { drawPlate(ctx, S); drawSpiral(ctx, S); } },
+    resonance: { eyebrow: "Chladni Fields · tones to leave on", h: 'The Resonance <span class="amp">Room</span>', p: "Calming tones to sit inside — <b>432, 528, 174 Hz</b>, binaural theta, brown noise — with warm timbres, a fade-out timer and the evidence labelled honestly.", small: false,
+      fig: drawRings },
+    law: { eyebrow: "Chladni Fields · field guide", h: 'The Law of <span class="amp">One</span>, in nine readings', p: "The load-bearing ideas of the Ra Material — densities, the Choice, harvest, the veil — with the sessions they come from. <b>“I am Ra.”</b>", small: true,
+      fig: function (ctx, S) { drawSigil(ctx, S, true); } }
+  };
+
+  if (card === "icon") {
+    document.body.innerHTML = '<div class="icon"><canvas width="1024" height="1024"></canvas></div>';
+    var ic = document.querySelector("canvas"), ictx = ic.getContext("2d");
+    ictx.fillStyle = "#0d120e"; ictx.fillRect(0, 0, 1024, 1024);
+    drawSigil(ictx, 1024, false);
+  } else {
+    var C = CARDS[card] || CARDS.plates;
+    document.body.innerHTML =
+      '<div class="card"><div class="grid"></div><div class="text"><div class="eyebrow">' + C.eyebrow + '</div>' +
+      '<h1 class="' + (C.small ? "small" : "") + '">' + C.h + '</h1><p>' + C.p + '</p><div class="url">iamra.lol</div></div>' +
+      '<canvas class="fig" width="1040" height="1040"></canvas><div class="rule"></div></div>';
+    var cv = document.querySelector("canvas.fig"), ctx = cv.getContext("2d");
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    C.fig(ctx, 520);
+  }
+})();
+</script>
+</body>
+</html>
