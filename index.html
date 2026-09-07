@@ -1,5 +1,5 @@
 <title>Chladni Fields</title>
-<meta name="description" content="Eight famous crop formations translated into tones, shown beside the resonance pattern each frequency would raise on a vibrating plate." />
+<meta name="description" content="Famous crop formations and ancient sacred figures translated into tones, shown beside the resonance pattern each frequency would raise on a vibrating plate — or sing your own." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
@@ -151,33 +151,51 @@
     border-radius: var(--r);
   }
   .ctl { display: flex; flex-direction: column; gap: 6px; }
-  .ctl > label {
+  .ctl > label, .ctl > .lbl {
     font-family: var(--font-mono);
     font-size: 10.5px;
     letter-spacing: .18em;
     text-transform: uppercase;
     color: var(--muted);
   }
-  .play {
+  .ctl .row { display: flex; align-items: center; gap: 10px; }
+  .ctl .val {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    min-width: 6ch;
+  }
+  .play, .mic {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 15px;
     letter-spacing: .04em;
     text-transform: uppercase;
-    color: var(--plate-bg);
-    background: var(--accent);
-    border: 1px solid var(--accent);
     border-radius: var(--r);
     padding: 11px 26px;
     cursor: pointer;
-    min-width: 148px;
     transition: filter .12s ease;
   }
-  .play:hover { filter: brightness(1.07); }
-  .play[data-on="1"] {
-    background: transparent;
-    color: var(--accent);
+  .play {
+    color: var(--plate-bg);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    min-width: 148px;
   }
+  .play:hover { filter: brightness(1.07); }
+  .play[data-on="1"] { background: transparent; color: var(--accent); }
+  .mic {
+    color: var(--sound);
+    background: transparent;
+    border: 1px solid var(--sound);
+    min-width: 168px;
+  }
+  .mic[data-on="1"] { background: var(--sound); color: var(--plate-bg); }
+  .free-only { display: none; }
+  .transport[data-free="1"] .free-only { display: flex; }
+  .transport[data-free="1"] .preset-only { display: none; }
+
   select, input[type="range"] { font-family: var(--font-mono); accent-color: var(--accent); }
   select {
     font-size: 12.5px;
@@ -188,15 +206,18 @@
     padding: 8px 10px;
   }
   input[type="range"] { width: 128px; }
+  input[type="range"].wide { width: 200px; }
+  .free-only input[type="range"] { accent-color: var(--sound); }
 
-  /* ---------- formation strip ---------- */
+  /* ---------- formation strips ---------- */
   .strip-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin: 40px 0 12px;
+    margin: 36px 0 12px;
     gap: 16px;
   }
+  .strip-head + .strip + .strip-head { margin-top: 22px; }
   .strip {
     display: grid;
     grid-auto-flow: column;
@@ -224,6 +245,9 @@
     border-color: var(--accent);
     background: var(--panel-2);
   }
+  .chip--free { border-style: dashed; }
+  .chip--free[aria-pressed="true"] { border-color: var(--sound); border-style: solid; }
+  .chip--free .chip-year { color: var(--sound); }
   .chip canvas { width: 100%; height: 84px; display: block; }
   .chip-name {
     font-family: var(--font-display);
@@ -451,6 +475,14 @@
     letter-spacing: .01em;
   }
   .method li span { color: var(--muted); display: block; font-size: .96rem; }
+  .method .own {
+    margin: 26px 0 0;
+    padding: 14px 16px;
+    border-left: 2px solid var(--sound);
+    background: var(--panel);
+    font-size: .96rem;
+  }
+  .method .own b { font-family: var(--font-display); font-weight: 600; color: var(--sound); }
 
   .dossier .lede {
     font-style: italic;
@@ -511,6 +543,7 @@
     .masthead { grid-template-columns: 1fr; }
     .theme-toggle { justify-self: start; }
     .bar b { font-size: 7.5px; }
+    input[type="range"].wide { width: 150px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -520,7 +553,7 @@
 </style>
 
 <div class="wrap">
-  <h2 class="sr-only">Chladni Fields: eight famous crop formations, each converted into a fundamental frequency and a set of partials, and shown next to the Chladni nodal pattern that frequency would raise on a vibrating plate.</h2>
+  <h2 class="sr-only">Chladni Fields: famous crop formations and ancient sacred figures, each converted into a fundamental frequency and a set of partials, shown next to the Chladni nodal pattern that frequency would raise on a vibrating plate. A free plate mode lets you set a tone or sing into a microphone and watch the pattern form.</h2>
 
   <header class="masthead">
     <div>
@@ -529,20 +562,32 @@
       <p class="premise">
         A vibrating plate scattered with sand sorts itself into figures — the sand
         settling wherever the plate holds still. This runs that idea backwards.
-        Eight of the best-known crop formations are read as <b>sound</b>: the geometry
-        sets a fundamental and a stack of partials, and beside each one is the
+        Famous crop formations, and the ancient figures they echo, are read as <b>sound</b>:
+        the geometry sets a fundamental and a stack of partials, and beside each one is the
         pattern that frequency would raise in sand on <b>Ernst Chladni's</b> plate.
+        Or skip the field entirely and <b>raise your own</b> — by tone, or by voice.
       </p>
     </div>
     <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
   </header>
 
-  <div class="transport" role="group" aria-label="Playback">
+  <div class="transport" id="transport" role="group" aria-label="Playback" data-free="0">
     <div class="ctl">
       <label for="playBtn">Transport</label>
       <button class="play" id="playBtn" type="button" data-on="0">Play tone</button>
     </div>
-    <div class="ctl">
+    <div class="ctl free-only">
+      <span class="lbl">Or</span>
+      <button class="mic" id="micBtn" type="button" data-on="0">Use microphone</button>
+    </div>
+    <div class="ctl free-only">
+      <label for="freqSel">Tone</label>
+      <div class="row">
+        <input type="range" id="freqSel" class="wide" min="40" max="1200" step="1" value="220" />
+        <span class="val" id="freqVal">220 Hz</span>
+      </div>
+    </div>
+    <div class="ctl preset-only">
       <label for="modeSel">Sustain</label>
       <select id="modeSel">
         <option value="drone">Drone — hold</option>
@@ -557,6 +602,13 @@
         <option value="bowed">Bowed — like a plate</option>
       </select>
     </div>
+    <div class="ctl free-only">
+      <label for="sharpSel">Line sharpness</label>
+      <div class="row">
+        <input type="range" id="sharpSel" min="6" max="60" step="1" value="26" />
+        <span class="val" id="sharpVal">26</span>
+      </div>
+    </div>
     <div class="ctl">
       <label for="volSel">Level</label>
       <input type="range" id="volSel" min="0" max="100" value="70" aria-label="Level" />
@@ -564,14 +616,20 @@
   </div>
 
   <div class="strip-head">
-    <p class="eyebrow">The formations</p>
+    <p class="eyebrow">Crop formations</p>
     <p class="eyebrow" aria-hidden="true">select one ▸</p>
   </div>
-  <div class="strip" id="strip" role="tablist" aria-label="Crop formations"></div>
+  <div class="strip" id="stripCrop" role="tablist" aria-label="Crop formations"></div>
+
+  <div class="strip-head">
+    <p class="eyebrow">Ancient figures&nbsp;·&nbsp;and your own</p>
+    <p class="eyebrow" aria-hidden="true">Egypt · Mesopotamia · India</p>
+  </div>
+  <div class="strip" id="stripAncient" role="tablist" aria-label="Ancient figures and free plate"></div>
 
   <section class="console" aria-label="Reading">
     <div class="panel panel--field">
-      <span class="panel-tag">Formation · aerial</span>
+      <span class="panel-tag" id="fieldTag">Formation · aerial</span>
       <canvas class="stage" id="fieldCanvas" width="600" height="600"></canvas>
       <div class="scanline" id="scan"></div>
       <div class="field-caption">
@@ -584,14 +642,14 @@
       <canvas class="scope" id="scopeCanvas" width="120" height="240"></canvas>
       <div class="readf" id="readF">—<small>Fundamental&nbsp;·&nbsp;Hz</small></div>
       <dl>
-        <div><dt>Symmetry</dt><dd id="readSym">—</dd></div>
-        <div><dt>Span</dt><dd id="readSpan">—</dd></div>
+        <div><dt id="readSymLbl">Symmetry</dt><dd id="readSym">—</dd></div>
+        <div><dt id="readSpanLbl">Span</dt><dd id="readSpan">—</dd></div>
         <div><dt>Plate mode</dt><dd id="readMode">—</dd></div>
       </dl>
     </div>
 
     <div class="panel panel--plate">
-      <span class="panel-tag">Chladni plate · nodal lines</span>
+      <span class="panel-tag" id="plateTag">Chladni plate · nodal lines</span>
       <canvas class="stage" id="plateCanvas" width="600" height="600"></canvas>
     </div>
   </section>
@@ -610,12 +668,13 @@
       <p class="eyebrow">How the translation works</p>
       <h2>Five readings off one drawing</h2>
       <ol>
-        <li><b>Span → pitch.</b><span>The formation's overall diameter sets the fundamental. A wider mark in the crop sounds lower, the way a longer string or a larger plate does.</span></li>
+        <li><b>Span → pitch.</b><span>The figure's overall size sets the fundamental. A wider mark in the crop sounds lower, the way a longer string or a larger plate does; a hand-sized amulet rings up in a higher register than any field.</span></li>
         <li><b>Symmetry → harmony.</b><span>N-fold rotational symmetry lifts the Nth partial and its multiples — the same partials a plate divides into when it carries N nodal diameters.</span></li>
-        <li><b>Rings → timbre.</b><span>Concentric bands in the design push energy higher or lower in the partial stack, giving each formation its colour.</span></li>
+        <li><b>Rings → timbre.</b><span>Concentric bands in the design push energy higher or lower in the partial stack, giving each figure its colour. Where a figure encodes numbers — the digits of π, the Horus-eye fractions — those numbers are used as the partial amplitudes directly.</span></li>
         <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
         <li><b>Then the plate.</b><span>The fundamental is fed to a square-plate Chladni model. The nodal lines it draws are the still places — where the sand would gather.</span></li>
       </ol>
+      <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then the plate stops following a figure and follows sound: thirty plate modes are each weighted by how much of the live spectrum falls at their frequency, and the sand settles on whatever the mix holds still. Drag the tone slider and play, or use the microphone and sing — low notes make big lazy loops, high notes fine filigree. On the left, the formation your tone would lay is drawn from the loudest mode.</p>
     </div>
 
     <div class="dossier">
@@ -632,7 +691,7 @@
   </section>
 
   <footer>
-    <span>Figures follow widely published accounts. Formation drawings are schematic, generated in-browser — not survey-accurate.</span>
+    <span>Figures follow widely published accounts. Drawings are schematic, generated in-browser — not survey-accurate. Microphone audio never leaves your browser.</span>
     <span>Web Audio · additive synthesis · analytic Chladni model</span>
   </footer>
 </div>
@@ -645,24 +704,17 @@
 
   /* ============================ DATA ============================ */
   var FORMATIONS = [
+    /* ---------------- crop formations ---------------- */
     {
-      id: "milkhill", name: "Milk Hill", place: "Alton Barnes, Wiltshire, England",
-      date: "Reported 12 August 2001", form: "Six-arm spiral · 409 circles",
-      diameter: 238, sym: 6, spiral: true, density: 0.95,
-      rings: [0.10, 0.30, 0.52, 0.74, 0.95],
-      draw: { kind: "spiral", arms: 6, count: 409, turns: 0.58, csize: 0.052, dir: 1 },
-      lede: "The largest formation most people can name — six curved arms of graded circles, each arm its own small galaxy. Surveyors counted four hundred and nine circles across roughly two hundred and forty metres of standing wheat."
+      id: "altonbarnes", group: "crop", name: "Alton Barnes Pictogram", place: "East Field, Alton Barnes, Wiltshire, England",
+      date: "Reported 12 July 1990", form: "Dumbbell pictogram with keys",
+      diameter: 120, sym: 2, spiral: false, density: 0.5,
+      rings: [0.15, 0.5, 0.85],
+      draw: { kind: "pictogram" },
+      lede: "The formation that made the phenomenon a headline: ringed circles strung along a long axis with rectangular 'keys' branching off, in the East Field below the Alton Barnes white horse. Its bar-like geometry gives a two-fold, open tone."
     },
     {
-      id: "juliaset", name: "Julia Set", place: "Beside Stonehenge, Wiltshire, England",
-      date: "Reported 7 July 1996", form: "Logarithmic spiral · 151 circles",
-      diameter: 45, sym: 1, spiral: true, density: 0.7,
-      rings: [0.22, 0.55, 0.88],
-      draw: { kind: "spiral", arms: 1, count: 151, turns: 2.45, csize: 0.05, dir: 1 },
-      lede: "A single sweep of 151 circles curling in on itself like the fractal it was named for, laid in a field of wheat next to the stones. Witnesses reported it filled in under an hour on a bright afternoon beside a busy road."
-    },
-    {
-      id: "barbury", name: "Barbury Castle", place: "Below the hillfort, Wiltshire, England",
+      id: "barbury", group: "crop", name: "Barbury Castle", place: "Below the hillfort, Wiltshire, England",
       date: "Reported 17 July 1991", form: "Triangle with three satellites",
       diameter: 90, sym: 3, spiral: false, density: 0.55,
       rings: [0.18, 0.62, 1.0],
@@ -670,15 +722,7 @@
       lede: "An equilateral triangle with a circle at each vertex — one plain, one ringed, one a stepped 'ratchet' spiral — and straight paths ruled between them. An early, sharply geometric formation still argued over decades later."
     },
     {
-      id: "windmill", name: "Windmill Hill", place: "Near Avebury, Wiltshire, England",
-      date: "Reported 29 July 1996", form: "Triple spiral · 194 circles",
-      diameter: 82, sym: 3, spiral: true, density: 0.8,
-      rings: [0.16, 0.44, 0.72, 0.96],
-      draw: { kind: "spiral", arms: 3, count: 194, turns: 0.72, csize: 0.05, dir: -1 },
-      lede: "A triskelion — three spiral arms of shrinking circles turning about a common centre, 194 in all. A more organic cousin of the geometric formations, close to the great henge at Avebury."
-    },
-    {
-      id: "mandelbrot", name: "Mandelbrot Set", place: "Ickleton, Cambridgeshire, England",
+      id: "mandelbrot", group: "crop", name: "Mandelbrot Set", place: "Ickleton, Cambridgeshire, England",
       date: "Reported 11 August 1991", form: "Escape-time fractal outline",
       diameter: 60, sym: 1, spiral: false, density: 0.6,
       rings: [0.35, 0.7, 0.95],
@@ -686,15 +730,47 @@
       lede: "The unmistakable cardioid-and-bulb of the Mandelbrot set, pressed into a barley field the same summer the equation was in every popular-science magazine. Its edge is fractal, so its partials never quite settle."
     },
     {
-      id: "sriyantra", name: "Sri Yantra", place: "Mickey Hot Springs dry lakebed, Oregon, USA",
-      date: "Found August 1990", form: "Nine interlocked triangles",
-      diameter: 400, sym: 9, spiral: false, density: 0.9,
-      rings: [0.12, 0.3, 0.5, 0.72, 0.92],
-      draw: { kind: "sriyantra" },
-      lede: "A quarter-mile-wide Sri Yantra scored into cracked alkali flat in eastern Oregon — nine overlapping triangles, lotus rings and square gates, said to run to some thirteen miles of line. Not wheat, but the most precise large figure of its kind."
+      id: "juliaset", group: "crop", name: "Julia Set", place: "Beside Stonehenge, Wiltshire, England",
+      date: "Reported 7 July 1996", form: "Logarithmic spiral · 151 circles",
+      diameter: 45, sym: 1, spiral: true, density: 0.7,
+      rings: [0.22, 0.55, 0.88],
+      draw: { kind: "spiral", arms: 1, count: 151, turns: 2.45, csize: 0.05, dir: 1 },
+      lede: "A single sweep of 151 circles curling in on itself like the fractal it was named for, laid in a field of wheat next to the stones. Witnesses reported it filled in under an hour on a bright afternoon beside a busy road."
     },
     {
-      id: "chilbolton", name: "Arecibo Reply", place: "By the Chilbolton radio telescope, Hampshire, England",
+      id: "windmill", group: "crop", name: "Windmill Hill", place: "Near Avebury, Wiltshire, England",
+      date: "Reported 29 July 1996", form: "Triple spiral · 194 circles",
+      diameter: 82, sym: 3, spiral: true, density: 0.8,
+      rings: [0.16, 0.44, 0.72, 0.96],
+      draw: { kind: "spiral", arms: 3, count: 194, turns: 0.72, csize: 0.05, dir: -1 },
+      lede: "A triskelion — three spiral arms of shrinking circles turning about a common centre, 194 in all. A more organic cousin of the geometric formations, close to the great henge at Avebury."
+    },
+    {
+      id: "etchilhampton", group: "crop", name: "Etchilhampton Grid", place: "Etchilhampton, near Devizes, Wiltshire, England",
+      date: "Reported 1 August 1997", form: "Lattice of 780 squares",
+      diameter: 70, sym: 4, spiral: false, density: 0.85,
+      rings: [0.6, 0.8, 0.97],
+      draw: { kind: "grid" },
+      lede: "A rectangular lattice of some 780 small standing squares — a checkerboard rather than a circle — laid beside a six-pointed star. Its strict regularity pours energy into the high partials."
+    },
+    {
+      id: "tawsmead", group: "crop", name: "Tawsmead Seven-fold", place: "Tawsmead Copse, near Alton Barnes, Wiltshire, England",
+      date: "Reported 9 August 1998", form: "Seven-fold star with crescents",
+      diameter: 75, sym: 7, spiral: false, density: 0.8,
+      rings: [0.2, 0.45, 0.7, 0.95],
+      draw: { kind: "sevenfold" },
+      lede: "Seven crescents around a seven-pointed star in a ring — a symmetry no compass-and-straightedge construction reaches exactly, which made its precision the talking point. Seven-fold symmetry rings the seventh partial, a note the harmonic series otherwise leaves faint."
+    },
+    {
+      id: "milkhill", group: "crop", name: "Milk Hill", place: "Alton Barnes, Wiltshire, England",
+      date: "Reported 12 August 2001", form: "Six-arm spiral · 409 circles",
+      diameter: 238, sym: 6, spiral: true, density: 0.95,
+      rings: [0.10, 0.30, 0.52, 0.74, 0.95],
+      draw: { kind: "spiral", arms: 6, count: 409, turns: 0.58, csize: 0.052, dir: 1 },
+      lede: "The largest formation most people can name — six curved arms of graded circles, each arm its own small galaxy. Surveyors counted four hundred and nine circles across roughly two hundred and forty metres of standing wheat."
+    },
+    {
+      id: "chilbolton", group: "crop", name: "Arecibo Reply", place: "By the Chilbolton radio telescope, Hampshire, England",
       date: "Reported 19 August 2001", form: "Rectangular binary raster",
       diameter: 30, sym: 2, spiral: false, density: 0.5,
       rings: [0.5, 0.9],
@@ -702,24 +778,117 @@
       lede: "A rectangular bitmap that reads as an answer to the 1974 Arecibo radio message — altered atomic numbers, a doubled strand, a big-headed figure, a different broadcast dish. Sonified from its rows rather than any rotational symmetry."
     },
     {
-      id: "crabwood", name: "Crabwood Face", place: "Crabwood, near Winchester, Hampshire, England",
+      id: "crabwood", group: "crop", name: "Crabwood Face", place: "Crabwood, near Winchester, Hampshire, England",
       date: "Reported 15 August 2002", form: "Halftone face and coded disc",
       diameter: 110, sym: 1, spiral: true, density: 0.75,
       rings: [0.2, 0.45, 0.7, 0.92],
       draw: { kind: "crabwood" },
       lede: "A face rendered in raster lines like a newspaper photo, beside a round disc holding a spiral of ASCII text. The scan-line lay gives it a grainy, high-partial voice."
+    },
+    {
+      id: "pi", group: "crop", name: "Barbury Castle π", place: "Barbury Castle, Wiltshire, England",
+      date: "Reported 1 June 2008", form: "Ratchet spiral encoding 3.141592654",
+      diameter: 46, sym: 10, spiral: true, density: 0.6,
+      rings: [0.3, 0.55, 0.8],
+      digits: [3, 1, 4, 1, 5, 9, 2, 6, 5, 4],
+      draw: { kind: "pi" },
+      lede: "A stepped spiral whose arc lengths, read outward in tenths of a turn, spell 3.141592654 — a small circle for the decimal point, three dots for the ellipsis. Its ten digits are used here directly as the amplitudes of its first ten partials."
+    },
+    {
+      id: "hackpen", group: "crop", name: "Hackpen Hill Cube", place: "Hackpen Hill, near Broad Hinton, Wiltshire, England",
+      date: "Reported 26 August 2012", form: "Isometric cube lattice",
+      diameter: 100, sym: 6, spiral: false, density: 0.85,
+      rings: [0.25, 0.5, 0.75, 1.0],
+      draw: { kind: "cube" },
+      lede: "A hexagonal field of rhombuses that flips, as you look at it, between a stack of cubes and a flat tiling — an optical illusion some three hundred feet across. Six-fold in outline, three-fold in depth."
+    },
+    {
+      id: "ansty", group: "crop", name: "Ansty Mandala", place: "Ansty, near Salisbury, Wiltshire, England",
+      date: "Reported 12 August 2016", form: "Eight-fold interlaced star",
+      diameter: 80, sym: 8, spiral: false, density: 0.95,
+      rings: [0.12, 0.3, 0.5, 0.72, 0.9],
+      draw: { kind: "ansty" },
+      lede: "An intricate eight-fold star built from interlaced bands and rings of small triangles, in the manner of Islamic geometric tiling; one of the most elaborate formations of its decade. Eight-fold symmetry lifts the octave partials."
+    },
+    {
+      id: "sriyantra", group: "crop", name: "Sri Yantra", place: "Mickey Hot Springs dry lakebed, Oregon, USA",
+      date: "Found August 1990", form: "Nine interlocked triangles",
+      diameter: 400, sym: 9, spiral: false, density: 0.9,
+      rings: [0.12, 0.3, 0.5, 0.72, 0.92],
+      draw: { kind: "sriyantra" },
+      lede: "A quarter-mile-wide Sri Yantra scored into cracked alkali flat in eastern Oregon — nine overlapping triangles, lotus rings and square gates, said to run to some thirteen miles of line. Not wheat, but the most precise large figure of its kind."
+    },
+
+    /* ---------------- ancient figures ---------------- */
+    {
+      id: "flower", group: "ancient", name: "Flower of Life", place: "Osireion, Abydos, Egypt",
+      date: "Drawn in ochre on granite; dating disputed, often placed in the first millennium BC", form: "Nineteen overlapping circles",
+      diameter: 0.25, sym: 6, spiral: false, density: 0.9,
+      rings: [0.2, 0.4, 0.6, 0.8, 1.0],
+      draw: { kind: "flower" },
+      lede: "Circles overlapping on a hexagonal lattice, drawn in red ochre on the granite of the Osireion behind the temple of Seti I. Six-fold like Milk Hill, and built the same way — from nothing but circles."
+    },
+    {
+      id: "horus", group: "ancient", name: "Eye of Horus", place: "Egypt — amulets, papyri, tomb walls",
+      date: "Old Kingdom onward, c. 2600 BC and later", form: "Wedjat with its six strokes",
+      diameter: 0.04, sym: 2, spiral: true, density: 0.7,
+      rings: [0.1, 0.4],
+      digits: [32, 16, 8, 4, 2, 1],
+      draw: { kind: "eye" },
+      lede: "The wedjat's six strokes were later read as the fractions ½, ¼, ⅛, 1⁄16, 1⁄32 and 1⁄64 — summing to 63⁄64, the missing sliver restored by magic. Those six fractions are used directly as the amplitudes of its first six partials."
+    },
+    {
+      id: "ishtar", group: "ancient", name: "Star of Ishtar", place: "Mesopotamia — kudurru boundary stones and cylinder seals",
+      date: "Second millennium BC onward", form: "Eight-pointed star in a disc",
+      diameter: 0.08, sym: 8, spiral: false, density: 0.6,
+      rings: [0.3, 0.65, 1.0],
+      draw: { kind: "ishtar" },
+      lede: "Inanna–Ishtar's emblem, the planet Venus as an eight-pointed star, cut into boundary stones beside the crescent of Sin and the sun disc of Shamash. Eight-fold, like the Ansty mandala three and a half thousand years later."
+    },
+    {
+      id: "shamash", group: "ancient", name: "Tablet of Shamash", place: "Sippar, Babylonia — now in the British Museum",
+      date: "c. 860 BC", form: "Sun disc: four rays, four waves",
+      diameter: 0.1, sym: 4, spiral: false, density: 0.7,
+      rings: [0.25, 0.5, 0.75],
+      draw: { kind: "shamash" },
+      lede: "The sun god's disc on the Sippar tablet: four straight rays alternating with four wavy ones inside a ring, set on an altar before the seated god. Four-fold, with the wavy rays adding a slower undertone between the harmonics."
+    },
+    {
+      id: "imago", group: "ancient", name: "Babylonian World Map", place: "Sippar, Babylonia — now in the British Museum",
+      date: "c. 6th century BC", form: "Disc, ocean ring, radiating regions",
+      diameter: 0.12, sym: 8, spiral: false, density: 0.5,
+      rings: [0.4, 0.7, 0.95],
+      draw: { kind: "imago" },
+      lede: "The oldest known map of the world: a disc of land ringed by the 'Bitter River', with triangular far regions pointing outward and Babylon as a bar across the Euphrates. Its ring-and-rays layout reads like an aerial formation."
+    },
+    {
+      id: "giza", group: "ancient", name: "Great Pyramid, in plan", place: "Giza plateau, Egypt",
+      date: "c. 2560 BC", form: "Square base, seen from directly above",
+      diameter: 230, sym: 4, spiral: false, density: 0.4,
+      rings: [0.05, 0.618, 1.0],
+      draw: { kind: "giza" },
+      lede: "Seen from directly above — the way every crop formation is seen — the Great Pyramid is a square cut by two diagonals, 230 metres on a side. Its span puts it in the same low register as Milk Hill; a partial is placed at 0.618 of the stack for the golden proportion its faces are said to hold."
     }
   ];
 
+  var FREE = {
+    id: "free", group: "free", name: "Your own tone", place: "Set a tone, or sing",
+    date: "live", form: "Audio-reactive free plate", diameter: 0, sym: 0, spiral: false, density: 0.7, rings: [],
+    draw: { kind: "free" },
+    lede: "The plate is following sound now, not a figure. Drag the tone slider and press Play, or switch on the microphone and sing, hum, whistle. Thirty plate modes each light up in proportion to how much of the spectrum lands on them; the sand settles on whatever the mix holds still. The formation on the left is the one your loudest mode would lay in a field."
+  };
+
   /* ============================ DOM ============================ */
   var $ = function (s) { return document.querySelector(s); };
-  var stripEl = $("#strip");
+  var stripCrop = $("#stripCrop"), stripAncient = $("#stripAncient");
   var fieldCv = $("#fieldCanvas"), plateCv = $("#plateCanvas"), scopeCv = $("#scopeCanvas");
   var fieldCtx = fieldCv.getContext("2d");
   var plateCtx = plateCv.getContext("2d");
   var scopeCtx = scopeCv.getContext("2d");
   var barsEl = $("#bars");
-  var playBtn = $("#playBtn"), modeSel = $("#modeSel"), timbreSel = $("#timbreSel"), volSel = $("#volSel");
+  var transportEl = $("#transport");
+  var playBtn = $("#playBtn"), micBtn = $("#micBtn"), modeSel = $("#modeSel"), timbreSel = $("#timbreSel"), volSel = $("#volSel");
+  var freqSel = $("#freqSel"), freqVal = $("#freqVal"), sharpSel = $("#sharpSel"), sharpVal = $("#sharpVal");
   var scanEl = $("#scan");
 
   var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
@@ -737,6 +906,7 @@
     COL.soundRgb = hexToRgb(COL.sound);
     COL.mutedRgb = hexToRgb(COL.muted);
   }
+  function rgba(rgb, a) { return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")"; }
 
   /* ============================ THEME ============================ */
   (function initTheme() {
@@ -750,10 +920,7 @@
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("chladni-theme", next); } catch (e) {}
       refreshColors();
-      renderFormation();
-      buildPlateBitmap();
-      drawPlate(0);
-      drawScope();
+      redrawAll();
     });
   })();
 
@@ -778,83 +945,54 @@
   var fieldSize = 600, plateSize = 600, scopeDim = { w: 120, h: 118 };
 
   /* ============================ FORMATION DRAWING ============================ */
-  function frame(ctx, S, label) {
-    // faint survey grid + tramlines, drawn behind every formation
+  function frame(ctx, S) {
     ctx.save();
-    ctx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.14)";
+    ctx.strokeStyle = rgba(COL.mutedRgb, 0.14);
     ctx.lineWidth = 1;
-    var rings = 4, cx = S / 2, cy = S / 2;
-    for (var i = 1; i <= rings; i++) {
-      ctx.beginPath();
-      ctx.arc(cx, cy, (S * 0.46) * i / rings, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    // tramlines — a pair of parallel wheel tracks across the field
-    ctx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.10)";
+    var cx = S / 2, cy = S / 2;
+    for (var i = 1; i <= 4; i++) { ctx.beginPath(); ctx.arc(cx, cy, (S * 0.46) * i / 4, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.strokeStyle = rgba(COL.mutedRgb, 0.10);
     var off = S * 0.09;
     ctx.beginPath(); ctx.moveTo(0, cy - off); ctx.lineTo(S, cy - off + S * 0.06);
     ctx.moveTo(0, cy + off); ctx.lineTo(S, cy + off + S * 0.06); ctx.stroke();
     ctx.restore();
   }
+  function ink(ctx, a, w) { ctx.strokeStyle = rgba(COL.accentRgb, a == null ? 0.9 : a); ctx.lineWidth = w || 1.3; ctx.fillStyle = rgba(COL.accentRgb, 0.12); }
+  function circ(ctx, x, y, r, fill) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); if (fill) ctx.fill(); ctx.stroke(); }
+  function poly(ctx, pts, close) { ctx.beginPath(); pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]); }); if (close) ctx.closePath(); ctx.stroke(); }
 
   function spiralCircles(ctx, S, d) {
     var cx = S / 2, cy = S / 2, R = S * 0.44;
     var per = Math.max(1, Math.round(d.count / d.arms));
-    ctx.save();
+    ctx.save(); ink(ctx, 0.85, 1.1);
     for (var a = 0; a < d.arms; a++) {
       var a0 = (a / d.arms) * Math.PI * 2;
       for (var i = 0; i < per; i++) {
         var t = per === 1 ? 0.5 : i / (per - 1);
         var ang = a0 + d.dir * t * d.turns * Math.PI * 2;
         var rad = 0.05 + 0.93 * t;
-        var px = cx + Math.cos(ang) * rad * R;
-        var py = cy + Math.sin(ang) * rad * R;
         var cr = R * (d.csize * (1 - 0.62 * t) + 0.006);
-        ctx.beginPath();
-        ctx.arc(px, py, cr, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.12)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.85)";
-        ctx.lineWidth = 1.1;
-        ctx.stroke();
+        circ(ctx, cx + Math.cos(ang) * rad * R, cy + Math.sin(ang) * rad * R, cr, true);
       }
     }
-    // hub
-    ctx.beginPath(); ctx.arc(cx, cy, R * 0.03, 0, Math.PI * 2);
-    ctx.fillStyle = COL.accent; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.03, 0, Math.PI * 2); ctx.fillStyle = COL.accent; ctx.fill();
     ctx.restore();
   }
 
   function drawBarbury(ctx, S) {
     var cx = S / 2, cy = S / 2 + S * 0.03, R = S * 0.36;
-    ctx.save();
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
-    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.1)";
-    ctx.lineWidth = 1.4;
+    ctx.save(); ink(ctx, 0.9, 1.4);
     var v = [];
-    for (var k = 0; k < 3; k++) {
-      var ang = -Math.PI / 2 + k * (Math.PI * 2 / 3);
-      v.push([cx + Math.cos(ang) * R, cy + Math.sin(ang) * R]);
-    }
-    ctx.beginPath();
-    ctx.moveTo(v[0][0], v[0][1]); ctx.lineTo(v[1][0], v[1][1]); ctx.lineTo(v[2][0], v[2][1]); ctx.closePath();
-    ctx.stroke();
-    // rays from centre
-    for (var j = 0; j < 3; j++) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(v[j][0], v[j][1]); ctx.stroke(); }
+    for (var k = 0; k < 3; k++) { var ang = -Math.PI / 2 + k * (Math.PI * 2 / 3); v.push([cx + Math.cos(ang) * R, cy + Math.sin(ang) * R]); }
+    poly(ctx, v, true);
+    for (var j = 0; j < 3; j++) poly(ctx, [[cx, cy], v[j]]);
     ctx.beginPath(); ctx.arc(cx, cy, S * 0.02, 0, Math.PI * 2); ctx.fillStyle = COL.accent; ctx.fill();
-    // vertex 0: plain disc
-    ctx.beginPath(); ctx.arc(v[0][0], v[0][1], S * 0.06, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.16)"; ctx.fill();
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)"; ctx.stroke();
-    // vertex 1: concentric rings
-    for (var r = 1; r <= 3; r++) {
-      ctx.beginPath(); ctx.arc(v[1][0], v[1][1], S * 0.028 * r, 0, Math.PI * 2); ctx.stroke();
-    }
-    // vertex 2: ratchet spiral
+    ctx.fillStyle = rgba(COL.accentRgb, 0.16);
+    circ(ctx, v[0][0], v[0][1], S * 0.06, true);
+    for (var r = 1; r <= 3; r++) circ(ctx, v[1][0], v[1][1], S * 0.028 * r);
     ctx.beginPath();
     for (var s2 = 0; s2 <= 30; s2++) {
-      var pr = S * 0.008 + s2 * S * 0.0022;
-      var pa = s2 * 0.6;
+      var pr = S * 0.008 + s2 * S * 0.0022, pa = s2 * 0.6;
       var x = v[2][0] + Math.cos(pa) * pr, y = v[2][1] + Math.sin(pa) * pr;
       if (s2 === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
@@ -863,30 +1001,16 @@
   }
 
   function drawMandelbrot(ctx, S) {
-    var img = ctx.createImageData(S, S);
-    var dat = img.data;
+    var img = ctx.createImageData(S, S), dat = img.data;
     var a = COL.accentRgb, m = COL.mutedRgb;
     var minR = -2.2, maxR = 0.8, minI = -1.5, maxI = 1.5;
-    for (var py = 0; py < S; py++) {
-      for (var px = 0; px < S; px++) {
-        var x0 = minR + (px / S) * (maxR - minR);
-        var y0 = minI + (py / S) * (maxI - minI);
-        var x = 0, y = 0, it = 0, maxit = 90;
-        while (x * x + y * y <= 4 && it < maxit) {
-          var xt = x * x - y * y + x0;
-          y = 2 * x * y + y0; x = xt; it++;
-        }
-        var idx = (py * S + px) * 4;
-        if (it === maxit) {
-          dat[idx] = a[0]; dat[idx + 1] = a[1]; dat[idx + 2] = a[2]; dat[idx + 3] = 235;
-        } else if (it > 6) {
-          var g = (it - 6) / (maxit - 6);
-          dat[idx] = m[0]; dat[idx + 1] = m[1]; dat[idx + 2] = m[2];
-          dat[idx + 3] = Math.round(70 * (1 - g));
-        } else {
-          dat[idx + 3] = 0;
-        }
-      }
+    for (var py = 0; py < S; py++) for (var px = 0; px < S; px++) {
+      var x0 = minR + (px / S) * (maxR - minR), y0 = minI + (py / S) * (maxI - minI);
+      var x = 0, y = 0, it = 0, maxit = 90;
+      while (x * x + y * y <= 4 && it < maxit) { var xt = x * x - y * y + x0; y = 2 * x * y + y0; x = xt; it++; }
+      var idx = (py * S + px) * 4;
+      if (it === maxit) { dat[idx] = a[0]; dat[idx + 1] = a[1]; dat[idx + 2] = a[2]; dat[idx + 3] = 235; }
+      else if (it > 6) { var g = (it - 6) / (maxit - 6); dat[idx] = m[0]; dat[idx + 1] = m[1]; dat[idx + 2] = m[2]; dat[idx + 3] = Math.round(70 * (1 - g)); }
     }
     ctx.putImageData(img, 0, 0);
   }
@@ -899,123 +1023,314 @@
   }
   function drawSriYantra(ctx, S) {
     var cx = S / 2, cy = S / 2, U = S * 0.30;
-    ctx.save();
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.92)";
-    ctx.lineWidth = 1.15;
+    ctx.save(); ink(ctx, 0.92, 1.15);
     var ups = [[1.0, 0.0], [0.74, 0.16], [0.5, 0.06], [0.26, 0.22]];
     var dns = [[1.06, -0.02], [0.82, -0.2], [0.58, -0.08], [0.36, -0.26], [0.2, -0.12]];
     var i;
     for (i = 0; i < ups.length; i++) tri(ctx, cx, cy + ups[i][1] * U, ups[i][0] * U * 0.92, ups[i][0] * U, true);
     for (i = 0; i < dns.length; i++) tri(ctx, cx, cy + dns[i][1] * U, dns[i][0] * U * 0.92, dns[i][0] * U, false);
     ctx.beginPath(); ctx.arc(cx, cy, S * 0.012, 0, Math.PI * 2); ctx.fillStyle = COL.accent; ctx.fill();
-    // lotus rings
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.55)";
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.55);
     [1.16, 1.28].forEach(function (rr, ri) {
-      ctx.beginPath(); ctx.arc(cx, cy, U * rr, 0, Math.PI * 2); ctx.stroke();
+      circ(ctx, cx, cy, U * rr);
       var petals = ri === 0 ? 16 : 24;
       for (var p = 0; p < petals; p++) {
-        var ang = p / petals * Math.PI * 2;
-        var r1 = U * rr, r2 = U * (rr + 0.07);
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1);
-        ctx.lineTo(cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2);
-        ctx.stroke();
+        var ang = p / petals * Math.PI * 2, r1 = U * rr, r2 = U * (rr + 0.07);
+        poly(ctx, [[cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1], [cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2]]);
       }
     });
-    // square gates
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.7)";
-    [1.42, 1.52, 1.62].forEach(function (g) {
-      var s = U * g;
-      ctx.strokeRect(cx - s, cy - s, s * 2, s * 2);
-    });
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.7);
+    [1.42, 1.52, 1.62].forEach(function (g) { var s = U * g; ctx.strokeRect(cx - s, cy - s, s * 2, s * 2); });
     ctx.restore();
   }
 
   function drawChilbolton(ctx, S) {
-    // stylised binary raster: header ticks, double helix, blocky figure, dish
-    var gw = 22, gh = 28;
-    var cell = Math.min(S * 0.62 / gw, S * 0.82 / gh);
+    var gw = 22, gh = 28, cell = Math.min(S * 0.62 / gw, S * 0.82 / gh);
     var ox = S / 2 - cell * gw / 2, oy = S / 2 - cell * gh / 2;
-    ctx.save();
-    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
-    function cellOn(gx, gy) { ctx.fillRect(ox + gx * cell + 0.5, oy + gy * cell + 0.5, cell - 1, cell - 1); }
+    ctx.save(); ctx.fillStyle = rgba(COL.accentRgb, 0.9);
+    function on(gx, gy) { ctx.fillRect(ox + gx * cell + 0.5, oy + gy * cell + 0.5, cell - 1, cell - 1); }
     var row;
-    // header counting strip
-    for (row = 2; row < 20; row += 2) cellOn(row, 1);
-    // atomic-number bars
-    for (row = 0; row < 5; row++) {
-      var len = [3, 5, 4, 6, 5][row];
-      for (var c = 0; c < len; c++) cellOn(4 + c, 3 + row);
-    }
-    // double helix
+    for (row = 2; row < 20; row += 2) on(row, 1);
+    for (row = 0; row < 5; row++) { var len = [3, 5, 4, 6, 5][row]; for (var c = 0; c < len; c++) on(4 + c, 3 + row); }
     for (var y = 9; y < 20; y++) {
-      var ph = (y - 9) / 11 * Math.PI * 2;
-      var xa = Math.round(11 + Math.sin(ph) * 5);
-      var xb = Math.round(11 - Math.sin(ph) * 5);
-      cellOn(xa, y); cellOn(xb, y);
-      if (y % 2 === 0) for (var xr = Math.min(xa, xb) + 1; xr < Math.max(xa, xb); xr++) cellOn(xr, y);
+      var ph = (y - 9) / 11 * Math.PI * 2, xa = Math.round(11 + Math.sin(ph) * 5), xb = Math.round(11 - Math.sin(ph) * 5);
+      on(xa, y); on(xb, y);
+      if (y % 2 === 0) for (var xr = Math.min(xa, xb) + 1; xr < Math.max(xa, xb); xr++) on(xr, y);
     }
-    // big-headed figure
-    for (var hx = 9; hx <= 13; hx++) cellOn(hx, 21);
-    for (var hy = 21; hy <= 22; hy++) { cellOn(9, hy); cellOn(13, hy); }
-    for (var bx = 10; bx <= 12; bx++) for (var by = 23; by <= 25; by++) cellOn(bx, by);
-    // broadcast dish
-    for (var dx = 6; dx <= 16; dx++) { var dh = Math.round(2 - Math.abs(dx - 11) * 0.28); for (var dy = 0; dy <= dh; dy++) cellOn(dx, 26 + dy); }
+    for (var hx = 9; hx <= 13; hx++) on(hx, 21);
+    for (var hy = 21; hy <= 22; hy++) { on(9, hy); on(13, hy); }
+    for (var bx = 10; bx <= 12; bx++) for (var by = 23; by <= 25; by++) on(bx, by);
+    for (var dx = 6; dx <= 16; dx++) { var dh = Math.round(2 - Math.abs(dx - 11) * 0.28); for (var dy = 0; dy <= dh; dy++) on(dx, 26 + dy); }
     ctx.restore();
   }
 
   function drawCrabwood(ctx, S) {
     ctx.save();
-    // right: coded disc — spiral of arcs + broken tick ring
     var dcx = S * 0.68, dcy = S * 0.5, dR = S * 0.24;
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.85)";
-    ctx.lineWidth = 1;
-    for (var i = 0; i < 26; i++) {
-      var rr = dR * (0.12 + 0.88 * i / 25);
-      var a0 = i * 0.5, a1 = a0 + Math.PI * 1.7;
-      ctx.beginPath(); ctx.arc(dcx, dcy, rr, a0, a1); ctx.stroke();
-    }
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.5)";
+    ink(ctx, 0.85, 1);
+    for (var i = 0; i < 26; i++) { var rr = dR * (0.12 + 0.88 * i / 25), a0 = i * 0.5; ctx.beginPath(); ctx.arc(dcx, dcy, rr, a0, a0 + Math.PI * 1.7); ctx.stroke(); }
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.5);
     for (var t = 0; t < 60; t++) {
       if (t % 5 === 0) continue;
       var ta = t / 60 * Math.PI * 2;
-      ctx.beginPath();
-      ctx.moveTo(dcx + Math.cos(ta) * dR * 1.04, dcy + Math.sin(ta) * dR * 1.04);
-      ctx.lineTo(dcx + Math.cos(ta) * dR * 1.12, dcy + Math.sin(ta) * dR * 1.12);
-      ctx.stroke();
+      poly(ctx, [[dcx + Math.cos(ta) * dR * 1.04, dcy + Math.sin(ta) * dR * 1.04], [dcx + Math.cos(ta) * dR * 1.12, dcy + Math.sin(ta) * dR * 1.12]]);
     }
-    // left: halftone face — scan lines whose dash length follows a coarse brightness map
-    var fcx = S * 0.32, fcy = S * 0.5, fw = S * 0.2, fh = S * 0.28;
-    var lines = 30;
-    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
+    var fcx = S * 0.32, fcy = S * 0.5, fw = S * 0.2, fh = S * 0.28, lines = 30;
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.9);
     ctx.lineWidth = Math.max(1, fh / lines * 0.62);
+    var seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
     for (var L = 0; L < lines; L++) {
-      var v = L / (lines - 1);
-      var yy = fcy - fh + v * fh * 2;
-      // elliptical head mask
+      var v = L / (lines - 1), yy = fcy - fh + v * fh * 2;
       var edge = 1 - Math.pow((v - 0.5) / 0.5, 2);
       if (edge <= 0) continue;
-      var halfW = fw * Math.sqrt(edge);
-      // brightness: darker brow band and eyes -> shorter dashes (gaps)
-      var bright = 0.6;
-      if (v > 0.30 && v < 0.40) bright = 0.2;          // brow
-      if (v > 0.40 && v < 0.52) bright = 0.85;         // eyes region (light) with holes
-      if (v > 0.66 && v < 0.76) bright = 0.35;         // mouth
+      var halfW = fw * Math.sqrt(edge), bright = 0.6;
+      if (v > 0.30 && v < 0.40) bright = 0.2;
+      if (v > 0.40 && v < 0.52) bright = 0.85;
+      if (v > 0.66 && v < 0.76) bright = 0.35;
       var segs = 26;
       for (var sx = 0; sx < segs; sx++) {
-        var u = sx / (segs - 1);
-        var xx = fcx - halfW + u * halfW * 2;
-        var local = bright;
-        // carve two eye holes
+        var u = sx / (segs - 1), xx = fcx - halfW + u * halfW * 2, local = bright;
         if (v > 0.40 && v < 0.52 && (Math.abs(u - 0.32) < 0.09 || Math.abs(u - 0.68) < 0.09)) local = 0.05;
-        if (Math.random() < local) {
-          ctx.beginPath();
-          ctx.moveTo(xx, yy);
-          ctx.lineTo(xx + halfW * 2 / segs * 0.9, yy);
-          ctx.stroke();
-        }
+        if (rnd() < local) poly(ctx, [[xx, yy], [xx + halfW * 2 / segs * 0.9, yy]]);
       }
     }
+    ctx.restore();
+  }
+
+  function drawPictogram(ctx, S) {
+    var cy = S / 2, x0 = S * 0.08, x1 = S * 0.92;
+    ctx.save(); ink(ctx, 0.9, S * 0.012);
+    poly(ctx, [[x0, cy], [x1, cy]]);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.16);
+    circ(ctx, S * 0.2, cy, S * 0.07, true); circ(ctx, S * 0.2, cy, S * 0.105);
+    circ(ctx, S * 0.5, cy, S * 0.05, true);
+    circ(ctx, S * 0.8, cy, S * 0.07, true); circ(ctx, S * 0.8, cy, S * 0.105);
+    // keys
+    var kw = S * 0.028, kh = S * 0.1;
+    ctx.fillStyle = rgba(COL.accentRgb, 0.25);
+    [[0.35, -1], [0.35, 1], [0.65, 1], [0.62, -1]].forEach(function (k, i) {
+      var kx = S * k[0], dir = k[1];
+      ctx.fillRect(kx - kw / 2, dir < 0 ? cy - kh - S * 0.012 : cy + S * 0.012, kw, kh);
+      ctx.strokeRect(kx - kw / 2, dir < 0 ? cy - kh - S * 0.012 : cy + S * 0.012, kw, kh);
+      // tooth
+      var ty = dir < 0 ? cy - kh - S * 0.012 : cy + S * 0.012 + kh;
+      ctx.fillRect(kx - kw / 2 + (i % 2 ? kw : -kw * 0.8), ty - (dir < 0 ? 0 : kw * 0.8), kw * 0.8, kw * 0.8);
+    });
+    ctx.restore();
+  }
+
+  function drawGrid(ctx, S) {
+    var cols = 26, rows = 30, W = S * 0.62, H = S * 0.74, cw = W / cols, ch = H / rows;
+    var ox = S / 2 - W / 2, oy = S / 2 - H / 2;
+    ctx.save(); ctx.fillStyle = rgba(COL.accentRgb, 0.85);
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) ctx.fillRect(ox + c * cw + cw * 0.22, oy + r * ch + ch * 0.22, cw * 0.56, ch * 0.56);
+    ink(ctx, 0.5, 1); ctx.strokeRect(ox - cw * 0.3, oy - ch * 0.3, W + cw * 0.6, H + ch * 0.6);
+    ctx.restore();
+  }
+
+  function drawSevenfold(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.44;
+    ctx.save(); ink(ctx, 0.9, 1.3);
+    circ(ctx, cx, cy, R); circ(ctx, cx, cy, R * 0.92);
+    var v = [];
+    for (var k = 0; k < 7; k++) { var a = -Math.PI / 2 + k * Math.PI * 2 / 7; v.push([cx + Math.cos(a) * R * 0.6, cy + Math.sin(a) * R * 0.6]); }
+    // {7/3} star
+    for (var i = 0; i < 7; i++) poly(ctx, [v[i], v[(i + 3) % 7]]);
+    // crescents
+    ctx.fillStyle = rgba(COL.accentRgb, 0.18);
+    for (var c = 0; c < 7; c++) {
+      var a2 = -Math.PI / 2 + c * Math.PI * 2 / 7;
+      var px = cx + Math.cos(a2) * R * 0.78, py = cy + Math.sin(a2) * R * 0.78;
+      circ(ctx, px, py, R * 0.11, true);
+      var qx = px + Math.cos(a2) * R * 0.045, qy = py + Math.sin(a2) * R * 0.045;
+      ctx.fillStyle = COL.panel; ctx.beginPath(); ctx.arc(qx, qy, R * 0.09, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = rgba(COL.accentRgb, 0.18);
+    }
+    circ(ctx, cx, cy, R * 0.14, true); circ(ctx, cx, cy, R * 0.06, true);
+    ctx.restore();
+  }
+
+  function drawPi(ctx, S) {
+    var cx = S / 2, cy = S / 2, digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 4];
+    var r = S * 0.07, step = S * 0.036, ang = -Math.PI / 2;
+    ctx.save(); ink(ctx, 0.9, S * 0.022); ctx.lineCap = "butt";
+    for (var i = 0; i < digits.length; i++) {
+      var sweep = digits[i] * Math.PI * 2 / 10;
+      ctx.beginPath(); ctx.arc(cx, cy, r, ang, ang + sweep); ctx.stroke();
+      ang += sweep;
+      var nx = cx + Math.cos(ang) * r, ny = cy + Math.sin(ang) * r;
+      r += step;
+      poly(ctx, [[nx, ny], [cx + Math.cos(ang) * r, cy + Math.sin(ang) * r]]);
+      if (i === 0) { ctx.fillStyle = COL.accent; ctx.beginPath(); ctx.arc(cx + Math.cos(ang - 0.12) * (r - step * 0.5), cy + Math.sin(ang - 0.12) * (r - step * 0.5), S * 0.012, 0, Math.PI * 2); ctx.fill(); }
+    }
+    ctx.fillStyle = COL.accent;
+    for (var d = 1; d <= 3; d++) { ctx.beginPath(); ctx.arc(cx + Math.cos(ang + d * 0.16) * r, cy + Math.sin(ang + d * 0.16) * r, S * 0.012, 0, Math.PI * 2); ctx.fill(); }
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.5); ctx.lineWidth = 1.2;
+    circ(ctx, cx, cy, r + step * 0.6);
+    ctx.restore();
+  }
+
+  function hexPts(cx, cy, R) { var p = []; for (var k = 0; k < 6; k++) { var a = Math.PI / 6 + k * Math.PI / 3; p.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R]); } return p; }
+  function drawCube(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.42, cell = R / 3.2;
+    ctx.save(); ink(ctx, 0.9, 1.3);
+    poly(ctx, hexPts(cx, cy, R), true);
+    // hex lattice of Y-cells within two rings
+    var w = cell * Math.sqrt(3), h = cell * 1.5;
+    for (var q = -3; q <= 3; q++) for (var rr = -3; rr <= 3; rr++) {
+      var x = cx + (q + rr / 2) * w, y = cy + rr * h;
+      if (Math.hypot(x - cx, y - cy) > R * 0.72) continue;
+      poly(ctx, hexPts(x, y, cell), true);
+      ctx.fillStyle = rgba(COL.accentRgb, 0.28); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - cell); ctx.lineTo(x + w / 2, y - cell / 2); ctx.lineTo(x + w / 2, y + cell / 2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = rgba(COL.accentRgb, 0.10); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + cell); ctx.lineTo(x + w / 2, y + cell / 2); ctx.lineTo(x + w / 2, y - cell / 2 + cell); ctx.closePath(); ctx.fill();
+      poly(ctx, [[x, y], [x, y - cell]]); poly(ctx, [[x, y], [x + w / 2, y + cell / 2]]); poly(ctx, [[x, y], [x - w / 2, y + cell / 2]]);
+    }
+    ctx.restore();
+  }
+
+  function starPts(cx, cy, n, ro, ri, rot) { var p = []; for (var k = 0; k < n * 2; k++) { var a = (rot || 0) + k * Math.PI / n, r = k % 2 ? ri : ro; p.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } return p; }
+  function drawAnsty(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.44;
+    ctx.save(); ink(ctx, 0.9, 1.2);
+    circ(ctx, cx, cy, R); circ(ctx, cx, cy, R * 0.94);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.12);
+    // ring of 32 small triangles
+    for (var t = 0; t < 32; t++) {
+      var a = t / 32 * Math.PI * 2, a2 = (t + 1) / 32 * Math.PI * 2, am = (a + a2) / 2;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * R * 0.94, cy + Math.sin(a) * R * 0.94); ctx.lineTo(cx + Math.cos(a2) * R * 0.94, cy + Math.sin(a2) * R * 0.94); ctx.lineTo(cx + Math.cos(am) * R * 0.84, cy + Math.sin(am) * R * 0.84); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    // {8/3} star, two rotated squares, inner rings
+    var v = []; for (var k = 0; k < 8; k++) { var b = k * Math.PI / 4; v.push([cx + Math.cos(b) * R * 0.8, cy + Math.sin(b) * R * 0.8]); }
+    for (var i = 0; i < 8; i++) poly(ctx, [v[i], v[(i + 3) % 8]]);
+    poly(ctx, starPts(cx, cy, 8, R * 0.5, R * 0.38, 0), true);
+    poly(ctx, starPts(cx, cy, 8, R * 0.3, R * 0.2, Math.PI / 8), true);
+    circ(ctx, cx, cy, R * 0.62); circ(ctx, cx, cy, R * 0.12, true);
+    ctx.restore();
+  }
+
+  function drawFlower(ctx, S) {
+    var cx = S / 2, cy = S / 2, r = S * 0.145;
+    ctx.save(); ink(ctx, 0.9, 1.3);
+    circ(ctx, cx, cy, r * 3.08); circ(ctx, cx, cy, r * 3);
+    var cs = [[0, 0]];
+    for (var k = 0; k < 6; k++) { var a = k * Math.PI / 3; cs.push([Math.cos(a) * r, Math.sin(a) * r]); cs.push([Math.cos(a) * 2 * r, Math.sin(a) * 2 * r]); cs.push([Math.cos(a + Math.PI / 6) * r * Math.sqrt(3), Math.sin(a + Math.PI / 6) * r * Math.sqrt(3)]); }
+    ctx.fillStyle = rgba(COL.accentRgb, 0.05);
+    cs.forEach(function (c) { circ(ctx, cx + c[0], cy + c[1], r, true); });
+    ctx.restore();
+  }
+
+  function drawEye(ctx, S) {
+    var cx = S / 2, cy = S * 0.46;
+    ctx.save(); ink(ctx, 0.92, S * 0.02); ctx.lineCap = "round"; ctx.lineJoin = "round";
+    // brow
+    ctx.beginPath(); ctx.moveTo(cx - S * 0.36, cy - S * 0.12); ctx.quadraticCurveTo(cx, cy - S * 0.36, cx + S * 0.32, cy - S * 0.2); ctx.stroke();
+    // lids
+    ctx.beginPath(); ctx.moveTo(cx - S * 0.3, cy); ctx.quadraticCurveTo(cx, cy - S * 0.24, cx + S * 0.3, cy); ctx.quadraticCurveTo(cx, cy + S * 0.16, cx - S * 0.3, cy); ctx.closePath(); ctx.stroke();
+    // pupil
+    ctx.fillStyle = COL.accent; ctx.beginPath(); ctx.arc(cx, cy - S * 0.02, S * 0.07, 0, Math.PI * 2); ctx.fill();
+    // tail
+    ctx.beginPath(); ctx.moveTo(cx + S * 0.3, cy); ctx.lineTo(cx + S * 0.46, cy + S * 0.12); ctx.stroke();
+    // teardrop
+    ctx.beginPath(); ctx.moveTo(cx - S * 0.06, cy + S * 0.13); ctx.quadraticCurveTo(cx - S * 0.1, cy + S * 0.3, cx - S * 0.1, cy + S * 0.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - S * 0.1, cy + S * 0.4); ctx.lineTo(cx - S * 0.2, cy + S * 0.4); ctx.stroke();
+    // spiral
+    ctx.beginPath(); ctx.moveTo(cx + S * 0.06, cy + S * 0.13); ctx.quadraticCurveTo(cx + S * 0.16, cy + S * 0.28, cx + S * 0.24, cy + S * 0.38); ctx.quadraticCurveTo(cx + S * 0.3, cy + S * 0.44, cx + S * 0.3, cy + S * 0.34); ctx.quadraticCurveTo(cx + S * 0.28, cy + S * 0.28, cx + S * 0.22, cy + S * 0.3); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawIshtar(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.42;
+    ctx.save(); ink(ctx, 0.9, 1.4);
+    circ(ctx, cx, cy, R * 1.08);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.16);
+    var pts = starPts(cx, cy, 8, R, R * 0.42, -Math.PI / 2);
+    ctx.beginPath(); pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.55);
+    for (var k = 0; k < 8; k++) { var a = -Math.PI / 2 + Math.PI / 8 + k * Math.PI / 4; poly(ctx, [[cx + Math.cos(a) * R * 0.45, cy + Math.sin(a) * R * 0.45], [cx + Math.cos(a) * R * 0.7, cy + Math.sin(a) * R * 0.7]]); }
+    ink(ctx, 0.9, 1.4); circ(ctx, cx, cy, R * 0.17, true); circ(ctx, cx, cy, R * 0.08, true);
+    ctx.restore();
+  }
+
+  function drawShamash(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.32;
+    ctx.save(); ink(ctx, 0.9, 1.4);
+    circ(ctx, cx, cy, R * 1.12); circ(ctx, cx, cy, R);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.2);
+    for (var k = 0; k < 4; k++) {
+      var a = k * Math.PI / 2, b = a + Math.PI / 4;
+      // straight ray: tapered
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a - 0.09) * R * 0.15, cy + Math.sin(a - 0.09) * R * 0.15); ctx.lineTo(cx + Math.cos(a) * R * 0.98, cy + Math.sin(a) * R * 0.98); ctx.lineTo(cx + Math.cos(a + 0.09) * R * 0.15, cy + Math.sin(a + 0.09) * R * 0.15); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // wavy ray
+      ctx.beginPath();
+      for (var s = 0; s <= 24; s++) {
+        var t = s / 24, rr = R * (0.16 + 0.8 * t), wob = Math.sin(t * Math.PI * 5) * R * 0.05;
+        var x = cx + Math.cos(b) * rr - Math.sin(b) * wob, y = cy + Math.sin(b) * rr + Math.cos(b) * wob;
+        if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    circ(ctx, cx, cy, R * 0.14, true);
+    ctx.restore();
+  }
+
+  function drawImago(ctx, S) {
+    var cx = S / 2, cy = S / 2, R = S * 0.3;
+    ctx.save(); ink(ctx, 0.9, 1.3);
+    circ(ctx, cx, cy, R * 0.72); circ(ctx, cx, cy, R);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.14);
+    // seven surviving nagû (of eight)
+    for (var k = 0; k < 8; k++) {
+      if (k === 5) continue;
+      var a = -Math.PI / 2 + k * Math.PI / 4;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a - 0.16) * R, cy + Math.sin(a - 0.16) * R);
+      ctx.lineTo(cx + Math.cos(a) * R * 1.45, cy + Math.sin(a) * R * 1.45);
+      ctx.lineTo(cx + Math.cos(a + 0.16) * R, cy + Math.sin(a + 0.16) * R);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    // Euphrates band and Babylon
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.6);
+    poly(ctx, [[cx - R * 0.07, cy - R * 0.7], [cx - R * 0.1, cy + R * 0.7]]);
+    poly(ctx, [[cx + R * 0.07, cy - R * 0.7], [cx + R * 0.04, cy + R * 0.7]]);
+    ink(ctx, 0.9, 1.3); ctx.strokeRect(cx - R * 0.3, cy - R * 0.32, R * 0.6, R * 0.16);
+    [[-0.38, -0.05], [0.32, -0.1], [0.4, 0.25], [-0.42, 0.28], [-0.2, 0.5], [0.2, 0.45]].forEach(function (c) { circ(ctx, cx + c[0] * R, cy + c[1] * R, R * 0.06); });
+    ctx.beginPath(); ctx.ellipse(cx, cy + R * 0.58, R * 0.22, R * 0.07, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawGiza(ctx, S) {
+    var cx = S / 2, cy = S / 2, h = S * 0.3;
+    ctx.save(); ink(ctx, 0.9, 1.5);
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.35); ctx.strokeRect(cx - h * 1.25, cy - h * 1.25, h * 2.5, h * 2.5);
+    ink(ctx, 0.9, 1.5);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.08); ctx.fillRect(cx - h, cy - h, h * 2, h * 2); ctx.strokeRect(cx - h, cy - h, h * 2, h * 2);
+    ctx.fillStyle = rgba(COL.accentRgb, 0.18);
+    ctx.beginPath(); ctx.moveTo(cx - h, cy - h); ctx.lineTo(cx + h, cy - h); ctx.lineTo(cx, cy); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx - h, cy + h); ctx.lineTo(cx + h, cy + h); ctx.lineTo(cx, cy); ctx.closePath(); ctx.fill();
+    poly(ctx, [[cx - h, cy - h], [cx + h, cy + h]]); poly(ctx, [[cx + h, cy - h], [cx - h, cy + h]]);
+    ctx.fillStyle = COL.accent; ctx.beginPath(); ctx.arc(cx, cy, S * 0.012, 0, Math.PI * 2); ctx.fill();
+    // north tick
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.6);
+    poly(ctx, [[cx, cy - h * 1.25], [cx, cy - h * 1.42]]); poly(ctx, [[cx - S * 0.012, cy - h * 1.36], [cx, cy - h * 1.42], [cx + S * 0.012, cy - h * 1.36]]);
+    ctx.restore();
+  }
+
+  function drawFreeGlyph(ctx, S) {
+    // mini free-plate glyph: cos-mode (3,2) nodal lines in the sound colour
+    var G = Math.max(24, Math.round(S / 2));
+    var off = document.createElement("canvas"); off.width = G; off.height = G;
+    var o = off.getContext("2d"), img = o.createImageData(G, G), s = COL.soundRgb;
+    for (var y = 0; y < G; y++) for (var x = 0; x < G; x++) {
+      var X = x / (G - 1), Y = y / (G - 1);
+      var v = Math.cos(3 * Math.PI * X) * Math.cos(2 * Math.PI * Y) - Math.cos(2 * Math.PI * X) * Math.cos(3 * Math.PI * Y);
+      var line = Math.exp(-14 * Math.abs(v)), i = (y * G + x) * 4;
+      img.data[i] = s[0]; img.data[i + 1] = s[1]; img.data[i + 2] = s[2]; img.data[i + 3] = Math.round(line * 230);
+    }
+    o.putImageData(img, 0, 0);
+    ctx.save(); ctx.fillStyle = COL.plateBg; ctx.fillRect(S * 0.08, S * 0.08, S * 0.84, S * 0.84);
+    ctx.drawImage(off, S * 0.08, S * 0.08, S * 0.84, S * 0.84);
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.5); ctx.strokeRect(S * 0.08, S * 0.08, S * 0.84, S * 0.84);
     ctx.restore();
   }
 
@@ -1023,43 +1338,67 @@
     ctx.clearRect(0, 0, S, S);
     if (!mini) frame(ctx, S);
     var d = f.draw;
-    if (d.kind === "spiral") spiralCircles(ctx, S, d);
-    else if (d.kind === "barbury") drawBarbury(ctx, S);
-    else if (d.kind === "mandelbrot") {
-      // render mandelbrot to a temp canvas at modest res then scale
-      var res = mini ? 90 : 280;
-      var tmp = document.createElement("canvas"); tmp.width = res; tmp.height = res;
-      drawMandelbrot(tmp.getContext("2d"), res);
-      ctx.save();
-      ctx.translate(S / 2, S / 2); ctx.scale(S * 0.92 / res, S * 0.92 / res); ctx.translate(-res / 2, -res / 2);
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(tmp, 0, 0);
-      ctx.restore();
+    switch (d.kind) {
+      case "spiral": spiralCircles(ctx, S, d); break;
+      case "barbury": drawBarbury(ctx, S); break;
+      case "mandelbrot": {
+        var res = mini ? 90 : 280;
+        var tmp = document.createElement("canvas"); tmp.width = res; tmp.height = res;
+        drawMandelbrot(tmp.getContext("2d"), res);
+        ctx.save(); ctx.translate(S / 2, S / 2); ctx.scale(S * 0.92 / res, S * 0.92 / res); ctx.translate(-res / 2, -res / 2);
+        ctx.imageSmoothingEnabled = true; ctx.drawImage(tmp, 0, 0); ctx.restore();
+        break;
+      }
+      case "sriyantra": drawSriYantra(ctx, S); break;
+      case "chilbolton": drawChilbolton(ctx, S); break;
+      case "crabwood": drawCrabwood(ctx, S); break;
+      case "pictogram": drawPictogram(ctx, S); break;
+      case "grid": drawGrid(ctx, S); break;
+      case "sevenfold": drawSevenfold(ctx, S); break;
+      case "pi": drawPi(ctx, S); break;
+      case "cube": drawCube(ctx, S); break;
+      case "ansty": drawAnsty(ctx, S); break;
+      case "flower": drawFlower(ctx, S); break;
+      case "eye": drawEye(ctx, S); break;
+      case "ishtar": drawIshtar(ctx, S); break;
+      case "shamash": drawShamash(ctx, S); break;
+      case "imago": drawImago(ctx, S); break;
+      case "giza": drawGiza(ctx, S); break;
+      case "free":
+        if (mini) drawFreeGlyph(ctx, S);
+        else spiralCircles(ctx, S, freeFormationArgs());
+        break;
     }
-    else if (d.kind === "sriyantra") drawSriYantra(ctx, S);
-    else if (d.kind === "chilbolton") drawChilbolton(ctx, S);
-    else if (d.kind === "crabwood") drawCrabwood(ctx, S);
   }
 
   /* ============================ SONIFICATION MATH ============================ */
   var SAMPLE_RATE = 44100;
   var NPART = 14;
+  var FMIN = 40, FMAX = 300, REF_D = 26;
+  function pitchFromSpan(D) {
+    // fields: 26 m → 300 Hz down to 400 m → ~46 Hz; artefacts below 26 m climb gently into a higher register
+    var f = D >= REF_D ? FMAX * Math.pow(REF_D / D, 0.69) : FMAX * Math.pow(REF_D / D, 0.12);
+    return Math.max(FMIN, Math.min(640, f));
+  }
+  function spanFromPitch(f) {
+    return f <= FMAX ? REF_D * Math.pow(FMAX / f, 1 / 0.69) : REF_D * Math.pow(FMAX / f, 1 / 0.12);
+  }
   function computeReading(f) {
-    var refD = 26, FMIN = 40, FMAX = 300;
-    var f0 = FMAX * Math.pow(refD / f.diameter, 0.69);
-    f0 = Math.max(FMIN, Math.min(FMAX, f0));
+    var f0 = pitchFromSpan(f.diameter);
     var sym = f.sym < 2 ? 2 : f.sym;
-    var parts = [];
-    var n, amp;
+    var parts = [], n, amp;
     for (n = 1; n <= NPART; n++) {
-      var pos = (n - 1) / (NPART - 1);
-      var rad = 0.18;
-      for (var ri = 0; ri < f.rings.length; ri++) {
-        rad += Math.exp(-Math.pow(pos - f.rings[ri], 2) / (2 * 0.06 * 0.06));
+      if (f.digits) {
+        var dg = n <= f.digits.length ? f.digits[n - 1] : 0;
+        var dmax = Math.max.apply(null, f.digits);
+        amp = (dg / dmax) * (f.spiral ? Math.pow(n, -0.35) : 1) + (n > f.digits.length ? 0.03 * Math.pow(n, -0.6) : 0);
+      } else {
+        var pos = (n - 1) / (NPART - 1), rad = 0.18;
+        for (var ri = 0; ri < f.rings.length; ri++) rad += Math.exp(-Math.pow(pos - f.rings[ri], 2) / (2 * 0.06 * 0.06));
+        var symW = 1 + (n % sym === 0 ? 1.4 : 0) + (n % sym === 1 ? 0.22 : 0);
+        var roll = f.spiral ? Math.pow(n, -0.8) : Math.pow(n, -0.42);
+        amp = (0.24 + rad) * symW * roll * (0.6 + 0.5 * f.density);
       }
-      var symW = 1 + (n % sym === 0 ? 1.4 : 0) + (n % sym === 1 ? 0.22 : 0);
-      var roll = f.spiral ? Math.pow(n, -0.8) : Math.pow(n, -0.42);
-      amp = (0.24 + rad) * symW * roll * (0.6 + 0.5 * f.density);
       parts.push({ n: n, freq: f0 * n, amp: amp, harm: (n % sym === 0) });
     }
     var mx = 0;
@@ -1067,14 +1406,23 @@
     parts.forEach(function (p) { p.amp = p.amp / mx; });
     parts = parts.filter(function (p) { return p.amp >= 0.02 && p.freq < 19000; });
     var m = Math.max(2, Math.min(10, sym));
-    var nn = Math.max(m + 1, Math.min(12, m + Math.round((f0 - FMIN) / 24)));
+    var nn = Math.max(m + 1, Math.min(12, m + Math.round((Math.min(f0, 300) - FMIN) / 24)));
     return { f0: f0, parts: parts, mode: { n: nn, m: m }, sym: sym };
+  }
+  function freeReading() {
+    var f0 = parseFloat(freqSel.value), t = timbreSel.value, parts = [];
+    for (var n = 1; n <= NPART; n++) {
+      var amp = t === "pure" ? (n === 1 ? 1 : 0) : t === "reed" ? (n % 2 ? 1 / (n * n) : 0) : 1 / n;
+      parts.push({ n: n, freq: f0 * n, amp: amp, harm: false });
+    }
+    return { f0: f0, parts: parts, mode: { n: 0, m: 0 }, sym: 0 };
   }
 
   /* ============================ AUDIO ENGINE ============================ */
   var actx = null, master = null, dry = null, wet = null, conv = null, analyser = null;
-  var td = null, fd = null;
+  var td = null, fd = null, ffd = null;
   var voiceBus = null, oscs = [], lfo = null, playing = false, pluckTimer = null;
+  var micStream = null, micSrc = null, micAn = null, micOn = false, micTd = null, micFfd = null;
 
   function ensureCtx() {
     if (actx) return;
@@ -1087,18 +1435,13 @@
     analyser = actx.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.75;
     td = new Uint8Array(analyser.fftSize);
     fd = new Uint8Array(analyser.frequencyBinCount);
+    ffd = new Float32Array(analyser.frequencyBinCount);
     dry.connect(master); conv.connect(wet); wet.connect(master);
     master.connect(analyser); master.connect(actx.destination);
   }
   function makeImpulse(sec, decay) {
-    var rate = actx.sampleRate, len = Math.floor(rate * sec);
-    var buf = actx.createBuffer(2, len, rate);
-    for (var ch = 0; ch < 2; ch++) {
-      var d = buf.getChannelData(ch);
-      for (var i = 0; i < len; i++) {
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-      }
-    }
+    var rate = actx.sampleRate, len = Math.floor(rate * sec), buf = actx.createBuffer(2, len, rate);
+    for (var ch = 0; ch < 2; ch++) { var d = buf.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
     return buf;
   }
   function volTarget() { return Math.pow(volSel.value / 100, 1.7) * 0.9; }
@@ -1106,13 +1449,8 @@
   function stopVoice(hard) {
     if (pluckTimer) { clearTimeout(pluckTimer); pluckTimer = null; }
     var t = actx ? actx.currentTime : 0;
-    if (voiceBus) {
-      try {
-        voiceBus.gain.cancelScheduledValues(t);
-        voiceBus.gain.setTargetAtTime(0.0001, t, 0.12);
-      } catch (e) {}
-    }
-    var toStop = oscs.slice(); var vb = voiceBus, lf = lfo;
+    if (voiceBus) { try { voiceBus.gain.cancelScheduledValues(t); voiceBus.gain.setTargetAtTime(0.0001, t, 0.12); } catch (e) {} }
+    var toStop = oscs.slice(), vb = voiceBus, lf = lfo;
     setTimeout(function () {
       toStop.forEach(function (o) { try { o.stop(); o.disconnect(); } catch (e) {} });
       if (lf) try { lf.stop(); lf.disconnect(); } catch (e) {}
@@ -1120,19 +1458,25 @@
     }, 420);
     oscs = []; voiceBus = null; lfo = null;
     if (hard) {
-      if (master) { master.gain.setTargetAtTime(0.0001, t, 0.15); }
+      if (master) master.gain.setTargetAtTime(0.0001, t, 0.15);
       playing = false;
-      playBtn.textContent = "Play tone";
-      playBtn.setAttribute("data-on", "0");
+      updatePlayLabel();
     }
+  }
+  function updatePlayLabel() {
+    var free = isFree();
+    if (!playing) playBtn.textContent = "Play tone";
+    else playBtn.textContent = (!free && modeSel.value === "pluck") ? "Strike again" : "Stop";
+    playBtn.setAttribute("data-on", playing ? "1" : "0");
   }
 
   function startVoice() {
     ensureCtx();
     if (actx.state === "suspended") actx.resume();
     stopVoice(false);
-    var R = current.reading;
-    var timbre = timbreSel.value, mode = modeSel.value;
+    if (micOn) stopMic();
+    var R = current.reading, free = isFree();
+    var timbre = timbreSel.value, mode = free ? "drone" : modeSel.value;
     voiceBus = actx.createGain(); voiceBus.gain.value = 0.0001;
     var tail = voiceBus;
     if (timbre === "bowed") {
@@ -1145,17 +1489,20 @@
     }
     tail.connect(dry); tail.connect(conv);
     var otype = timbre === "reed" ? "triangle" : (timbre === "bowed" ? "sawtooth" : "sine");
-    var detunes = current.f.density > 0.72 ? [0, -5, 5] : [0];
-    R.parts.forEach(function (p) {
-      detunes.forEach(function (ct) {
-        var o = actx.createOscillator();
-        o.type = otype; o.frequency.value = p.freq; o.detune.value = ct;
-        var g = actx.createGain();
-        g.gain.value = p.amp * (ct === 0 ? 1 : 0.32) * 0.26;
-        o.connect(g); g.connect(voiceBus); o.start();
-        oscs.push(o);
+    if (free) {
+      var o1 = actx.createOscillator(); o1.type = otype; o1.frequency.value = R.f0;
+      var g1 = actx.createGain(); g1.gain.value = otype === "sine" ? 0.5 : 0.28;
+      o1.connect(g1); g1.connect(voiceBus); o1.start(); oscs.push(o1);
+    } else {
+      var detunes = current.f.density > 0.72 ? [0, -5, 5] : [0];
+      R.parts.forEach(function (p) {
+        detunes.forEach(function (ct) {
+          var o = actx.createOscillator(); o.type = otype; o.frequency.value = p.freq; o.detune.value = ct;
+          var g = actx.createGain(); g.gain.value = p.amp * (ct === 0 ? 1 : 0.32) * 0.26;
+          o.connect(g); g.connect(voiceBus); o.start(); oscs.push(o);
+        });
       });
-    });
+    }
     var t = actx.currentTime;
     master.gain.cancelScheduledValues(t);
     master.gain.setTargetAtTime(volTarget(), t, 0.05);
@@ -1168,183 +1515,297 @@
       voiceBus.gain.linearRampToValueAtTime(1, t + 0.5);
     }
     playing = true;
-    playBtn.textContent = mode === "pluck" ? "Strike again" : "Stop";
-    playBtn.setAttribute("data-on", "1");
+    updatePlayLabel();
+  }
+  function retuneFree() {
+    // live slider while a free tone plays: move the oscillator instead of rebuilding
+    if (playing && isFree() && oscs.length) {
+      var f = parseFloat(freqSel.value);
+      oscs[0].frequency.setTargetAtTime(f, actx.currentTime, 0.02);
+    }
   }
 
-  /* ============================ CHLADNI PLATE ============================ */
-  var plateBmp = null;   // offscreen nodal-line bitmap
-  var particles = [];
+  function startMic() {
+    ensureCtx();
+    if (actx.state === "suspended") actx.resume();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      $("#dosLede").textContent = "This browser doesn't offer microphone access. Use the tone slider instead.";
+      return;
+    }
+    micBtn.textContent = "Asking…";
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+      .then(function (stream) {
+        if (playing) stopVoice(true);
+        micStream = stream;
+        micSrc = actx.createMediaStreamSource(stream);
+        micAn = actx.createAnalyser(); micAn.fftSize = 2048; micAn.smoothingTimeConstant = 0.6;
+        micTd = new Float32Array(micAn.fftSize); micFfd = new Float32Array(micAn.frequencyBinCount);
+        micSrc.connect(micAn);   // analysis only — never routed to the speakers
+        micOn = true;
+        micBtn.textContent = "Microphone live — sing";
+        micBtn.setAttribute("data-on", "1");
+        $("#dosLede").textContent = "Microphone live. Sing, hum or whistle — low notes make big lazy loops, high notes fine filigree. Nothing is recorded or sent anywhere; the audio is analysed in your browser and discarded.";
+      })
+      .catch(function (err) {
+        micBtn.textContent = "Use microphone";
+        $("#dosLede").textContent = "Microphone not available (" + (err && err.name ? err.name : "blocked") + "). Allow it in the browser's site permissions, or use the tone slider instead.";
+      });
+  }
+  function stopMic() {
+    if (micStream) micStream.getTracks().forEach(function (tr) { try { tr.stop(); } catch (e) {} });
+    if (micSrc) try { micSrc.disconnect(); } catch (e) {}
+    micStream = null; micSrc = null; micAn = null; micOn = false;
+    micBtn.textContent = "Use microphone";
+    micBtn.setAttribute("data-on", "0");
+    if (isFree()) $("#dosLede").textContent = FREE.lede;
+  }
+
+  /* pitch: normalised autocorrelation on the mic buffer */
+  var detectedHz = 0;
+  function detectPitch(buf, rate) {
+    var N = buf.length, rms = 0, i;
+    for (i = 0; i < N; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / N);
+    if (rms < 0.012) return 0;
+    var minLag = Math.floor(rate / 1200), maxLag = Math.floor(rate / 40);
+    var best = 0, bestLag = 0;
+    for (var lag = minLag; lag <= maxLag; lag++) {
+      var c = 0;
+      for (i = 0; i < N - lag; i += 2) c += buf[i] * buf[i + lag];
+      if (c > best) { best = c; bestLag = lag; }
+    }
+    if (!bestLag) return 0;
+    var e0 = 0; for (i = 0; i < N; i += 2) e0 += buf[i] * buf[i];
+    if (best / e0 < 0.3) return 0;
+    return rate / bestLag;
+  }
+
+  /* ============================ CHLADNI PLATE — preset (single mode) ============================ */
+  var plateBmp = null, particles = [], avgSettle = 0;
   var PN = reduceMotion ? 900 : 1300;
 
-  function zAt(x, y, n, m) {
-    return Math.sin(n * Math.PI * x) * Math.sin(m * Math.PI * y) -
-           Math.sin(m * Math.PI * x) * Math.sin(n * Math.PI * y);
-  }
+  function zAt(x, y, n, m) { return Math.sin(n * Math.PI * x) * Math.sin(m * Math.PI * y) - Math.sin(m * Math.PI * x) * Math.sin(n * Math.PI * y); }
   function gradAt(x, y, n, m) {
     var pin = Math.PI * n, pim = Math.PI * m;
-    var dx = pin * Math.cos(pin * x) * Math.sin(pim * y) - pim * Math.cos(pim * x) * Math.sin(pin * y);
-    var dy = pim * Math.sin(pin * x) * Math.cos(pim * y) - pin * Math.sin(pim * x) * Math.cos(pin * y);
-    return [dx, dy];
+    return [pin * Math.cos(pin * x) * Math.sin(pim * y) - pim * Math.cos(pim * x) * Math.sin(pin * y),
+            pim * Math.sin(pin * x) * Math.cos(pim * y) - pin * Math.sin(pim * x) * Math.cos(pin * y)];
   }
-
   function buildPlateBitmap() {
-    var G = 240;
-    var off = document.createElement("canvas"); off.width = G; off.height = G;
-    var octx = off.getContext("2d");
-    var img = octx.createImageData(G, G);
-    var dat = img.data;
-    var n = current.reading.mode.n, m = current.reading.mode.m;
-    var s = COL.soundRgb;
-    for (var yy = 0; yy < G; yy++) {
-      for (var xx = 0; xx < G; xx++) {
-        var z = Math.abs(zAt(xx / (G - 1), yy / (G - 1), n, m));
-        var idx = (yy * G + xx) * 4;
-        // nodal line: z near 0
-        var line = Math.max(0, 1 - z / 0.16);
-        line = Math.pow(line, 1.6);
-        // faint antinode wash
-        var wash = Math.min(1, z) * 0.10;
-        dat[idx] = s[0]; dat[idx + 1] = s[1]; dat[idx + 2] = s[2];
-        dat[idx + 3] = Math.round(line * 210 + wash * 40);
-      }
+    if (isFree()) return;
+    var G = 240, off = document.createElement("canvas"); off.width = G; off.height = G;
+    var octx = off.getContext("2d"), img = octx.createImageData(G, G), dat = img.data;
+    var n = current.reading.mode.n, m = current.reading.mode.m, s = COL.soundRgb;
+    for (var yy = 0; yy < G; yy++) for (var xx = 0; xx < G; xx++) {
+      var z = Math.abs(zAt(xx / (G - 1), yy / (G - 1), n, m)), idx = (yy * G + xx) * 4;
+      var line = Math.pow(Math.max(0, 1 - z / 0.16), 1.6), wash = Math.min(1, z) * 0.10;
+      dat[idx] = s[0]; dat[idx + 1] = s[1]; dat[idx + 2] = s[2]; dat[idx + 3] = Math.round(line * 210 + wash * 40);
     }
     octx.putImageData(img, 0, 0);
     plateBmp = off;
   }
-
-  function seedParticles() {
-    particles = [];
-    for (var i = 0; i < PN; i++) {
-      particles.push({ x: Math.random(), y: Math.random(), settle: 0 });
-    }
-  }
+  function seedParticles() { particles = []; for (var i = 0; i < PN; i++) particles.push({ x: Math.random(), y: Math.random(), settle: 0 }); }
   function stepParticles(energy) {
     var n = current.reading.mode.n, m = current.reading.mode.m;
-    var lr = 0.010 + energy * 0.006;
-    var jit = 0.0016 + 0.004 * (1 - avgSettle);
-    var sumS = 0;
+    var lr = 0.010 + energy * 0.006, jit = 0.0016 + 0.004 * (1 - avgSettle), sumS = 0;
     for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-      var z = zAt(p.x, p.y, n, m);
-      var g = gradAt(p.x, p.y, n, m);
-      var gl = Math.hypot(g[0], g[1]) || 1e-6;
-      var dir = z >= 0 ? 1 : -1;
+      var p = particles[i], z = zAt(p.x, p.y, n, m), g = gradAt(p.x, p.y, n, m);
+      var gl = Math.hypot(g[0], g[1]) || 1e-6, dir = z >= 0 ? 1 : -1;
       p.x -= dir * (g[0] / gl) * lr + (Math.random() - 0.5) * jit;
       p.y -= dir * (g[1] / gl) * lr + (Math.random() - 0.5) * jit;
       if (p.x < 0) p.x = -p.x; if (p.x > 1) p.x = 2 - p.x;
       if (p.y < 0) p.y = -p.y; if (p.y > 1) p.y = 2 - p.y;
       var near = 1 - Math.min(1, Math.abs(zAt(p.x, p.y, n, m)) / 0.12);
-      p.settle += (near - p.settle) * 0.05;
-      sumS += p.settle;
+      p.settle += (near - p.settle) * 0.05; sumS += p.settle;
     }
     avgSettle = sumS / particles.length;
   }
-  var avgSettle = 0;
 
+  /* ============================ CHLADNI PLATE — free (audio-weighted superposition) ============================ */
+  var MODES_N = 6, MODES = [];
+  (function () {
+    for (var m = 1; m <= MODES_N; m++) for (var n = 1; n <= MODES_N; n++) if (m !== n) MODES.push({ m: m, n: n, f: Math.sqrt(m * m + n * n) });
+    var fMin = Infinity, fMax = 0;
+    MODES.forEach(function (o) { fMin = Math.min(fMin, o.f); fMax = Math.max(fMax, o.f); });
+    MODES.forEach(function (o) { o.fn = (o.f - fMin) / (fMax - fMin); o.hz = 60 * Math.pow(1500 / 60, o.fn); });
+  })();
+  var W = new Float32Array(MODES.length);
+  var FG = 112, field = new Float32Array(FG * FG), cosT = [];
+  (function () { for (var k = 0; k <= MODES_N; k++) { var row = new Float32Array(FG); for (var i = 0; i < FG; i++) row[i] = Math.cos(k * Math.PI * (i + 0.5) / FG); cosT.push(row); } })();
+  var freeBmpCv = document.createElement("canvas"); freeBmpCv.width = FG; freeBmpCv.height = FG;
+  var freeBmpCtx = freeBmpCv.getContext("2d"), freeImg = freeBmpCtx.createImageData(FG, FG);
+  var tSeed = 0, dominant = { m: 3, n: 2 };
+
+  function updateWeights() {
+    tSeed += 0.008;
+    var live = (micOn && micAn) || (playing && analyser);
+    var an = micOn ? micAn : analyser, data = micOn ? micFfd : ffd;
+    var total = 0, i, sm = 0.86;
+    if (live) {
+      an.getFloatFrequencyData(data);
+      var nyq = SAMPLE_RATE / 2, DB_FLOOR = -90, DB_CEIL = -20;
+      for (i = 0; i < MODES.length; i++) {
+        var centre = Math.round(MODES[i].hz / nyq * data.length), db = -140;
+        for (var k = -2; k <= 2; k++) { var b = Math.min(data.length - 1, Math.max(0, centre + k)); if (data[b] > db) db = data[b]; }
+        var amp = Math.min(1, Math.max(0, (db - DB_FLOOR) / (DB_CEIL - DB_FLOOR))); amp *= amp;
+        var baseline = 0.06 * (0.5 + 0.5 * Math.sin(tSeed + i * 1.7)) * (i < 10 ? 1 : 0.3);
+        W[i] = sm * W[i] + (1 - sm) * Math.max(amp, baseline);
+        total += W[i];
+      }
+    } else {
+      // no audio yet: shape the plate from the slider alone, using a virtual harmonic spectrum of the chosen tone
+      var f = parseFloat(freqSel.value), t = timbreSel.value;
+      for (i = 0; i < MODES.length; i++) {
+        var a = 0;
+        for (var h = 1; h <= 8; h++) {
+          var ha = t === "pure" ? (h === 1 ? 1 : 0) : t === "reed" ? (h % 2 ? 1 / (h * h) : 0) : 1 / h;
+          if (!ha) continue;
+          var d = Math.log(MODES[i].hz / (f * h));
+          a += ha * Math.exp(-(d * d) / (2 * 0.09 * 0.09));
+        }
+        W[i] = sm * W[i] + (1 - sm) * Math.min(1, a);
+        total += W[i];
+      }
+    }
+    if (total > 0.0001) { var norm = Math.min(1, 3.0 / total); if (norm < 1) for (i = 0; i < MODES.length; i++) W[i] *= norm; }
+    var bi = 0; for (i = 1; i < MODES.length; i++) if (W[i] > W[bi]) bi = i;
+    if (MODES[bi].m !== dominant.m || MODES[bi].n !== dominant.n) { dominant = { m: MODES[bi].m, n: MODES[bi].n }; onDominantChange(); }
+  }
+  function computeFreeField() {
+    var i, x, y, idx = 0;
+    for (y = 0; y < FG; y++) for (x = 0; x < FG; x++) {
+      var acc = 0;
+      for (i = 0; i < MODES.length; i++) {
+        var w = W[i]; if (w <= 0.0001) continue;
+        var m = MODES[i].m, n = MODES[i].n;
+        acc += w * (cosT[m][x] * cosT[n][y] - cosT[n][x] * cosT[m][y]);
+      }
+      field[idx++] = acc;
+    }
+  }
+  function sampleField(u, v) {
+    var fx = Math.min(FG - 1.001, Math.max(0, u * FG - 0.5)), fy = Math.min(FG - 1.001, Math.max(0, v * FG - 0.5));
+    var x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0;
+    var a = field[y0 * FG + x0], b = field[y0 * FG + x0 + 1], c = field[(y0 + 1) * FG + x0], d = field[(y0 + 1) * FG + x0 + 1];
+    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+  }
+  function stepFreeParticles() {
+    var h = 1 / FG, lr = 0.008, jit = 0.003, sumS = 0;
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i], z = sampleField(p.x, p.y);
+      var gx = (sampleField(p.x + h, p.y) - sampleField(p.x - h, p.y)) / (2 * h);
+      var gy = (sampleField(p.x, p.y + h) - sampleField(p.x, p.y - h)) / (2 * h);
+      var gl = Math.hypot(gx, gy) || 1e-6, dir = z >= 0 ? 1 : -1;
+      p.x -= dir * (gx / gl) * lr + (Math.random() - 0.5) * jit;
+      p.y -= dir * (gy / gl) * lr + (Math.random() - 0.5) * jit;
+      if (p.x < 0) p.x = -p.x; if (p.x > 1) p.x = 2 - p.x;
+      if (p.y < 0) p.y = -p.y; if (p.y > 1) p.y = 2 - p.y;
+      var near = Math.exp(-6 * Math.abs(sampleField(p.x, p.y)));
+      p.settle += (near - p.settle) * 0.05; sumS += p.settle;
+    }
+    avgSettle = sumS / particles.length;
+  }
+  function renderFreeBitmap() {
+    var s = COL.soundRgb, sharp = parseFloat(sharpSel.value), gain = 2.2, d = freeImg.data;
+    for (var i = 0; i < FG * FG; i++) {
+      var line = Math.exp(-sharp * Math.abs(field[i]) * gain), o = i * 4;
+      d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235);
+    }
+    freeBmpCtx.putImageData(freeImg, 0, 0);
+  }
+  function freeFormationArgs() {
+    var m = dominant.m, n = dominant.n, big = Math.max(m, n), small = Math.min(m, n);
+    return { arms: Math.min(9, big + small - 1), count: 80 + 30 * (big + small), turns: 0.25 + 0.09 * small, csize: 0.05, dir: (m > n) ? 1 : -1 };
+  }
+  function onDominantChange() {
+    if (!isFree()) return;
+    renderFormation();
+    $("#readMode").textContent = "(" + dominant.n + "," + dominant.m + ")";
+    $("#readSym").textContent = (dominant.m + dominant.n - 1) + "-fold";
+  }
+
+  /* ============================ DRAW: plate, scope ============================ */
   function drawPlate(energy) {
     var S = plateSize;
     plateCtx.clearRect(0, 0, S, S);
-    plateCtx.fillStyle = COL.plateBg;
-    plateCtx.fillRect(0, 0, S, S);
-    if (plateBmp) {
-      plateCtx.save();
-      plateCtx.globalAlpha = 0.55 + 0.4 * Math.min(1, energy * 2);
-      plateCtx.imageSmoothingEnabled = true;
-      plateCtx.drawImage(plateBmp, 0, 0, S, S);
-      plateCtx.restore();
-    }
-    // sand
+    plateCtx.fillStyle = COL.plateBg; plateCtx.fillRect(0, 0, S, S);
+    plateCtx.save();
+    plateCtx.imageSmoothingEnabled = true;
+    if (isFree()) { plateCtx.globalAlpha = 0.9; plateCtx.drawImage(freeBmpCv, 0, 0, S, S); }
+    else if (plateBmp) { plateCtx.globalAlpha = 0.55 + 0.4 * Math.min(1, energy * 2); plateCtx.drawImage(plateBmp, 0, 0, S, S); }
+    plateCtx.restore();
     plateCtx.fillStyle = "rgba(233,229,215," + (0.5 + 0.4 * avgSettle) + ")";
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-      var sz = 0.8 + p.settle * 1.1;
-      plateCtx.fillRect(p.x * S - sz / 2, p.y * S - sz / 2, sz, sz);
-    }
-    // brass rim
-    plateCtx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.5)";
-    plateCtx.lineWidth = 2;
-    plateCtx.strokeRect(1, 1, S - 2, S - 2);
+    for (var i = 0; i < particles.length; i++) { var p = particles[i], sz = 0.8 + p.settle * 1.1; plateCtx.fillRect(p.x * S - sz / 2, p.y * S - sz / 2, sz, sz); }
+    plateCtx.strokeStyle = rgba(COL.accentRgb, 0.5); plateCtx.lineWidth = 2; plateCtx.strokeRect(1, 1, S - 2, S - 2);
   }
 
-  /* ============================ SCOPE ============================ */
   function drawScope() {
     var w = scopeDim.w, h = scopeDim.h;
     scopeCtx.clearRect(0, 0, w, h);
-    scopeCtx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.25)";
-    scopeCtx.lineWidth = 1;
+    scopeCtx.strokeStyle = rgba(COL.mutedRgb, 0.25); scopeCtx.lineWidth = 1;
     scopeCtx.beginPath(); scopeCtx.moveTo(w / 2, 0); scopeCtx.lineTo(w / 2, h); scopeCtx.stroke();
     var grad = scopeCtx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, COL.accent);
-    grad.addColorStop(1, COL.sound);
-    scopeCtx.strokeStyle = grad;
-    scopeCtx.lineWidth = 1.4;
+    grad.addColorStop(0, COL.accent); grad.addColorStop(1, COL.sound);
+    scopeCtx.strokeStyle = grad; scopeCtx.lineWidth = 1.4;
     scopeCtx.beginPath();
-    if (playing && analyser) {
-      analyser.getByteTimeDomainData(td);
-      var step = td.length / h;
+    var src = null, isFloat = false;
+    if (micOn && micAn) { micAn.getFloatTimeDomainData(micTd); src = micTd; isFloat = true; }
+    else if (playing && analyser) { analyser.getByteTimeDomainData(td); src = td; }
+    if (src) {
+      var step = src.length / h;
       for (var y = 0; y < h; y++) {
-        var v = (td[Math.floor(y * step)] - 128) / 128;
-        var x = w / 2 + v * (w / 2 - 3);
+        var v = isFloat ? src[Math.floor(y * step)] * 2.5 : (src[Math.floor(y * step)] - 128) / 128;
+        var x = w / 2 + Math.max(-1, Math.min(1, v)) * (w / 2 - 3);
         if (y === 0) scopeCtx.moveTo(x, y); else scopeCtx.lineTo(x, y);
       }
-    } else {
-      scopeCtx.moveTo(w / 2, 0); scopeCtx.lineTo(w / 2, h);
-    }
+    } else { scopeCtx.moveTo(w / 2, 0); scopeCtx.lineTo(w / 2, h); }
     scopeCtx.stroke();
   }
 
   /* ============================ METER ============================ */
   var barEls = [];
   function buildMeter() {
-    barsEl.innerHTML = "";
-    barEls = [];
+    barsEl.innerHTML = ""; barEls = [];
     for (var i = 1; i <= NPART; i++) {
-      var b = document.createElement("div");
-      b.className = "bar";
-      var inner = document.createElement("i");
-      var lab = document.createElement("b");
-      lab.textContent = i;
-      b.appendChild(inner); b.appendChild(lab);
-      barsEl.appendChild(b);
+      var b = document.createElement("div"); b.className = "bar";
+      var inner = document.createElement("i"), lab = document.createElement("b"); lab.textContent = i;
+      b.appendChild(inner); b.appendChild(lab); barsEl.appendChild(b);
       barEls.push({ wrap: b, inner: inner, lab: lab });
     }
   }
   function refreshMeter() {
-    var R = current.reading;
-    var byN = {};
+    var R = current.reading, byN = {};
     R.parts.forEach(function (p) { byN[p.n] = p; });
     for (var i = 0; i < NPART; i++) {
-      var n = i + 1, p = byN[n];
-      var el = barEls[i];
-      var base = p ? p.amp : 0;
-      el.baseAmp = base;
-      el.harm = p ? p.harm : false;
+      var n = i + 1, p = byN[n], el = barEls[i], base = p ? p.amp : 0;
+      el.baseAmp = base; el.harm = p ? p.harm : false;
       el.wrap.classList.toggle("harm", !!el.harm);
       el.inner.style.height = (base * 100) + "%";
       el.lab.textContent = el.harm ? "×" : n;
-      el.lab.title = "partial " + n;
     }
-    $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · × marks multiples of " + R.sym + "-fold symmetry";
+    if (isFree()) $("#meterNote").textContent = micOn ? "live spectrum at multiples of the detected pitch" : "harmonics of " + Math.round(R.f0) + " Hz · shaped by the chosen voice";
+    else if (current.f.digits) $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · amplitudes taken from the figure's own numbers";
+    else $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · × marks multiples of " + R.sym + "-fold symmetry";
   }
   function liveMeter() {
-    if (!(playing && analyser)) return;
-    analyser.getByteFrequencyData(fd);
-    var R = current.reading;
+    var an = micOn ? micAn : (playing ? analyser : null);
+    if (!an) return;
+    var data = micOn ? micFfd : ffd;
+    an.getFloatFrequencyData(data);
+    var f0 = micOn ? (detectedHz || current.reading.f0) : current.reading.f0;
     for (var i = 0; i < NPART; i++) {
       var el = barEls[i];
-      if (!el.baseAmp) continue;
-      var freq = R.f0 * (i + 1);
-      var bin = Math.round(freq * analyser.fftSize / SAMPLE_RATE);
-      var e = bin < fd.length ? fd[bin] / 255 : 0;
-      var h = el.baseAmp * (0.55 + 1.0 * e) * 100;
+      var bin = Math.round(f0 * (i + 1) * an.fftSize / SAMPLE_RATE);
+      var db = bin < data.length ? data[bin] : -140;
+      var e = Math.min(1, Math.max(0, (db + 90) / 70));
+      var h = micOn ? e * 100 : el.baseAmp * (0.55 + 1.0 * e) * 100;
       el.inner.style.height = Math.min(120, h) + "%";
     }
   }
 
   /* ============================ RENDER LOOP ============================ */
-  var t0 = performance.now();
+  var t0 = performance.now(), frameNo = 0, lastFree = false;
   function loop(now) {
+    frameNo++;
     var energy = 0;
     if (playing && analyser) {
       analyser.getByteTimeDomainData(td);
@@ -1352,119 +1813,161 @@
       for (var i = 0; i < td.length; i += 8) { var v = (td[i] - 128) / 128; s += v * v; }
       energy = Math.min(1, Math.sqrt(s / (td.length / 8)) * 3.2);
     }
-    stepParticles(energy);
+    if (isFree()) {
+      updateWeights();
+      computeFreeField();
+      renderFreeBitmap();
+      stepFreeParticles();
+      if (micOn && micAn && frameNo % 6 === 0) {
+        micAn.getFloatTimeDomainData(micTd);
+        var hz = detectPitch(micTd, SAMPLE_RATE);
+        if (hz) detectedHz = detectedHz ? detectedHz * 0.6 + hz * 0.4 : hz;
+        $("#readF").innerHTML = (hz ? Math.round(detectedHz) : "—") + "<small>Detected&nbsp;·&nbsp;Hz</small>";
+        $("#readSpan").textContent = hz ? "≈ " + fmtSpan(spanFromPitch(detectedHz)) : "—";
+      }
+    } else {
+      stepParticles(energy);
+    }
     drawPlate(energy);
     drawScope();
     liveMeter();
-    // scanline
     if (!reduceMotion) {
       var y = ((now - t0) / 2600 % 1) * fieldSize;
       scanEl.style.transform = "translateY(" + y + "px)";
-      scanEl.style.opacity = playing ? "0.6" : "0.28";
+      scanEl.style.opacity = (playing || micOn) ? "0.6" : "0.28";
     }
     requestAnimationFrame(loop);
   }
+  function fmtSpan(m) { return m >= 10 ? Math.round(m) + " m" : m >= 1 ? m.toFixed(1) + " m" : Math.round(m * 100) + " cm"; }
 
   /* ============================ WIRING ============================ */
   var current = { f: null, reading: null };
+  function isFree() { return current.f && current.f.id === "free"; }
 
   function renderFormation() {
     fieldSize = fitSquare(fieldCv, fieldCtx);
     drawFormation(fieldCtx, fieldSize, current.f, false);
   }
+  function redrawAll() {
+    renderFormation(); buildPlateBitmap(); drawPlate(0); drawScope();
+    Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { drawChipGlyph(c); });
+  }
 
-  function selectFormation(f, fromClick) {
+  function selectFormation(f) {
+    var wasFree = isFree();
     current.f = f;
-    current.reading = computeReading(f);
-    // captions + dossier
+    var free = isFree();
+    if (wasFree && !free && micOn) stopMic();
+    current.reading = free ? freeReading() : computeReading(f);
+    transportEl.setAttribute("data-free", free ? "1" : "0");
+    $("#fieldTag").textContent = free ? "Formation your tone would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
+    $("#plateTag").textContent = free ? "Free plate · audio-reactive" : "Chladni plate · nodal lines";
     $("#fcName").textContent = f.name;
     $("#fcMeta").textContent = f.place;
-    $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Fundamental&nbsp;·&nbsp;Hz</small>";
-    $("#readSym").textContent = f.sym <= 1 ? "none" : f.sym + "-fold";
-    $("#readSpan").textContent = f.diameter + " m";
-    $("#readMode").textContent = "(" + current.reading.mode.n + "," + current.reading.mode.m + ")";
     $("#dosName").textContent = f.name;
     $("#dosLede").textContent = f.lede;
-    $("#dosLoc").textContent = f.place;
-    $("#dosDate").textContent = f.date;
+    $("#dosLoc").textContent = free ? "Wherever you are" : f.place;
+    $("#dosDate").textContent = free ? "Now" : f.date;
     $("#dosForm").textContent = f.form;
-    $("#dosSpan").textContent = "~" + f.diameter + " m across";
-    // visuals
+    if (free) {
+      $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Tone&nbsp;·&nbsp;Hz</small>";
+      $("#readSymLbl").textContent = "Loudest mode"; $("#readSpanLbl").textContent = "Field equivalent";
+      $("#readSym").textContent = (dominant.m + dominant.n - 1) + "-fold";
+      $("#readSpan").textContent = "≈ " + fmtSpan(spanFromPitch(current.reading.f0));
+      $("#readMode").textContent = "(" + dominant.n + "," + dominant.m + ")";
+      $("#dosSpan").textContent = "≈ " + fmtSpan(spanFromPitch(current.reading.f0)) + " — a field this tone would fit";
+      for (var w = 0; w < W.length; w++) W[w] = 0;
+    } else {
+      $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Fundamental&nbsp;·&nbsp;Hz</small>";
+      $("#readSymLbl").textContent = "Symmetry"; $("#readSpanLbl").textContent = "Span";
+      $("#readSym").textContent = f.sym <= 1 ? "none" : f.sym + "-fold";
+      $("#readSpan").textContent = fmtSpan(f.diameter);
+      $("#readMode").textContent = "(" + current.reading.mode.n + "," + current.reading.mode.m + ")";
+      $("#dosSpan").textContent = "~" + fmtSpan(f.diameter) + " across";
+    }
     renderFormation();
     buildPlateBitmap();
     seedParticles();
     avgSettle = 0;
     refreshMeter();
-    // chip state
-    Array.prototype.forEach.call(stripEl.children, function (c) {
-      c.setAttribute("aria-pressed", c.dataset.id === f.id ? "true" : "false");
-    });
-    // if a tone is playing, retune to the new formation
+    Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { c.setAttribute("aria-pressed", c.dataset.id === f.id ? "true" : "false"); });
     if (playing) startVoice();
-    if (reduceMotion) { for (var k = 0; k < 260; k++) stepParticles(0); drawPlate(0); }
+    updatePlayLabel();
+    if (reduceMotion) {
+      if (free) { for (var k = 0; k < 40; k++) { updateWeights(); } computeFreeField(); renderFreeBitmap(); for (var k2 = 0; k2 < 260; k2++) stepFreeParticles(); }
+      else for (var k3 = 0; k3 < 260; k3++) stepParticles(0);
+      drawPlate(0); drawScope();
+    }
   }
 
-  function buildStrip() {
-    FORMATIONS.forEach(function (f) {
-      var btn = document.createElement("button");
-      btn.className = "chip";
-      btn.type = "button";
-      btn.dataset.id = f.id;
-      btn.setAttribute("role", "tab");
-      btn.setAttribute("aria-pressed", "false");
-      var cv = document.createElement("canvas");
-      var nm = document.createElement("span"); nm.className = "chip-name"; nm.textContent = f.name;
-      var yr = document.createElement("span"); yr.className = "chip-year";
-      yr.textContent = f.date.replace("Reported ", "").replace("Found ", "").replace(/^\w+ /, "").replace(/.*?(\d{4}).*/, "$1");
-      btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
-      btn.addEventListener("click", function () { selectFormation(f, true); });
-      stripEl.appendChild(btn);
-      // draw mini glyph
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var rect = cv.getBoundingClientRect();
-      var w = rect.width || 112;
-      cv.width = w * dpr; cv.height = 84 * dpr;
-      var mctx = cv.getContext("2d");
-      mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // square glyph centred in the 84 tall box
-      mctx.save();
-      var gs = Math.min(w, 84);
-      mctx.translate((w - gs) / 2, (84 - gs) / 2);
-      drawFormation(mctx, gs, f, true);
-      mctx.restore();
-    });
+  function drawChipGlyph(btn) {
+    var f = btn._f, cv = btn.querySelector("canvas");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = cv.getBoundingClientRect(), w = rect.width || 112;
+    cv.width = w * dpr; cv.height = 84 * dpr;
+    var mctx = cv.getContext("2d"); mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.save(); var gs = Math.min(w, 84); mctx.translate((w - gs) / 2, (84 - gs) / 2);
+    drawFormation(mctx, gs, f, true); mctx.restore();
+  }
+  function makeChip(f, host) {
+    var btn = document.createElement("button");
+    btn.className = "chip" + (f.id === "free" ? " chip--free" : "");
+    btn.type = "button"; btn.dataset.id = f.id; btn._f = f;
+    btn.setAttribute("role", "tab"); btn.setAttribute("aria-pressed", "false");
+    var cv = document.createElement("canvas");
+    var nm = document.createElement("span"); nm.className = "chip-name"; nm.textContent = f.name;
+    var yr = document.createElement("span"); yr.className = "chip-year";
+    var m = f.date.match(/(\d{3,4})\s*BC/i) || f.date.match(/\b(\d{4})\b/);
+    yr.textContent = f.id === "free" ? "live · mic or tone" : (m ? (/(BC)/i.test(f.date) ? "c. " + m[1] + " BC" : m[1]) : "—");
+    btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
+    btn.addEventListener("click", function () { selectFormation(f); });
+    host.appendChild(btn);
+    drawChipGlyph(btn);
+  }
+  function buildStrips() {
+    FORMATIONS.filter(function (f) { return f.group === "crop"; }).forEach(function (f) { makeChip(f, stripCrop); });
+    FORMATIONS.filter(function (f) { return f.group === "ancient"; }).forEach(function (f) { makeChip(f, stripAncient); });
+    makeChip(FREE, stripAncient);
   }
 
   playBtn.addEventListener("click", function () {
-    if (playing && modeSel.value === "drone") { stopVoice(true); }
-    else { startVoice(); }
+    if (playing && (isFree() || modeSel.value === "drone")) stopVoice(true);
+    else startVoice();
   });
+  micBtn.addEventListener("click", function () { if (micOn) stopMic(); else startMic(); });
   document.addEventListener("keydown", function (e) {
     if (e.code === "Space" && e.target === document.body) {
       e.preventDefault();
-      if (playing && modeSel.value === "drone") stopVoice(true); else startVoice();
+      if (playing && (isFree() || modeSel.value === "drone")) stopVoice(true); else startVoice();
     }
   });
-  modeSel.addEventListener("change", function () {
-    playBtn.textContent = playing ? (modeSel.value === "pluck" ? "Strike again" : "Stop") : "Play tone";
-    if (playing && modeSel.value === "drone") startVoice();
+  modeSel.addEventListener("change", function () { updatePlayLabel(); if (playing && modeSel.value === "drone") startVoice(); });
+  timbreSel.addEventListener("change", function () {
+    if (isFree()) { current.reading = freeReading(); refreshMeter(); }
+    if (playing) startVoice();
   });
-  timbreSel.addEventListener("change", function () { if (playing) startVoice(); });
-  volSel.addEventListener("input", function () {
-    if (actx && master) master.gain.setTargetAtTime(volTarget(), actx.currentTime, 0.05);
+  freqSel.addEventListener("input", function () {
+    var f = parseFloat(freqSel.value);
+    freqVal.textContent = f + " Hz";
+    if (isFree()) {
+      current.reading = freeReading(); refreshMeter();
+      if (!micOn) {
+        $("#readF").innerHTML = f + "<small>Tone&nbsp;·&nbsp;Hz</small>";
+        $("#readSpan").textContent = "≈ " + fmtSpan(spanFromPitch(f));
+        $("#dosSpan").textContent = "≈ " + fmtSpan(spanFromPitch(f)) + " — a field this tone would fit";
+      }
+      retuneFree();
+    }
   });
+  sharpSel.addEventListener("input", function () { sharpVal.textContent = sharpSel.value; });
+  volSel.addEventListener("input", function () { if (actx && master) master.gain.setTargetAtTime(volTarget(), actx.currentTime, 0.05); });
 
   var rz;
   window.addEventListener("resize", function () {
     clearTimeout(rz);
     rz = setTimeout(function () {
-      fieldSize = fitSquare(fieldCv, fieldCtx);
-      plateSize = fitSquare(plateCv, plateCtx);
-      scopeDim = fitScope();
-      renderFormation();
-      buildPlateBitmap();
-      drawPlate(0);
-      drawScope();
+      fieldSize = fitSquare(fieldCv, fieldCtx); plateSize = fitSquare(plateCv, plateCtx); scopeDim = fitScope();
+      redrawAll();
     }, 160);
   });
 
@@ -1474,18 +1977,13 @@
     fieldSize = fitSquare(fieldCv, fieldCtx);
     plateSize = fitSquare(plateCv, plateCtx);
     scopeDim = fitScope();
-    buildStrip();
+    buildStrips();
     buildMeter();
-    selectFormation(FORMATIONS[0], false);
+    selectFormation(FORMATIONS.filter(function (f) { return f.id === "milkhill"; })[0]);
     if (!reduceMotion) requestAnimationFrame(loop);
     else { drawPlate(0); drawScope(); }
   }
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () {
-      // redraw glyphs/labels once fonts land
-      renderFormation();
-    });
-  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { renderFormation(); });
   boot();
 })();
 </script>
