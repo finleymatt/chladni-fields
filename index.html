@@ -1290,7 +1290,7 @@
         <li><b>Symmetry → harmony.</b><span>N-fold rotational symmetry lifts the Nth partial and its multiples — the same partials a plate divides into when it carries N nodal diameters.</span></li>
         <li><b>Rings → timbre.</b><span>Concentric bands in the design push energy higher or lower in the partial stack, giving each figure its colour. Where a figure encodes numbers — the digits of π, the Horus-eye fractions — those numbers are used as the partial amplitudes directly.</span></li>
         <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
-        <li><b>Then the plate.</b><span>The fundamental is fed to a square-plate Chladni model. The nodal lines it draws are the still places — where the sand would gather.</span></li>
+        <li><b>Then the plate.</b><span>The figure's sound — fundamental and partial stack together — drives a square plate the way a real tone does: every plate mode responds by how close it sits to resonance with each partial. The sand settles where the plate holds still. It is the shape of the <em>sound</em>, not a copy of the figure — a square plate can only make its own family of figures.</span></li>
       </ol>
       <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then both plates stop following a figure and follow sound. The model is a driven plate's: each mode responds with amplitude 1 / (ω<sub>k</sub>² − ω² + i·2ζω<sub>k</sub>ω), so whichever modes sit nearest each spectral peak carry the figure, and it morphs continuously as the pitch moves rather than jumping between pictures. Square-plate modes go as m² + n² (bending stiffness); the circular plate on the left uses Bessel-function modes with a free edge — rings and spokes, the crop-circle family — drawn as flattened crop. Drag the tone slider and play, or use the microphone and sing, bow, or play a record: several notes at once excite several figures, and you see their sum.</p>
     </div>
@@ -2463,18 +2463,25 @@
     return [pin * Math.cos(pin * x) * Math.sin(pim * y) - pim * Math.cos(pim * x) * Math.sin(pin * y),
             pim * Math.sin(pin * x) * Math.cos(pim * y) - pin * Math.sin(pim * x) * Math.cos(pin * y)];
   }
-  function buildPlateBitmap() {
-    if (isFree()) return;
-    var G = 240, off = document.createElement("canvas"); off.width = G; off.height = G;
-    var octx = off.getContext("2d"), img = octx.createImageData(G, G), dat = img.data;
-    var n = current.reading.mode.n, m = current.reading.mode.m, s = COL.soundRgb;
-    for (var yy = 0; yy < G; yy++) for (var xx = 0; xx < G; xx++) {
-      var z = Math.abs(zAt(xx / (G - 1), yy / (G - 1), n, m)), idx = (yy * G + xx) * 4;
-      var line = Math.pow(Math.max(0, 1 - z / 0.16), 1.6), wash = Math.min(1, z) * 0.10;
-      dat[idx] = s[0]; dat[idx + 1] = s[1]; dat[idx + 2] = s[2]; dat[idx + 3] = Math.round(line * 210 + wash * 40);
+  // The figure's own sound - fundamental and partial stack - drives the same forced-vibration square-plate model
+  // the free plate uses, so the figure's plate is exactly what that sound does to sand. The field is recomputed for
+  // a short run of frames after each selection (the tone is static), then only the sand keeps moving.
+  var presetFrames = 0;
+  function buildPlateBitmap() { if (!isFree()) presetFrames = 70; }
+  function presetPeaks() {
+    var parts = current.reading.parts.slice().sort(function (a, b) { return b.amp - a.amp; }).slice(0, 6);
+    return parts.map(function (p) { return { f: p.freq, a: p.amp }; });
+  }
+  function presetStep() {
+    if (presetFrames > 0) {
+      presetFrames--;
+      peaks = presetPeaks(); sigS = 1;
+      topSq = computeStillness(SQ, ISQ, false, 0.035);
+      smoothField(ISQ, ISQs, 0.7);
+      renderFreeBitmaps(true);
+      if (topSq) $("#readMode").textContent = "(" + topSq.n + "," + topSq.m + ")" + (topSq.sign > 0 ? "+" : "−");
     }
-    octx.putImageData(img, 0, 0);
-    plateBmp = off;
+    stepFreeParticles();
   }
   function seedParticles() { particles = []; for (var i = 0; i < PN; i++) particles.push({ x: Math.random(), y: Math.random(), settle: 0 }); }
   function stepParticles(energy) {
@@ -2688,18 +2695,19 @@
   var freeBmpCtx = freeBmpCv.getContext("2d"), freeImg = freeBmpCtx.createImageData(FG, FG);
   var circBmpCv = document.createElement("canvas"); circBmpCv.width = FG; circBmpCv.height = FG;
   var circBmpCtx = circBmpCv.getContext("2d"), circImg = circBmpCtx.createImageData(FG, FG);
-  function renderFreeBitmaps() {
-    var s = COL.soundRgb, a = COL.accentRgb, sharp = parseFloat(sharpSel.value), d = freeImg.data, e = circImg.data, P = FG * FG;
+  function renderFreeBitmaps(squareOnly) {
+    var s = COL.soundRgb, a = COL.accentRgb, sharp = isFree() ? parseFloat(sharpSel.value) : 14, d = freeImg.data, e = circImg.data, P = FG * FG;
     for (var i = 0; i < P; i++) {
       var o = i * 4;
       var line = Math.exp(-sharp * ISQs[i]);
       d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235 * sigS);
+      if (squareOnly) continue;
       if (rIdx[i] < 0) { e[o + 3] = 0; continue; }
       var lay = Math.exp(-sharp * 0.75 * ICRs[i]);       // flattened crop is a little wider than a sand line
       e[o] = a[0]; e[o + 1] = a[1]; e[o + 2] = a[2]; e[o + 3] = Math.round((0.06 + 0.94 * lay) * 235 * sigS);
     }
     freeBmpCtx.putImageData(freeImg, 0, 0);
-    circBmpCtx.putImageData(circImg, 0, 0);
+    if (!squareOnly) circBmpCtx.putImageData(circImg, 0, 0);
   }
   function blitCircular(ctx, S) {
     var pad = S * 0.05, side = S - 2 * pad;
@@ -2736,8 +2744,8 @@
     plateCtx.fillStyle = COL.plateBg; plateCtx.fillRect(0, 0, S, S);
     plateCtx.save();
     plateCtx.imageSmoothingEnabled = true;
-    if (isFree()) { plateCtx.globalAlpha = 0.9; plateCtx.drawImage(freeBmpCv, 0, 0, S, S); }
-    else if (plateBmp) { plateCtx.globalAlpha = 0.55 + 0.4 * Math.min(1, energy * 2); plateCtx.drawImage(plateBmp, 0, 0, S, S); }
+    plateCtx.globalAlpha = isFree() ? 0.9 : 0.72 + 0.25 * Math.min(1, energy * 2);
+    plateCtx.drawImage(freeBmpCv, 0, 0, S, S);
     plateCtx.restore();
     plateCtx.fillStyle = "rgba(233,229,215," + (0.5 + 0.4 * avgSettle) + ")";
     for (var i = 0; i < particles.length; i++) { var p = particles[i], sz = 0.8 + p.settle * 1.1; plateCtx.fillRect(p.x * S - sz / 2, p.y * S - sz / 2, sz, sz); }
@@ -2826,7 +2834,7 @@
       drawFormation(fieldCtx, fieldSize, FREE, false);
       if (frameNo % 6 === 0) updateFreeReadouts();
     } else {
-      stepParticles(energy);
+      presetStep();
     }
     drawPlate(energy);
     drawScope();
@@ -2888,8 +2896,9 @@
       $("#readSymLbl").textContent = "Symmetry"; $("#readSpanLbl").textContent = "Span";
       $("#readSym").textContent = f.sym <= 1 ? "none" : f.sym + "-fold";
       $("#readSpan").textContent = fmtSpan(f.diameter);
-      $("#readMode").textContent = "(" + current.reading.mode.n + "," + current.reading.mode.m + ")";
+      $("#readMode").textContent = "—";
       $("#dosSpan").textContent = "~" + fmtSpan(f.diameter) + " across";
+      resetFree(); sigS = 1;
     }
     renderFormation();
     buildPlateBitmap();
