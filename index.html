@@ -1937,6 +1937,7 @@
         micBtn.textContent = "Stop microphone";
         micBtn.setAttribute("data-on", "1");
         updatePlayLabel();
+        refreshMeter();
         $("#dosLede").textContent = "Microphone live. Sing, hum or whistle — low notes make big lazy loops, high notes fine filigree. Nothing is recorded or sent anywhere; the audio is analysed in your browser and discarded.";
       })
       .catch(function (err) {
@@ -1951,7 +1952,7 @@
     micStream = null; micSrc = null; micAn = null; micOn = false;
     micBtn.textContent = "Use microphone";
     micBtn.setAttribute("data-on", "0");
-    if (isFree()) $("#dosLede").textContent = FREE.lede;
+    if (isFree()) { $("#dosLede").textContent = FREE.lede; refreshMeter(); }
     updatePlayLabel();
   }
 
@@ -2310,7 +2311,7 @@
       el.inner.style.height = (base * 100) + "%";
       el.lab.textContent = el.harm ? "×" : n;
     }
-    if (isFree()) $("#meterNote").textContent = micOn ? "live spectrum at multiples of the detected pitch" : "harmonics of " + Math.round(R.f0) + " Hz · shaped by the chosen voice";
+    if (isFree()) $("#meterNote").textContent = micOn ? "live spectrum at multiples of the detected pitch" : "harmonics of " + Math.round(R.f0) + " Hz · what the chosen voice would sound";
     else if (current.f.digits) $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · amplitudes taken from the figure's own numbers";
     else $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · × marks multiples of " + R.sym + "-fold symmetry";
   }
