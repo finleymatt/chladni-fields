@@ -385,16 +385,36 @@
     margin: 36px 0 12px;
     gap: 16px;
   }
-  .strip-head + .strip + .strip-head { margin-top: 22px; }
+  .strip-wrap + .strip-head { margin-top: 22px; }
+  .strip-wrap { position: relative; }
   .strip {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 132px;
     gap: 10px;
     overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: thin;
+    padding: 2px 2px 8px;
+    scrollbar-width: none;             /* the strip fades at its edges instead of showing a bar */
+    -ms-overflow-style: none;
   }
+  .strip::-webkit-scrollbar { display: none; }
+  .strip[data-more-end="1"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent); }
+  .strip[data-more-start="1"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 72px); mask-image: linear-gradient(90deg, transparent, #000 72px); }
+  .strip[data-more-start="1"][data-more-end="1"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 72px, #000 calc(100% - 72px), transparent); mask-image: linear-gradient(90deg, transparent, #000 72px, #000 calc(100% - 72px), transparent); }
+  .strip-nav {
+    position: absolute; top: 50%; transform: translateY(-60%);
+    width: 34px; height: 54px;
+    display: none; place-items: center;
+    border: 1px solid var(--edge); border-radius: var(--r);
+    background: color-mix(in srgb, var(--panel) 88%, transparent);
+    color: var(--muted); font-family: var(--font-display); font-size: 22px; line-height: 1; padding: 0 0 3px;
+    cursor: pointer; box-shadow: var(--shadow);
+    transition: color .12s ease, border-color .12s ease, opacity .15s ease;
+  }
+  .strip-nav:hover { color: var(--accent); border-color: var(--accent); }
+  .strip-nav--prev { left: -12px; } .strip-nav--next { right: -12px; }
+  .strip-wrap[data-more-start="1"] .strip-nav--prev, .strip-wrap[data-more-end="1"] .strip-nav--next { display: grid; }
+  @media (max-width: 900px) { .strip-nav { display: none !important; } }
   .chip {
     position: relative;
     background: var(--panel);
@@ -772,6 +792,8 @@
   }
   .method li::before {
     content: counter(step, decimal-leading-zero);
+    grid-column: 1;
+    grid-row: 1 / span 2;
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--accent);
@@ -779,11 +801,12 @@
     padding-top: 4px;
   }
   .method li b {
+    grid-column: 2;
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: .01em;
   }
-  .method li span { color: var(--muted); display: block; font-size: .96rem; }
+  .method li span { grid-column: 2; color: var(--muted); display: block; font-size: .96rem; max-width: 78ch; }
   .method .own {
     margin: 26px 0 0;
     padding: 14px 16px;
@@ -1119,13 +1142,21 @@
     </div>
     <p class="eyebrow hide-m" aria-hidden="true">select one ▸</p>
   </div>
-  <div class="strip" id="stripCrop" role="tablist" aria-label="Crop formations"></div>
+  <div class="strip-wrap">
+    <div class="strip" id="stripCrop" role="tablist" aria-label="Crop formations"></div>
+    <button class="strip-nav strip-nav--prev" type="button" aria-label="Scroll formations left" data-dir="-1">‹</button>
+    <button class="strip-nav strip-nav--next" type="button" aria-label="Scroll formations right" data-dir="1">›</button>
+  </div>
 
   <div class="strip-head">
     <p class="eyebrow">Ancient figures&nbsp;·&nbsp;and your own</p>
     <button class="cta" id="ctaFree" type="button">Raise your own tone ▸</button>
   </div>
-  <div class="strip" id="stripAncient" role="tablist" aria-label="Ancient figures and free plate"></div>
+  <div class="strip-wrap">
+    <div class="strip" id="stripAncient" role="tablist" aria-label="Ancient figures and free plate"></div>
+    <button class="strip-nav strip-nav--prev" type="button" aria-label="Scroll figures left" data-dir="-1">‹</button>
+    <button class="strip-nav strip-nav--next" type="button" aria-label="Scroll figures right" data-dir="1">›</button>
+  </div>
 
   <div class="transport" id="transport" role="group" aria-label="Playback" data-free="0">
     <div class="transport-head">
@@ -2926,6 +2957,29 @@
     var strip = chip.parentElement, target = chip.offsetLeft - (strip.clientWidth - chip.offsetWidth) / 2;
     try { strip.scrollTo({ left: Math.max(0, target), behavior: reduceMotion ? "auto" : "smooth" }); } catch (e) { strip.scrollLeft = Math.max(0, target); }
   }
+  // strips: edge fades and chevrons instead of a scrollbar; the wheel scrolls them sideways under the pointer
+  Array.prototype.forEach.call(document.querySelectorAll(".strip-wrap"), function (wrap) {
+    var strip = wrap.querySelector(".strip");
+    function edges() {
+      var more = strip.scrollWidth - strip.clientWidth > 4;
+      var atStart = strip.scrollLeft <= 2, atEnd = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+      var s = more && !atStart ? "1" : "0", e = more && !atEnd ? "1" : "0";
+      strip.setAttribute("data-more-start", s); strip.setAttribute("data-more-end", e);
+      wrap.setAttribute("data-more-start", s); wrap.setAttribute("data-more-end", e);
+    }
+    strip.addEventListener("scroll", edges, { passive: true });
+    window.addEventListener("resize", edges);
+    Array.prototype.forEach.call(wrap.querySelectorAll(".strip-nav"), function (b) {
+      b.addEventListener("click", function () { strip.scrollBy({ left: parseInt(b.getAttribute("data-dir"), 10) * strip.clientWidth * 0.8, behavior: reduceMotion ? "auto" : "smooth" }); });
+    });
+    strip.addEventListener("wheel", function (ev) {
+      if (Math.abs(ev.deltaX) > Math.abs(ev.deltaY)) return;            // trackpads already scroll sideways
+      var canLeft = strip.scrollLeft > 0, canRight = strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1;
+      if ((ev.deltaY > 0 && canRight) || (ev.deltaY < 0 && canLeft)) { ev.preventDefault(); strip.scrollLeft += ev.deltaY; }
+    }, { passive: false });
+    setTimeout(edges, 0);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(edges);
+  });
   $("#prevBtn").addEventListener("click", function () { stepFigure(-1); });
   $("#nextBtn").addEventListener("click", function () { stepFigure(1); });
   // swipe anywhere on the console (either plate, or the readout between them) to change figure
