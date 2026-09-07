@@ -264,8 +264,13 @@
     padding: 8px 10px;
     min-height: 40px;
   }
-  input[type="range"] { width: 100%; min-width: 0; height: 28px; margin: 0; }
-  .free-only input[type="range"] { accent-color: var(--sound); }
+  input[type="range"] { width: 100%; min-width: 0; height: 32px; margin: 0; -webkit-appearance: none; appearance: none; background: transparent; touch-action: pan-y; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--edge); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer; }
+  input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--edge); }
+  input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); cursor: pointer; }
+  .free-only input[type="range"]::-webkit-slider-thumb { background: var(--sound); }
+  .free-only input[type="range"]::-moz-range-thumb { background: var(--sound); }
   .cta {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -716,6 +721,95 @@
   }
   .dossier .facts dd { margin: 0; font-size: .96rem; }
 
+  /* ---------- field guide: the Law of One ---------- */
+  .laws {
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--edge);
+  }
+  .laws-head { display: grid; grid-template-columns: 1fr auto; gap: 12px 24px; align-items: end; }
+  .laws-head h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    line-height: 1.05;
+    margin: .2em 0 0;
+    text-wrap: balance;
+  }
+  .laws-head h2 .amp { color: var(--accent); font-weight: 500; }
+  .laws-intro { max-width: 66ch; color: var(--muted); margin: 10px 0 0; }
+  .laws-intro b { color: var(--ink); font-weight: 600; }
+  .laws-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .laws-links a, .laws-links button {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 7px 12px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .laws-links a:hover, .laws-links button:hover { border-color: var(--accent); }
+  .laws-grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--edge);
+    border: 1px solid var(--edge);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .law {
+    background: var(--panel);
+    padding: 18px 18px 20px;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 6px;
+  }
+  .law .ref {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .law h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: .01em;
+  }
+  .law p { margin: 0; font-size: .95rem; color: var(--muted); }
+  .law p b { color: var(--ink); font-weight: 600; }
+  .law q { font-style: italic; color: var(--ink); quotes: "“" "”"; }
+  .law--ra { background: var(--panel-2); }
+  .law--ra h3 { color: var(--accent); }
+  .densities { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+  .densities span {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: .04em;
+    text-align: center;
+    padding: 6px 2px;
+    border-radius: 2px;
+    border: 1px solid var(--edge);
+    color: var(--muted);
+    line-height: 1.25;
+  }
+  .densities span b { display: block; font-family: var(--font-display); font-size: 13px; color: var(--ink); }
+  .densities span[data-here="1"] { border-color: var(--accent); color: var(--ink); }
+  .densities span[data-ra="1"] { border-color: var(--sound); }
+  .law-note { margin: 12px 0 0; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted); line-height: 1.6; max-width: 90ch; }
+  @media (max-width: 900px) { .laws-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .laws-head { grid-template-columns: 1fr; } .laws-links { justify-content: flex-start; } }
+  @media (max-width: 560px) { .laws-grid { grid-template-columns: 1fr; } .densities { grid-template-columns: repeat(4, 1fr); } }
+
   footer {
     margin-top: 52px;
     padding-top: 20px;
@@ -736,13 +830,91 @@
     clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
 
+  /* ---------- figure navigation: arrows on the panel, swipe, a picker for phones ---------- */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 58px;
+    border: 1px solid var(--edge);
+    border-radius: var(--r);
+    background: color-mix(in srgb, var(--panel) 72%, transparent);
+    color: var(--muted);
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    padding: 0 0 3px;
+    cursor: pointer;
+    opacity: .8;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .nav-arrow:hover { color: var(--accent); border-color: var(--accent); opacity: 1; }
+  .nav-arrow--prev { left: 10px; }
+  .nav-arrow--next { right: 10px; }
+  .figure-pick { display: none; align-items: center; gap: 10px; }
+  .figure-pick select { max-width: 62vw; }
+  .strip { scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .chip { scroll-snap-align: start; }
+  .mic-help {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--sound);
+    border-radius: var(--r);
+    background: color-mix(in srgb, var(--sound) 10%, var(--panel));
+    color: var(--ink);
+    font-size: .95rem;
+    line-height: 1.5;
+    max-width: 70ch;
+  }
+  .mic-help[data-show="1"] { display: block; }
+  .mic-help b { font-family: var(--font-display); color: var(--sound); }
+  .mic-help ol { margin: 8px 0 0; padding-left: 20px; }
+  .mic-help li { margin: 2px 0; }
+  .info--mic { width: min(540px, calc(100vw - 32px)); }
+  .info--mic .info-text { border-left: 0; }
+  .info--mic .info-blurb b { font-family: var(--font-display); color: var(--sound); }
+
   @media (max-width: 900px) {
-    .console { grid-template-columns: 1fr; }
-    .panel--field { border-right: 0; border-bottom: 1px solid var(--edge); }
-    .panel--plate { border-left: 0; border-top: 1px solid var(--edge); }
-    .gutter { flex-direction: row; flex-wrap: wrap; justify-content: space-around; padding: 14px; }
-    .gutter canvas.scope { width: 100%; height: 70px; order: -1; }
-    .gutter dl { grid-template-columns: repeat(3, 1fr); width: auto; gap: 4px 18px; }
+    /* phones: the plates come first and stay pinned at the top while the controls scroll beneath them */
+    .wrap { display: flex; flex-direction: column; }
+    .console { order: 1; position: sticky; top: 0; z-index: 5; margin-top: 14px; border-radius: var(--r) var(--r) 0 0; border-bottom: 0; }
+    .transport { order: 2; margin-top: 0; border-top: 0; border-radius: 0 0 var(--r) var(--r); box-shadow: none; }
+    .transport[data-free="1"] { box-shadow: none; border-top: 0; }
+    .transport[data-free="1"] + .console { border-color: var(--edge); }
+    .console[data-free="1"] { border-color: var(--sound); box-shadow: inset 0 2px 0 var(--sound); }
+    .meter { order: 3; }
+    .lower { order: 4; }
+    .laws { order: 5; }
+    footer { order: 6; }
+    .console { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+    .panel--field { grid-area: 1 / 1 / 2 / 2; border-right: 1px solid var(--edge); border-bottom: 1px solid var(--edge); }
+    .panel--plate { grid-area: 1 / 2 / 2 / 3; border-left: 0; border-top: 0; border-bottom: 1px solid var(--edge); }
+    .gutter { grid-area: 2 / 1 / 3 / 3; }
+    .panel-tag { font-size: 8.5px; top: 6px; left: 6px; letter-spacing: .12em; }
+    .field-caption { left: 8px; right: 8px; bottom: 6px; }
+    .field-caption .fc-name { font-size: .95rem; }
+    .field-caption .fc-meta { display: none; }
+    .nav-arrow { width: 28px; height: 44px; font-size: 20px; opacity: .7; }
+    .nav-arrow--prev { left: 6px; } .nav-arrow--next { right: 6px; }
+    .gutter { grid-column: 1 / -1; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; padding: 8px 12px; gap: 14px; min-width: 0; }
+    .gutter canvas.scope { display: none; }
+    .readf { font-size: 1.35rem; flex: 0 0 auto; }
+    .readf small { font-size: .5rem; letter-spacing: .12em; }
+    .gutter dl { display: flex; flex-wrap: wrap; width: auto; gap: 2px 14px; text-align: left; min-width: 0; flex: 1 1 auto; }
+    .gutter dt { font-size: 8px; }
+    .gutter dd { font-size: 11px; }
+    .figure-pick { display: flex; }
+    .hide-m { display: none; }
+    .transport .hint, .transport[data-free="1"] .hint.free-only { display: none; }
+    .ctl--slider { grid-template-columns: 1fr auto; grid-template-areas: "label val" "range range"; gap: 2px 10px; min-width: 0; max-width: none; flex-basis: 100%; }
+    .ctl--slider > label { grid-area: label; }
+    .ctl--slider .row { display: contents; }
+    .ctl--slider .row input { grid-area: range; }
+    .ctl--slider .row .val { grid-area: val; }
     .lower { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
@@ -798,7 +970,11 @@
 
   <div class="strip-head">
     <p class="eyebrow">Crop formations</p>
-    <p class="eyebrow" aria-hidden="true">select one ▸</p>
+    <div class="figure-pick">
+      <label class="eyebrow" for="figureSel">Choose</label>
+      <select id="figureSel" aria-label="Choose a figure"></select>
+    </div>
+    <p class="eyebrow hide-m" aria-hidden="true">select one ▸</p>
   </div>
   <div class="strip" id="stripCrop" role="tablist" aria-label="Crop formations"></div>
 
@@ -873,6 +1049,7 @@
       </div>
     </div>
     <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Both plates are driven-vibration models: every mode answers by how near it sits to resonance with each spectral peak of what's sounding, so the figures morph continuously with pitch and blend when several notes sound. The microphone is analysed in your browser and never recorded.</p>
+    <div class="mic-help" id="micHelp" data-show="0" role="status"></div>
   </div>
 
   <section class="console" id="console" aria-label="Reading">
@@ -880,6 +1057,8 @@
       <span class="panel-tag" id="fieldTag">Formation · aerial</span>
       <canvas class="stage" id="fieldCanvas" width="600" height="600"></canvas>
       <div class="scanline" id="scan"></div>
+      <button class="nav-arrow nav-arrow--prev" id="prevBtn" type="button" aria-label="Previous figure">‹</button>
+      <button class="nav-arrow nav-arrow--next" id="nextBtn" type="button" aria-label="Next figure">›</button>
       <div class="field-caption">
         <div class="fc-name" id="fcName">—</div>
         <div class="fc-meta" id="fcMeta">—</div>
@@ -939,11 +1118,98 @@
     </div>
   </section>
 
+  <section class="laws" aria-labelledby="lawsTitle">
+    <div class="laws-head">
+      <div>
+        <p class="eyebrow">Field guide&nbsp;·&nbsp;the Ra Material</p>
+        <h2 id="lawsTitle">The Law of <span class="amp">One</span>, in nine readings</h2>
+        <p class="laws-intro">
+          Between 1981 and 1984, in a house in Louisville, Kentucky, three people recorded 106 sessions with a voice that opened
+          every one of them with <b>“I am Ra.”</b> The transcripts became <i>The Law of One</i>. Whatever you make of the
+          source, it is a remarkably consistent cosmology — and it talks about vibration, density and geometry the way
+          this page does. Here are its load-bearing ideas, with the sessions they come from.
+        </p>
+      </div>
+      <div class="laws-links">
+        <a href="https://www.lawofone.info/" target="_blank" rel="noopener">Read the sessions ↗</a>
+        <a href="https://www.llresearch.org/" target="_blank" rel="noopener">L/L Research ↗</a>
+        <button type="button" id="goGiza">Ra's pyramid, in plan ▸</button>
+      </div>
+    </div>
+
+    <div class="laws-grid">
+      <div class="law law--ra">
+        <span class="ref">Session 1 · 4</span>
+        <h3>The Law of One</h3>
+        <p><q>You are every thing, every being, every emotion, every event, every situation. You are unity. You are infinity. You are love/light, light/love. You are.</q> Everything is one Creator experiencing itself; separation is the illusion the rest of the material is about learning through.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 13</span>
+        <h3>The three distortions</h3>
+        <p>The One expresses itself through three <b>distortions</b>, in order: <b>free will</b> (the first, also called the Law of Confusion — nothing may be forced on you, including the truth), <b>love</b> (the creative Logos), and <b>light</b> (the stuff everything is built from). Love/light is the working name for reality.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 16</span>
+        <h3>Seven densities</h3>
+        <p>Consciousness climbs through seven <b>densities</b> — vibratory bands, not places. You are reading this in the third.</p>
+        <div class="densities">
+          <span><b>1</b>awareness</span><span><b>2</b>growth</span><span data-here="1"><b>3</b>choice</span><span><b>4</b>love</span><span><b>5</b>wisdom</span><span data-ra="1"><b>6</b>unity</span><span><b>7</b>gateway</span>
+        </div>
+      </div>
+      <div class="law">
+        <span class="ref">Session 17</span>
+        <h3>The Choice</h3>
+        <p>Third density exists for one decision: to polarise toward <b>service to others</b> or <b>service to self</b>. Both are valid paths back to the One. Ra gives the thresholds bluntly: to graduate positively you must be <b>51%</b> oriented to others; negatively, <b>95%</b> to self. The lukewarm repeat the grade.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 6 · 17</span>
+        <h3>Harvest</h3>
+        <p>Every 25,000 years, and decisively after three such cycles, a planet is <b>harvested</b>: those who have chosen move on to fourth density. Ra placed Earth's harvest about thirty years after 1981 — which is why the material shadowed the 2012 talk — and described fourth density as <q>a density of love and understanding.</q></p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 83</span>
+        <h3>The veil</h3>
+        <p>An early experiment: a <b>veil of forgetting</b> was drawn between the conscious and unconscious mind, so that third-density beings would not remember they are the Creator. Choices made blind count for more. It is why nothing here can simply be told to you.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Throughout</span>
+        <h3>Catalyst</h3>
+        <p>Everything that happens to you — illness, love, a difficult person, a crop circle in a wheat field — is <b>catalyst</b>: raw material offered to the self for growth. Unused catalyst is re-offered, sometimes as the body's own <q>distortions.</q></p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 12</span>
+        <h3>Wanderers</h3>
+        <p>Beings of higher densities who volunteer to be born here, behind the veil, to lighten the planet's vibration. Ra estimated about 65 million on Earth in 1981. Their tell: a lifelong sense of not being from around here.</p>
+      </div>
+      <div class="law law--ra">
+        <span class="ref">Sessions 2 · 3 · 6</span>
+        <h3>Ra, and the pyramid</h3>
+        <p>Ra describes itself as a sixth-density <b>social memory complex</b> from Venus, a <q>humble messenger of the Law of One</q>, speaking for the Confederation of Planets. It says it visited Egypt some 11,000 years ago and raised the <b>Great Pyramid by thought</b>, as a place of healing and initiation, and regrets how the teaching was turned into priestcraft. The figure is on this page: a square with a cross, seen from above.</p>
+      </div>
+    </div>
+    <p class="law-note">Channelled material, presented here on its own terms and not as a claim about the world. Quotations are from the L/L Research transcripts; session numbers point to where each idea is first laid out, not to every place it recurs.</p>
+  </section>
+
   <footer>
     <span>Figures follow widely published accounts. Drawings are schematic, generated in-browser — not survey-accurate. Microphone audio never leaves your browser.</span>
     <span>Web Audio · additive synthesis · analytic Chladni model</span>
   </footer>
 </div>
+
+<dialog class="info info--mic" id="micDlg" aria-labelledby="micDlgTitle">
+  <div class="info-head">
+    <p class="eyebrow">Microphone</p>
+    <button class="info-close" id="micDlgClose" type="button">Not now</button>
+  </div>
+  <div class="info-text">
+    <h2 id="micDlgTitle">Your phone will ask first</h2>
+    <p class="info-blurb">Tap <b>Allow microphone</b> below, then tap <b>Allow</b> on the permission your browser shows. The sound is analysed on your device and never recorded or sent anywhere.</p>
+    <p class="info-about" id="micDlgNote" hidden></p>
+    <div class="btn-row" style="margin-top: 14px;">
+      <button class="mic" id="micDlgGo" type="button" data-on="0">Allow microphone</button>
+    </div>
+  </div>
+</dialog>
 
 <dialog class="info" id="infoDlg" aria-labelledby="infoName">
   <div class="info-head">
@@ -1115,7 +1381,7 @@
     },
     {
       id: "ishtar", group: "ancient", name: "Star of Ishtar", place: "Mesopotamia — kudurru boundary stones and cylinder seals",
-      date: "Second millennium BC onward", form: "Eight-pointed star in a disc",
+      date: "Second millennium BC onward; the kudurru shown is c. 1180 BC", form: "Eight-pointed star in a disc",
       diameter: 0.08, sym: 8, spiral: false, density: 0.6,
       rings: [0.3, 0.65, 1.0],
       draw: { kind: "ishtar" },
@@ -1917,22 +2183,49 @@
     }
   }
 
+  /* ---- microphone: prime, request inside the tap, and explain the way back when the OS says no ---- */
+  var UA = navigator.userAgent || "";
+  var isIOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(UA);
+  // in-app browsers (Messages, Instagram, Facebook, TikTok…) never get the microphone; on iOS they lack "Safari" in the UA
+  var inApp = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|GSA\/|; wv\)/.test(UA) || (isIOS && !/Safari/.test(UA));
+  var micHelp = $("#micHelp"), micDlg = $("#micDlg"), micPrimed = false, micSink = null;
+  function showMicHelp(html) { micHelp.innerHTML = html; micHelp.setAttribute("data-show", html ? "1" : "0"); }
+  function micDeniedHelp() {
+    if (inApp) return "<b>This page is open inside another app's browser</b>, which can't use the microphone. Tap the share or <b>···</b> button and choose <b>Open in Safari</b> (or <b>Open in browser</b>), then try again.";
+    if (isIOS) return "<b>Safari has the microphone switched off for this site.</b> To switch it back on:<ol><li>Tap the <b>ᴀᴀ</b> (or the page icon) at the left of the address bar.</li><li>Tap <b>Website Settings</b>.</li><li>Set <b>Microphone</b> to <b>Allow</b>, then tap Done and try <b>Use microphone</b> again.</li></ol>If it still refuses: iPhone <b>Settings → Apps → Safari → Microphone → Ask</b>.";
+    if (isAndroid) return "<b>The microphone is blocked for this site.</b> Tap the <b>lock</b> (or tune) icon at the left of the address bar → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>, then try again.";
+    return "<b>Your browser blocked the microphone for this site.</b> Click the camera/microphone icon at the right of the address bar, allow it, and try again.";
+  }
+  function openMicPrimer() {
+    var note = $("#micDlgNote");
+    if (!window.isSecureContext) { showMicHelp("<b>Browsers only offer the microphone on a secure (https) page.</b> Open <b>https://iamra.lol</b> and try there."); return; }
+    if (inApp) { note.textContent = "You seem to be inside another app's browser, which can't use the microphone. Open this page in Safari or Chrome first."; note.hidden = false; }
+    else { note.textContent = isIOS ? "On iPhone the permission appears at the bottom of the screen the first time; if you tapped Don't Allow before, Safari will remember — the help below tells you where to change it." : ""; note.hidden = !note.textContent; }
+    if (typeof micDlg.showModal === "function") micDlg.showModal(); else startMic();
+  }
   function startMic() {
     ensureCtx();
     if (actx.state === "suspended") actx.resume();
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      $("#dosLede").textContent = "This browser doesn't offer microphone access. Use the tone slider instead.";
+      showMicHelp("<b>This browser doesn't offer microphone access.</b> Use the tone slider instead, or open the page in Safari or Chrome.");
       return;
     }
+    showMicHelp("");
     micBtn.textContent = "Asking…";
+    setStatus("waiting for the microphone permission…", false);
+    // the request is issued synchronously inside the tap — iOS refuses it otherwise
     navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
       .then(function (stream) {
         if (playing) stopVoice(true);
+        if (actx.state === "suspended") actx.resume();
         micStream = stream;
         micSrc = actx.createMediaStreamSource(stream);
         micAn = actx.createAnalyser(); micAn.fftSize = 4096; micAn.smoothingTimeConstant = 0.45;
         micTd = new Float32Array(micAn.fftSize); micFfd = new Float32Array(micAn.frequencyBinCount);
-        micSrc.connect(micAn);   // analysis only — never routed to the speakers
+        micSrc.connect(micAn);
+        // a muted path to the output keeps the graph "live" on iOS Safari; nothing audible ever comes out of it
+        micSink = actx.createGain(); micSink.gain.value = 0; micSrc.connect(micSink); micSink.connect(actx.destination);
         micOn = true;
         micBtn.textContent = "Stop microphone";
         micBtn.setAttribute("data-on", "1");
@@ -1941,20 +2234,29 @@
         $("#dosLede").textContent = "Microphone live. Sing, hum or whistle — low notes make big lazy loops, high notes fine filigree. Nothing is recorded or sent anywhere; the audio is analysed in your browser and discarded.";
       })
       .catch(function (err) {
+        var name = err && err.name ? err.name : "blocked";
         micBtn.textContent = "Use microphone";
-        setStatus("microphone not available (" + (err && err.name ? err.name : "blocked") + ") — allow it in site permissions, or use the slider", false);
-        $("#dosLede").textContent = "Microphone not available (" + (err && err.name ? err.name : "blocked") + "). Allow it in the browser's site permissions, or use the tone slider instead. Note that browsers only offer the microphone on https pages.";
+        setStatus("microphone not available (" + name + ") — see the note below", false);
+        if (name === "NotAllowedError" || name === "SecurityError" || name === "PermissionDeniedError") showMicHelp(micDeniedHelp());
+        else if (name === "NotFoundError" || name === "DevicesNotFoundError") showMicHelp("<b>No microphone was found</b> on this device. Use the tone slider instead.");
+        else if (name === "NotReadableError" || name === "AbortError") showMicHelp("<b>Another app is using the microphone.</b> Close it (or end the call) and try again.");
+        else showMicHelp("<b>The microphone couldn't start</b> (" + name + "). Reload the page and try again, or use the tone slider.");
+        $("#dosLede").textContent = "Microphone not available (" + name + "). The note under the controls says how to allow it; the tone slider works meanwhile.";
       });
   }
   function stopMic() {
     if (micStream) micStream.getTracks().forEach(function (tr) { try { tr.stop(); } catch (e) {} });
     if (micSrc) try { micSrc.disconnect(); } catch (e) {}
-    micStream = null; micSrc = null; micAn = null; micOn = false;
+    if (micSink) try { micSink.disconnect(); } catch (e) {}
+    micStream = null; micSrc = null; micSink = null; micAn = null; micOn = false;
     micBtn.textContent = "Use microphone";
     micBtn.setAttribute("data-on", "0");
     if (isFree()) { $("#dosLede").textContent = FREE.lede; refreshMeter(); }
     updatePlayLabel();
   }
+  $("#micDlgGo").addEventListener("click", function () { micPrimed = true; micDlg.close(); startMic(); });
+  $("#micDlgClose").addEventListener("click", function () { micDlg.close(); });
+  micDlg.addEventListener("click", function (e) { if (e.target === micDlg) micDlg.close(); });
 
   /* pitch: normalised autocorrelation on the mic buffer */
   var detectedHz = 0;
@@ -2383,9 +2685,12 @@
     if (wasFree && !free && micOn) stopMic();
     current.reading = free ? freeReading() : computeReading(f);
     transportEl.setAttribute("data-free", free ? "1" : "0");
+    consoleEl.setAttribute("data-free", free ? "1" : "0");
     $("#transportLbl").textContent = free ? "Your own tone · free plate" : "Playback";
-    if (scrollTo && !reduceMotion) transportEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    else if (scrollTo) transportEl.scrollIntoView();
+    // desktop: bring the controls (and the console under them) into view; phones: the plates, with the controls right below
+    var scrollTarget = window.innerWidth < 900 ? consoleEl : transportEl;
+    if (scrollTo && !reduceMotion) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+    else if (scrollTo) scrollTarget.scrollIntoView();
     $("#fieldTag").textContent = free ? "Circular plate · the formation this sound would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
     $("#plateTag").textContent = free ? "Square plate · audio-reactive" : "Chladni plate · nodal lines";
     $("#fcName").textContent = f.name;
@@ -2422,6 +2727,7 @@
       c.querySelector(".chip-main").setAttribute("aria-pressed", on ? "true" : "false");
     });
     $("#dosSrc").hidden = free;
+    syncFigureNav(f);
     if (playing) startVoice();
     updatePlayLabel();
   }
@@ -2461,22 +2767,66 @@
     host.appendChild(wrap);
     drawChipGlyph(wrap);
   }
+  var ORDER = FORMATIONS.filter(function (f) { return f.group === "crop"; })
+    .concat(FORMATIONS.filter(function (f) { return f.group === "ancient"; }), [FREE]);
+  var figureSel = $("#figureSel");
   function buildStrips() {
     FORMATIONS.filter(function (f) { return f.group === "crop"; }).forEach(function (f) { makeChip(f, stripCrop); });
     FORMATIONS.filter(function (f) { return f.group === "ancient"; }).forEach(function (f) { makeChip(f, stripAncient); });
     makeChip(FREE, stripAncient);
+    // phone picker: one native select, grouped
+    [["Crop formations", "crop"], ["Ancient figures", "ancient"], ["Your own", "free"]].forEach(function (g) {
+      var og = document.createElement("optgroup"); og.label = g[0];
+      ORDER.filter(function (f) { return f.group === g[1]; }).forEach(function (f) {
+        var o = document.createElement("option"); o.value = f.id; o.textContent = f.name + (f.id === "free" ? " — mic or tone" : ""); og.appendChild(o);
+      });
+      figureSel.appendChild(og);
+    });
+    figureSel.addEventListener("change", function () {
+      var f = ORDER.filter(function (x) { return x.id === figureSel.value; })[0];
+      if (f) selectFormation(f, true);
+    });
   }
+  function stepFigure(dir) {
+    var i = ORDER.indexOf(current.f), n = ORDER.length;
+    selectFormation(ORDER[((i < 0 ? 0 : i) + dir + n) % n], window.innerWidth < 900);
+  }
+  function syncFigureNav(f) {
+    if (figureSel.value !== f.id) figureSel.value = f.id;
+    // centre the chip within its own strip only (scrollIntoView would also nudge the page sideways on phones)
+    var chip = document.querySelector('.chip[data-id="' + f.id + '"]');
+    if (!chip) return;
+    var strip = chip.parentElement, target = chip.offsetLeft - (strip.clientWidth - chip.offsetWidth) / 2;
+    try { strip.scrollTo({ left: Math.max(0, target), behavior: reduceMotion ? "auto" : "smooth" }); } catch (e) { strip.scrollLeft = Math.max(0, target); }
+  }
+  $("#goGiza").addEventListener("click", function () { selectFormation(FORMATIONS.filter(function (f) { return f.id === "giza"; })[0], true); });
+  $("#prevBtn").addEventListener("click", function () { stepFigure(-1); });
+  $("#nextBtn").addEventListener("click", function () { stepFigure(1); });
+  // swipe anywhere on the console (either plate, or the readout between them) to change figure
+  (function () {
+    var panel = consoleEl, sx = 0, sy = 0, live = false;
+    panel.addEventListener("touchstart", function (e) { if (e.touches.length !== 1) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; live = true; }, { passive: true });
+    panel.addEventListener("touchend", function (e) {
+      if (!live) return; live = false;
+      var t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
+      if (!t) return;
+      var dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) > 48 && Math.abs(dy) < 60) stepFigure(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
 
   playBtn.addEventListener("click", function () {
     if (playing && (isFree() || modeSel.value === "drone")) stopVoice(true);
     else startVoice();
   });
-  micBtn.addEventListener("click", function () { if (micOn) stopMic(); else startMic(); });
+  micBtn.addEventListener("click", function () { if (micOn) stopMic(); else if (micPrimed) startMic(); else openMicPrimer(); });
   document.addEventListener("keydown", function (e) {
-    if (e.code === "Space" && e.target === document.body) {
+    if (e.target !== document.body) return;
+    if (e.code === "Space") {
       e.preventDefault();
       if (playing && (isFree() || modeSel.value === "drone")) stopVoice(true); else startVoice();
-    }
+    } else if (e.code === "ArrowRight") { stepFigure(1); }
+    else if (e.code === "ArrowLeft") { stepFigure(-1); }
   });
   modeSel.addEventListener("change", function () { updatePlayLabel(); if (playing && modeSel.value === "drone") startVoice(); });
   timbreSel.addEventListener("change", function () {
