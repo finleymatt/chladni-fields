@@ -648,7 +648,11 @@
   }
   .plate-note b { font-family: var(--font-display); color: var(--sound); font-weight: 600; }
   .plate-note small { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; color: #8b9568; }
-  @media (max-width: 900px) { .plate-why { top: 6px; right: 6px; font-size: 8.5px; padding: 3px 7px; } .plate-note { font-size: .8rem; padding: 8px 10px; } }
+  @media (max-width: 900px) {
+    /* narrow plate: the tag keeps the top edge, the why-button takes the bottom corner, the note sits above it */
+    .plate-why { top: auto; bottom: 6px; right: 6px; font-size: 8.5px; padding: 3px 7px; }
+    .plate-note { font-size: .8rem; padding: 8px 10px; bottom: 34px; left: 6px; right: 6px; }
+  }
 
   .field-caption {
     position: absolute;
