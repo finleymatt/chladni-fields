@@ -907,7 +907,10 @@
     .gutter dl { display: flex; flex-wrap: wrap; width: auto; gap: 2px 14px; text-align: left; min-width: 0; flex: 1 1 auto; }
     .gutter dt { font-size: 8px; }
     .gutter dd { font-size: 11px; }
-    .figure-pick { display: flex; }
+    .strip-head { flex-wrap: wrap; gap: 8px 16px; }
+    .figure-pick { display: flex; flex: 1 1 100%; min-width: 0; }
+    .figure-pick label { flex: 0 0 auto; }
+    .figure-pick select { flex: 1 1 auto; width: 100%; max-width: none; min-width: 0; font-size: 16px; }   /* 16px: iOS won't zoom the page on focus */
     .hide-m { display: none; }
     .transport .hint, .transport[data-free="1"] .hint.free-only { display: none; }
     .ctl--slider { grid-template-columns: 1fr auto; grid-template-areas: "label val" "range range"; gap: 2px 10px; min-width: 0; max-width: none; flex-basis: 100%; }
