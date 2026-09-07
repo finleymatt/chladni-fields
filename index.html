@@ -737,10 +737,17 @@
   .lower {
     margin-top: 44px;
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: clamp(24px, 5vw, 60px);
+    grid-template-columns: 1fr;
+    gap: 40px;
     align-items: start;
   }
+  /* the dossier changes with every figure, so it leads: lede left, facts right; the method follows beneath */
+  .dossier { order: -1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 4px clamp(24px, 5vw, 60px); align-items: start; }
+  .dossier > .eyebrow, .dossier > h2, .dossier > .lede, .dossier > .src-btn { grid-column: 1; }
+  .dossier > .facts { grid-column: 2; grid-row: 1 / span 5; margin-top: 0; }
+  .dossier > .src-btn { justify-self: start; }
+  .method { padding-top: 32px; border-top: 1px solid var(--edge); }
+  @media (max-width: 900px) { .dossier { grid-template-columns: 1fr; } .dossier > .facts { grid-column: 1; grid-row: auto; margin-top: 16px; } }
   .method h2, .dossier h2 {
     font-family: var(--font-display);
     font-weight: 600;
