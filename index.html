@@ -2079,6 +2079,46 @@
   var voiceBus = null, oscs = [], lfo = null, playing = false, pluckTimer = null;
   var micStream = null, micSrc = null, micAn = null, micOn = false, micTd = null, micFfd = null;
 
+  // iOS mutes Web Audio while the ring/silent switch is on silent, but not <audio> elements. Playing a silent
+  // <audio> inside the first tap moves the page's audio session to "playback", after which Web Audio is heard
+  // regardless of the switch. Called synchronously from every audio-starting gesture; harmless elsewhere.
+  var unlockEl = null;
+  function unlockAudio() {
+    try {
+      if (!unlockEl) {
+        var rate = 8000, n = 4000, bytes = new Uint8Array(44 + n), dv = new DataView(bytes.buffer);
+        function str(o, s) { for (var i = 0; i < s.length; i++) bytes[o + i] = s.charCodeAt(i); }
+        str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt "); dv.setUint32(16, 16, true);
+        dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate, true);
+        dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); str(36, "data"); dv.setUint32(40, n, true);
+        for (var k = 0; k < n; k++) bytes[44 + k] = 128;
+        var b64 = btoa(String.fromCharCode.apply(null, bytes));
+        unlockEl = document.createElement("audio");
+        unlockEl.setAttribute("playsinline", ""); unlockEl.loop = true; unlockEl.volume = 0.01;
+        unlockEl.src = "data:audio/wav;base64," + b64;
+      }
+      var p = unlockEl.play(); if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+    if (actx) { if (actx.state !== "running") { var r = actx.resume(); if (r && r.catch) r.catch(function () {}); } }
+  }
+  function audioHealthCheck() {
+    // iOS reports "interrupted" after a call or another app took audio; a still-suspended context means the tap didn't unlock it
+    setTimeout(function () {
+      if (!actx || !playing) return;
+      if (actx.state !== "running") {
+        var r = actx.resume(); if (r && r.catch) r.catch(function () {});
+        showMicHelp("<b>Sound hasn't started</b> (audio state: " + actx.state + "). Tap Play again. On iPhone also check the <b>ring/silent switch</b> on the left edge and the volume buttons.");
+      } else if (isIOS && !iosSoundNoteShown) {
+        iosSoundNoteShown = true;
+        showMicHelp("<b>iPhone:</b> if you hear nothing, flip the <b>ring/silent switch</b> on the left edge to ring, and check the volume — iOS mutes web audio on silent. Then tap Play again. " + diagLine());
+      }
+    }, 900);
+  }
+  var iosSoundNoteShown = false;
+  function diagLine() {
+    var m = UA.match(/(CriOS|FxiOS|EdgiOS|Version)\/([\d.]+)/), b = m ? ({ CriOS: "Chrome", FxiOS: "Firefox", EdgiOS: "Edge", Version: "Safari" })[m[1]] + " " + m[2].split(".").slice(0, 2).join(".") : (/Chrome\/([\d.]+)/.test(UA) ? "Chrome" : "browser");
+    return "<small style=\"font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--muted)\">diag: " + b + " · " + (isIOS ? "iOS" : isAndroid ? "Android" : "desktop") + (inApp ? " · in-app browser" : "") + " · " + (window.isSecureContext ? "https" : "not https") + " · audio " + (actx ? actx.state : "not started") + "</small>";
+  }
   function ensureCtx() {
     if (actx) return;
     actx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2130,8 +2170,9 @@
 
   function startVoice() {
     ensureCtx();
-    if (actx.state === "suspended") actx.resume();
+    unlockAudio();
     stopVoice(false);
+    audioHealthCheck();
     if (micOn) stopMic();
     var R = current.reading, free = isFree();
     var timbre = timbreSel.value, mode = free ? "drone" : modeSel.value;
@@ -2193,7 +2234,7 @@
   function showMicHelp(html) { micHelp.innerHTML = html; micHelp.setAttribute("data-show", html ? "1" : "0"); }
   function micDeniedHelp() {
     if (inApp) return "<b>This page is open inside another app's browser</b>, which can't use the microphone. Tap the share or <b>···</b> button and choose <b>Open in Safari</b> (or <b>Open in browser</b>), then try again.";
-    if (isIOS) return "<b>Safari has the microphone switched off for this site.</b> To switch it back on:<ol><li>Tap the <b>ᴀᴀ</b> (or the page icon) at the left of the address bar.</li><li>Tap <b>Website Settings</b>.</li><li>Set <b>Microphone</b> to <b>Allow</b>, then tap Done and try <b>Use microphone</b> again.</li></ol>If it still refuses: iPhone <b>Settings → Apps → Safari → Microphone → Ask</b>.";
+    if (isIOS) return "<b>iPhone refused the microphone.</b> Two things fix this, in order:<ol><li><b>Open the page in the Safari app itself.</b> If you tapped a link in a message or another app, this is an in-app view, which never gets the microphone — tap the <b>Safari (compass) icon</b> in the bottom-right corner, or share → <b>Open in Safari</b>, then try again.</li><li>In Safari, tap the <b>ᴀᴀ</b> (or page icon) at the left of the address bar → <b>Website Settings</b> → <b>Microphone</b> → <b>Allow</b>, tap Done, then <b>Use microphone</b> again.</li></ol>Still refused: iPhone <b>Settings → Apps → Safari → Microphone → Ask</b>. " + diagLine();
     if (isAndroid) return "<b>The microphone is blocked for this site.</b> Tap the <b>lock</b> (or tune) icon at the left of the address bar → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>, then try again.";
     return "<b>Your browser blocked the microphone for this site.</b> Click the camera/microphone icon at the right of the address bar, allow it, and try again.";
   }
@@ -2201,7 +2242,7 @@
     var note = $("#micDlgNote");
     if (!window.isSecureContext) { showMicHelp("<b>Browsers only offer the microphone on a secure (https) page.</b> Open <b>https://iamra.lol</b> and try there."); return; }
     if (inApp) { note.textContent = "You seem to be inside another app's browser, which can't use the microphone. Open this page in Safari or Chrome first."; note.hidden = false; }
-    else { note.textContent = isIOS ? "On iPhone the permission appears at the bottom of the screen the first time; if you tapped Don't Allow before, Safari will remember — the help below tells you where to change it." : ""; note.hidden = !note.textContent; }
+    else { note.textContent = isIOS ? "iPhone: this only works in the Safari app itself — if you opened the link from a message or another app, tap the Safari (compass) icon in the bottom-right corner first. The permission then appears at the bottom of the screen; if you tapped Don't Allow before, Safari remembers, and the help below says where to change it." : ""; note.hidden = !note.textContent; }
     if (typeof micDlg.showModal === "function") micDlg.showModal(); else startMic();
   }
   function startMic() {
@@ -2215,10 +2256,13 @@
     micBtn.textContent = "Asking…";
     setStatus("waiting for the microphone permission…", false);
     // the request is issued synchronously inside the tap — iOS refuses it otherwise
-    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+    unlockAudio();
+    // iOS ignores the processing constraints and is happier with the plain form; other browsers get the flat, unprocessed signal
+    var constraints = isIOS ? { audio: true } : { audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } };
+    navigator.mediaDevices.getUserMedia(constraints)
       .then(function (stream) {
         if (playing) stopVoice(true);
-        if (actx.state === "suspended") actx.resume();
+        if (actx.state !== "running") { var rr = actx.resume(); if (rr && rr.catch) rr.catch(function () {}); }
         micStream = stream;
         micSrc = actx.createMediaStreamSource(stream);
         micAn = actx.createAnalyser(); micAn.fftSize = 4096; micAn.smoothingTimeConstant = 0.45;
