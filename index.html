@@ -633,6 +633,22 @@
     pointer-events: none;
   }
   .panel--plate .panel-tag { color: var(--sound); }
+  .plate-why {
+    position: absolute; top: 10px; right: 10px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--sound); background: color-mix(in srgb, var(--plate-bg) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--sound) 55%, transparent); border-radius: 999px; padding: 4px 9px; cursor: pointer;
+  }
+  .plate-why:hover, .plate-why[aria-expanded="true"] { background: var(--sound); color: var(--plate-bg); }
+  .plate-note {
+    position: absolute; left: 10px; right: 10px; bottom: 10px;
+    padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--sound) 55%, transparent); border-radius: var(--r);
+    background: color-mix(in srgb, var(--plate-bg) 92%, transparent); color: #e9e5d7;
+    font-size: .9rem; line-height: 1.45; max-width: 46ch;
+  }
+  .plate-note b { font-family: var(--font-display); color: var(--sound); font-weight: 600; }
+  .plate-note small { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; color: #8b9568; }
+  @media (max-width: 900px) { .plate-why { top: 6px; right: 6px; font-size: 8.5px; padding: 3px 7px; } .plate-note { font-size: .8rem; padding: 8px 10px; } }
 
   .field-caption {
     position: absolute;
@@ -1267,7 +1283,9 @@
     </div>
 
     <div class="panel panel--plate">
-      <span class="panel-tag" id="plateTag">Chladni plate · nodal lines</span>
+      <span class="panel-tag" id="plateTag">Round plate · scaled to the span</span>
+      <button class="plate-why" id="plateWhy" type="button" aria-expanded="false" aria-controls="plateNote">? why this shape</button>
+      <div class="plate-note" id="plateNote" hidden></div>
       <canvas class="stage" id="plateCanvas" width="600" height="600"></canvas>
     </div>
   </section>
@@ -1290,7 +1308,7 @@
         <li><b>Symmetry → harmony.</b><span>N-fold rotational symmetry lifts the Nth partial and its multiples — the same partials a plate divides into when it carries N nodal diameters.</span></li>
         <li><b>Rings → timbre.</b><span>Concentric bands in the design push energy higher or lower in the partial stack, giving each figure its colour. Where a figure encodes numbers — the digits of π, the Horus-eye fractions — those numbers are used as the partial amplitudes directly.</span></li>
         <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
-        <li><b>Then the plate.</b><span>The figure's sound — fundamental and partial stack together — drives a square plate the way a real tone does: every plate mode responds by how close it sits to resonance with each partial. The sand settles where the plate holds still. It is the shape of the <em>sound</em>, not a copy of the figure — a square plate can only make its own family of figures.</span></li>
+        <li><b>Then the plate.</b><span>The figure's sound drives a <em>round</em> plate scaled to its span. A round plate can only hold still along spokes and rings — the crop-circle family — and the tone is set where the mode that shares the figure's symmetry resonates: six spokes for a six-fold formation. The partials add fainter lines. So the sand rhymes with the figure without copying it: it is the shape of the figure's <em>sound</em>, computed as a real forced vibration.</span></li>
       </ol>
       <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then both plates stop following a figure and follow sound. The model is a driven plate's: each mode responds with amplitude 1 / (ω<sub>k</sub>² − ω² + i·2ζω<sub>k</sub>ω), so whichever modes sit nearest each spectral peak carry the figure, and it morphs continuously as the pitch moves rather than jumping between pictures. Square-plate modes go as m² + n² (bending stiffness); the circular plate on the left uses Bessel-function modes with a free edge — rings and spokes, the crop-circle family — drawn as flattened crop. Drag the tone slider and play, or use the microphone and sing, bow, or play a record: several notes at once excite several figures, and you see their sum.</p>
     </div>
@@ -2463,27 +2481,59 @@
     return [pin * Math.cos(pin * x) * Math.sin(pim * y) - pim * Math.cos(pim * x) * Math.sin(pin * y),
             pim * Math.sin(pin * x) * Math.cos(pim * y) - pin * Math.sin(pim * x) * Math.cos(pin * y)];
   }
-  // The figure's own sound - fundamental and partial stack - drives the same forced-vibration square-plate model
-  // the free plate uses, so the figure's plate is exactly what that sound does to sand. The field is recomputed for
-  // a short run of frames after each selection (the tone is static), then only the sand keeps moving.
-  var presetFrames = 0;
+  // The figure's plate is a CIRCULAR plate — the family whose still lines are spokes and rings, the crop-circle
+  // family — scaled to the figure's span so that the mode sharing the figure's symmetry (n spokes, s rings) resonates
+  // at the figure's fundamental. The whole partial stack then drives it through the forced-vibration model, so the
+  // fundamental raises the symmetric figure and the partials add their fainter detail. Recomputed for a short run of
+  // frames after each selection (the tone is static); then only the sand keeps moving.
+  var presetFrames = 0, FIGMODES = [], figTarget = { n: 6, s: 2 };
+  var PLATE_OVERRIDES = {
+    altonbarnes: { n: 2, s: 1 }, barbury: { n: 3, s: 1 }, mandelbrot: { n: 1, s: 2 }, juliaset: { n: 1, s: 3 }, windmill: { n: 3, s: 2 },
+    etchilhampton: { n: 4, s: 2 }, tawsmead: { n: 7, s: 2 }, milkhill: { n: 6, s: 3 }, chilbolton: { n: 2, s: 1 }, crabwood: { n: 1, s: 2 },
+    pi: { n: 10, s: 3 }, hackpen: { n: 6, s: 2 }, ansty: { n: 8, s: 3 }, sriyantra: { n: 9, s: 3 },
+    flower: { n: 6, s: 3 }, horus: { n: 1, s: 2 }, ishtar: { n: 8, s: 1 }, shamash: { n: 4, s: 1 }, imago: { n: 8, s: 2 }, giza: { n: 4, s: 1 }
+  };
+  function buildFigureModes(f, f0) {
+    var ov = PLATE_OVERRIDES[f.id] || {};
+    var n = ov.n != null ? ov.n : (f.sym >= 2 ? Math.min(f.sym, CIRC_NMAX) : 1), s = ov.s || 2;
+    var target = null;
+    for (var i = 0; i < CIRC_ALL.length; i++) if (CIRC_ALL[i].n === n && CIRC_ALL[i].s === s) { target = CIRC_ALL[i]; break; }
+    if (!target) target = CIRC_ALL[0];
+    figTarget = { n: n, s: s };
+    // driven with the figure's own symmetry (n points around the rim), so only modes sharing that symmetry answer;
+    // a single-point drive would pile every mode's antinode on one side and lean the figure over
+    FIGMODES = CIRC_ALL.filter(function (m) { return n < 2 || m.n % n === 0; }).map(function (m) {
+      var fq = f0 * Math.pow(m.k / target.k, 2);   // plate scaled so the target mode sits exactly on the fundamental
+      return { n: m.n, s: m.s, R: m.R, f: fq, w: 2 * Math.PI * fq, w2: 4 * Math.PI * Math.PI * fq * fq };
+    });
+  }
   function buildPlateBitmap() { if (!isFree()) presetFrames = 70; }
   function presetPeaks() {
-    // the four loudest partials carry the figure; the fundamental is always among them
-    var parts = current.reading.parts.slice().sort(function (a, b) { return b.amp - a.amp; }).slice(0, 4);
-    if (!parts.some(function (p) { return p.n === 1; })) parts.push(current.reading.parts[0]);
-    return parts.filter(function (p) { return p.amp >= 0.2; }).map(function (p) { return { f: p.freq, a: p.amp }; });
+    // the fundamental carries the symmetric figure at full strength; the three next-loudest partials add detail
+    var parts = current.reading.parts, fund = parts[0];
+    var rest = parts.slice(1).sort(function (a, b) { return b.amp - a.amp; }).slice(0, 3).filter(function (p) { return p.amp >= 0.25; });
+    return [{ f: fund.freq, a: 1 }].concat(rest.map(function (p) { return { f: p.freq, a: p.amp * 0.7 }; }));
   }
   function presetStep() {
     if (presetFrames > 0) {
       presetFrames--;
       peaks = presetPeaks(); sigS = 1;
-      topSq = computeStillness(SQ, ISQ, false, 0.035);
-      smoothField(ISQ, ISQs, 0.7);
-      renderFreeBitmaps(true);
-      if (topSq) $("#readMode").textContent = "(" + topSq.n + "," + topSq.m + ")" + (topSq.sign > 0 ? "+" : "−");
+      topCirc = computeStillness(FIGMODES, ICR, true, 0.03);
+      smoothField(ICR, ICRs, 0.7);
+      renderPresetBitmap();
+      if (topCirc) $("#readMode").textContent = topCirc.n + (topCirc.n === 1 ? " spoke · " : " spokes · ") + topCirc.s + (topCirc.s === 1 ? " ring" : " rings");
     }
-    stepFreeParticles();
+    stepFreeParticles(ICRs, true);
+  }
+  function renderPresetBitmap() {
+    var s = COL.soundRgb, d = freeImg.data, P = FG * FG;
+    for (var i = 0; i < P; i++) {
+      var o = i * 4;
+      if (rIdx[i] < 0) { d[o + 3] = 0; continue; }
+      var line = Math.exp(-14 * ICRs[i]);
+      d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235);
+    }
+    freeBmpCtx.putImageData(freeImg, 0, 0);
   }
   function seedParticles() { particles = []; for (var i = 0; i < PN; i++) particles.push({ x: Math.random(), y: Math.random(), settle: 0 }); }
   function stepParticles(energy) {
@@ -2567,6 +2617,19 @@
       var u = (x + 0.5) / FG * 2 - 1, v = (y + 0.5) / FG * 2 - 1, r = Math.hypot(u, v), th = Math.atan2(v, u), p = y * FG + x;
       rIdx[p] = r <= 1 ? Math.round(r * RN) : -1;
       for (nn = 0; nn <= CIRC_NMAX; nn++) cosNT[nn][p] = Math.cos(nn * th);
+    }
+  })();
+  // every circular mode up to 12 spokes and 5 rings, with its wavenumber, for plates that are scaled per figure
+  var CIRC_ALL = [];
+  (function () {
+    for (var n = 0; n <= CIRC_NMAX; n++) {
+      var zs = jpZeros(n, 5);
+      for (var s = 0; s < zs.length; s++) {
+        var kk = zs[s], R = new Float32Array(RN + 1), mx = 0, i;
+        for (i = 0; i <= RN; i++) { R[i] = besselJ(n, kk * i / RN); if (Math.abs(R[i]) > mx) mx = Math.abs(R[i]); }
+        for (i = 0; i <= RN; i++) R[i] /= mx;
+        CIRC_ALL.push({ n: n, s: s + 1, k: kk, R: R });
+      }
     }
   })();
 
@@ -2675,18 +2738,23 @@
     var a = I[y0 * FG + x0], b = I[y0 * FG + x0 + 1], c = I[(y0 + 1) * FG + x0], d = I[(y0 + 1) * FG + x0 + 1];
     return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
   }
-  function stepFreeParticles() {
+  function stepFreeParticles(F, disc) {
+    F = F || ISQs;
     var h = 1.5 / FG, lr = 0.007, jit = 0.0025 + 0.004 * (1 - sigS), sumS = 0;
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
-      var gx = (sampleI(ISQs, p.x + h, p.y) - sampleI(ISQs, p.x - h, p.y)) / (2 * h);
-      var gy = (sampleI(ISQs, p.x, p.y + h) - sampleI(ISQs, p.x, p.y - h)) / (2 * h);
+      var gx = (sampleI(F, p.x + h, p.y) - sampleI(F, p.x - h, p.y)) / (2 * h);
+      var gy = (sampleI(F, p.x, p.y + h) - sampleI(F, p.x, p.y - h)) / (2 * h);
       var gl = Math.hypot(gx, gy);
       if (gl > 1e-4) { p.x -= (gx / gl) * lr * sigS; p.y -= (gy / gl) * lr * sigS; }
       p.x += (Math.random() - 0.5) * jit; p.y += (Math.random() - 0.5) * jit;
       if (p.x < 0) p.x = -p.x; if (p.x > 1) p.x = 2 - p.x;
       if (p.y < 0) p.y = -p.y; if (p.y > 1) p.y = 2 - p.y;
-      var near = Math.exp(-7 * sampleI(ISQs, p.x, p.y)) * sigS;
+      if (disc) {   // sand stays on the round plate
+        var dx = p.x - 0.5, dy = p.y - 0.5, rr = Math.hypot(dx, dy);
+        if (rr > 0.485) { p.x = 0.5 + dx / rr * 0.48; p.y = 0.5 + dy / rr * 0.48; }
+      }
+      var near = Math.exp(-7 * sampleI(F, p.x, p.y)) * sigS;
       p.settle += (near - p.settle) * 0.05; sumS += p.settle;
     }
     avgSettle = sumS / particles.length;
@@ -2751,6 +2819,10 @@
     plateCtx.restore();
     plateCtx.fillStyle = "rgba(233,229,215," + (0.5 + 0.4 * avgSettle) + ")";
     for (var i = 0; i < particles.length; i++) { var p = particles[i], sz = 0.8 + p.settle * 1.1; plateCtx.fillRect(p.x * S - sz / 2, p.y * S - sz / 2, sz, sz); }
+    if (!isFree()) {   // the figure's plate is round: its rim, and a faint spoke count around it
+      plateCtx.strokeStyle = rgba(COL.accentRgb, 0.55); plateCtx.lineWidth = 1.5;
+      plateCtx.beginPath(); plateCtx.arc(S / 2, S / 2, S / 2 - 2, 0, Math.PI * 2); plateCtx.stroke();
+    }
     plateCtx.strokeStyle = rgba(COL.accentRgb, 0.5); plateCtx.lineWidth = 2; plateCtx.strokeRect(1, 1, S - 2, S - 2);
   }
 
@@ -2877,7 +2949,7 @@
     if (scrollTo && !reduceMotion) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (scrollTo) scrollTarget.scrollIntoView();
     $("#fieldTag").textContent = free ? "Circular plate · the formation this sound would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
-    $("#plateTag").textContent = free ? "Square plate · audio-reactive" : "Chladni plate · nodal lines";
+    $("#plateTag").textContent = free ? "Square plate · audio-reactive" : "Round plate · scaled to the span";
     $("#fcName").textContent = f.name;
     $("#fcMeta").textContent = f.place;
     $("#dosName").textContent = f.name;
@@ -2901,7 +2973,9 @@
       $("#readMode").textContent = "—";
       $("#dosSpan").textContent = "~" + fmtSpan(f.diameter) + " across";
       resetFree(); sigS = 1;
+      buildFigureModes(f, current.reading.f0);
     }
+    paintPlateNote();
     renderFormation();
     buildPlateBitmap();
     seedParticles();
@@ -3007,6 +3081,18 @@
     }, { passive: false });
     setTimeout(edges, 0);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(edges);
+  });
+  // the "? why this shape" note on the plate — so nobody expects the sand to copy the figure
+  function paintPlateNote() {
+    var note = $("#plateNote"), f = current.f;
+    if (isFree()) note.innerHTML = "<b>Chladni's square plate</b>, driven by whatever is sounding. A vibrating plate can only hold still along its own family of lines, so what you see is the shape of the <b>sound</b> — never a picture of anything.";
+    else note.innerHTML = "<b>A round plate the size of the field</b> — " + fmtSpan(f.diameter) + " across — driven by this figure's tone, at " + (figTarget.n >= 2 ? figTarget.n + " points spaced like the figure" : "one point") + ". A round plate can only hold still along <b>spokes and rings</b>, so the tone sits where the mode sharing the figure's symmetry rings: <b>" + figTarget.n + (figTarget.n === 1 ? " spoke, " : " spokes, ") + figTarget.s + (figTarget.s === 1 ? " ring" : " rings") + "</b>. The partials add fainter lines. It's the shape of the figure's <b>sound</b>, not a copy of the figure.<small>real modal response · not a drawing</small>";
+  }
+  $("#plateWhy").addEventListener("click", function () {
+    var open = this.getAttribute("aria-expanded") !== "true";
+    this.setAttribute("aria-expanded", open ? "true" : "false");
+    $("#plateNote").hidden = !open;
+    if (open) paintPlateNote();
   });
   $("#prevBtn").addEventListener("click", function () { stepFigure(-1); });
   $("#nextBtn").addEventListener("click", function () { stepFigure(1); });
