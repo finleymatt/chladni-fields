@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d120e" />
+<title>The Law of One · Chladni Fields</title>
+<meta name="description" content="The Law of One in nine readings — the load-bearing ideas of the Ra Material, with the sessions they come from. A field guide from Chladni Fields." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+<style>
+  :root {
+    --bg: #e3e4db; --panel: #eef0e7; --panel-2: #e8eae0; --edge: #c4c7b4; --ink: #21261d; --muted: #59634c;
+    --accent: #856611; --accent-soft: #9c7c28; --sound: #1f6472; --plate-bg: #0b0e0b;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(20,26,16,.35);
+    --font-display: 'Chakra Petch', 'Bahnschrift', 'DIN Alternate', system-ui, sans-serif;
+    --font-body: 'Spectral', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    --maxw: 1180px; --r: 3px;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d120e; --panel: #151b14; --panel-2: #1b2119; --edge: #2c3326; --ink: #e9e5d7; --muted: #8b9568;
+    --accent: #d3a851; --accent-soft: #b98f3f; --sound: #64bac8; --plate-bg: #090c09;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 24px 50px -24px rgba(0,0,0,.7);
+  }
+  :root[data-vibe="dmt"] {
+    --bg: #07030f; --panel: #10061f; --panel-2: #170a2d; --edge: #3b1e66; --ink: #f5edff; --muted: #b28ae6;
+    --accent: #ff4fd8; --accent-soft: #c94ad1; --sound: #4df3ff; --plate-bg: #05020c;
+    --shadow: 0 0 0 1px rgba(255,79,216,.12), 0 24px 60px -22px rgba(120,60,255,.65);
+  }
+  :root[data-vibe="dmt"][data-theme="light"] {
+    --bg: #f1e9ff; --panel: #faf6ff; --panel-2: #f2eaff; --edge: #d5c2f3; --ink: #1b0a30; --muted: #6d47a6;
+    --accent: #d417a8; --accent-soft: #b02fa6; --sound: #0a9fb5; --plate-bg: #12061f;
+    --shadow: 0 0 0 1px rgba(212,23,168,.10), 0 18px 44px -20px rgba(120,60,255,.45);
+  }
+  :root[data-vibe="dmt"] body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 42%),
+      radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--sound) 12%, transparent), transparent 40%),
+      repeating-radial-gradient(circle at 50% 38%, transparent 0 46px, color-mix(in srgb, var(--accent) 7%, transparent) 46px 47px);
+    background-attachment: fixed;
+  }
+  :root[data-vibe="dmt"] .eyebrow { color: color-mix(in srgb, var(--sound) 70%, var(--muted)); }
+  :root[data-vibe="dmt"] .laws-grid { box-shadow: var(--shadow), inset 0 0 0 1px color-mix(in srgb, var(--sound) 10%, transparent); }
+  :root[data-vibe="dmt"] .law--ra h3, :root[data-vibe="dmt"] h1 .amp { text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent); }
+  .vibe-toggle[data-on="1"] { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; letter-spacing: .003em; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: clamp(18px, 3.4vw, 44px) clamp(14px, 3.2vw, 40px) 64px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+  .back, .theme-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); background: transparent; border: 1px solid var(--edge); border-radius: 999px;
+    padding: 8px 14px; cursor: pointer; text-decoration: none; min-height: 40px;
+  }
+  .back { color: var(--accent); border-color: var(--accent); }
+  .back:hover, .theme-toggle:hover { color: var(--ink); border-color: var(--accent); }
+  .back b { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .02em; text-transform: none; }
+  .side-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .laws-head { display: grid; grid-template-columns: 1fr auto; gap: 12px 24px; align-items: end; }
+  h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.02; margin: .2em 0 0; text-wrap: balance; }
+  h1 .amp { color: var(--accent); font-weight: 500; }
+  .laws-intro { max-width: 66ch; color: var(--muted); margin: 12px 0 0; }
+  .laws-intro b { color: var(--ink); font-weight: 600; }
+  .laws-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .laws-links a {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+    background: transparent; border: 1px solid var(--edge); border-radius: 999px; padding: 7px 12px; text-decoration: none;
+  }
+  .laws-links a:hover { border-color: var(--accent); }
+  .laws-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--edge); border: 1px solid var(--edge); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+  .law { background: var(--panel); padding: 18px 18px 20px; display: grid; grid-template-rows: auto auto 1fr; gap: 6px; }
+  .law .ref { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .law h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.15; margin: 0; letter-spacing: .01em; }
+  .law p { margin: 0; font-size: .95rem; color: var(--muted); }
+  .law p b { color: var(--ink); font-weight: 600; }
+  .law q { font-style: italic; color: var(--ink); quotes: "“" "”"; }
+  .law--ra { background: var(--panel-2); }
+  .law--ra h3 { color: var(--accent); }
+  .densities { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+  .densities span { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .04em; text-align: center; padding: 6px 2px; border-radius: 2px; border: 1px solid var(--edge); color: var(--muted); line-height: 1.25; }
+  .densities span b { display: block; font-family: var(--font-display); font-size: 13px; color: var(--ink); }
+  .densities span[data-here="1"] { border-color: var(--accent); color: var(--ink); }
+  .densities span[data-ra="1"] { border-color: var(--sound); }
+  .law-note { margin: 14px 0 0; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted); line-height: 1.6; max-width: 90ch; }
+  .bottom { margin-top: 36px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .credit { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  @media (max-width: 900px) { .laws-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .laws-head { grid-template-columns: 1fr; } .laws-links { justify-content: flex-start; } }
+  @media (max-width: 560px) { .laws-grid { grid-template-columns: 1fr; } .densities { grid-template-columns: repeat(4, 1fr); } .top { margin-bottom: 18px; } }
+</style>
+<script>
+  (function () {
+    var t = "dark", v = "";
+    try { t = localStorage.getItem("chladni-theme") === "light" ? "light" : "dark"; v = localStorage.getItem("chladni-vibe") === "dmt" ? "dmt" : ""; } catch (e) {}
+    document.documentElement.setAttribute("data-theme", t);
+    if (v) document.documentElement.setAttribute("data-vibe", v);
+  })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top" aria-label="Page">
+    <a class="back" href="index.html">← <b>Back to the plates</b></a>
+    <div class="side-row">
+      <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch between dark and light">◐ Light</button>
+    </div>
+  </nav>
+
+  <section class="laws" aria-labelledby="lawsTitle">
+    <div class="laws-head">
+      <div>
+        <p class="eyebrow">Field guide&nbsp;·&nbsp;the Ra Material</p>
+        <h1 id="lawsTitle">The Law of <span class="amp">One</span>, in nine readings</h1>
+        <p class="laws-intro">
+          Between 1981 and 1984, in a house in Louisville, Kentucky, three people recorded 106 sessions with a voice that opened
+          every one of them with <b>“I am Ra.”</b> The transcripts became <i>The Law of One</i>. Whatever you make of the
+          source, it is a remarkably consistent cosmology — and it talks about vibration, density and geometry the way
+          the plates do. Here are its load-bearing ideas, with the sessions they come from.
+        </p>
+      </div>
+      <div class="laws-links">
+        <a href="https://www.lawofone.info/" target="_blank" rel="noopener">Read the sessions ↗</a>
+        <a href="https://www.llresearch.org/" target="_blank" rel="noopener">L/L Research ↗</a>
+        <a href="index.html?f=giza">Ra's pyramid, in plan ▸</a>
+      </div>
+    </div>
+
+    <div class="laws-grid">
+      <div class="law law--ra">
+        <span class="ref">Session 1 · 4</span>
+        <h3>The Law of One</h3>
+        <p><q>You are every thing, every being, every emotion, every event, every situation. You are unity. You are infinity. You are love/light, light/love. You are.</q> Everything is one Creator experiencing itself; separation is the illusion the rest of the material is about learning through.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 13</span>
+        <h3>The three distortions</h3>
+        <p>The One expresses itself through three <b>distortions</b>, in order: <b>free will</b> (the first, also called the Law of Confusion — nothing may be forced on you, including the truth), <b>love</b> (the creative Logos), and <b>light</b> (the stuff everything is built from). Love/light is the working name for reality.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 16</span>
+        <h3>Seven densities</h3>
+        <p>Consciousness climbs through seven <b>densities</b> — vibratory bands, not places. You are reading this in the third.</p>
+        <div class="densities">
+          <span><b>1</b>awareness</span><span><b>2</b>growth</span><span data-here="1"><b>3</b>choice</span><span><b>4</b>love</span><span><b>5</b>wisdom</span><span data-ra="1"><b>6</b>unity</span><span><b>7</b>gateway</span>
+        </div>
+      </div>
+      <div class="law">
+        <span class="ref">Session 17</span>
+        <h3>The Choice</h3>
+        <p>Third density exists for one decision: to polarise toward <b>service to others</b> or <b>service to self</b>. Both are valid paths back to the One. Ra gives the thresholds bluntly: to graduate positively you must be <b>51%</b> oriented to others; negatively, <b>95%</b> to self. The lukewarm repeat the grade.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 6 · 17</span>
+        <h3>Harvest</h3>
+        <p>Every 25,000 years, and decisively after three such cycles, a planet is <b>harvested</b>: those who have chosen move on to fourth density. Ra placed Earth's harvest about thirty years after 1981 — which is why the material shadowed the 2012 talk — and described fourth density as <q>a density of love and understanding.</q></p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 83</span>
+        <h3>The veil</h3>
+        <p>An early experiment: a <b>veil of forgetting</b> was drawn between the conscious and unconscious mind, so that third-density beings would not remember they are the Creator. Choices made blind count for more. It is why nothing here can simply be told to you.</p>
+      </div>
+      <div class="law">
+        <span class="ref">Throughout</span>
+        <h3>Catalyst</h3>
+        <p>Everything that happens to you — illness, love, a difficult person, a crop circle in a wheat field — is <b>catalyst</b>: raw material offered to the self for growth. Unused catalyst is re-offered, sometimes as the body's own <q>distortions.</q></p>
+      </div>
+      <div class="law">
+        <span class="ref">Session 12</span>
+        <h3>Wanderers</h3>
+        <p>Beings of higher densities who volunteer to be born here, behind the veil, to lighten the planet's vibration. Ra estimated about 65 million on Earth in 1981. Their tell: a lifelong sense of not being from around here.</p>
+      </div>
+      <div class="law law--ra">
+        <span class="ref">Sessions 2 · 3 · 6</span>
+        <h3>Ra, and the pyramid</h3>
+        <p>Ra describes itself as a sixth-density <b>social memory complex</b> from Venus, a <q>humble messenger of the Law of One</q>, speaking for the Confederation of Planets. It says it visited Egypt some 11,000 years ago and raised the <b>Great Pyramid by thought</b>, as a place of healing and initiation, and regrets how the teaching was turned into priestcraft. The figure is on the plates page: <a href="index.html?f=giza">a square with a cross, seen from above</a>.</p>
+      </div>
+    </div>
+    <p class="law-note">Channelled material, presented here on its own terms and not as a claim about the world. Quotations are from the L/L Research transcripts; session numbers point to where each idea is first laid out, not to every place it recurs.</p>
+  </section>
+
+  <div class="bottom">
+    <a class="back" href="index.html">← <b>Back to the plates</b></a>
+    <p class="credit">Designed by Matt Finley</p>
+  </div>
+</div>
+<script>
+  (function () {
+    var root = document.documentElement, themeBtn = document.getElementById("themeBtn"), vibeBtn = document.getElementById("vibeBtn");
+    function paint() {
+      var dark = root.getAttribute("data-theme") !== "light", dmt = root.getAttribute("data-vibe") === "dmt";
+      themeBtn.textContent = dark ? "◐ Light" : "◑ Dark";
+      vibeBtn.setAttribute("data-on", dmt ? "1" : "0"); vibeBtn.setAttribute("aria-pressed", dmt ? "true" : "false");
+      vibeBtn.textContent = dmt ? "✺ DMT on" : "✺ DMT";
+    }
+    themeBtn.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("chladni-theme", next); } catch (e) {}
+      paint();
+    });
+    vibeBtn.addEventListener("click", function () {
+      var on = root.getAttribute("data-vibe") !== "dmt";
+      if (on) root.setAttribute("data-vibe", "dmt"); else root.removeAttribute("data-vibe");
+      try { localStorage.setItem("chladni-vibe", on ? "dmt" : ""); } catch (e) {}
+      paint();
+    });
+    paint();
+  })();
+</script>
+</body>
+</html>
