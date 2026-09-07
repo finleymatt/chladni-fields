@@ -2469,8 +2469,10 @@
   var presetFrames = 0;
   function buildPlateBitmap() { if (!isFree()) presetFrames = 70; }
   function presetPeaks() {
-    var parts = current.reading.parts.slice().sort(function (a, b) { return b.amp - a.amp; }).slice(0, 6);
-    return parts.map(function (p) { return { f: p.freq, a: p.amp }; });
+    // the four loudest partials carry the figure; the fundamental is always among them
+    var parts = current.reading.parts.slice().sort(function (a, b) { return b.amp - a.amp; }).slice(0, 4);
+    if (!parts.some(function (p) { return p.n === 1; })) parts.push(current.reading.parts[0]);
+    return parts.filter(function (p) { return p.amp >= 0.2; }).map(function (p) { return { f: p.freq, a: p.amp }; });
   }
   function presetStep() {
     if (presetFrames > 0) {
@@ -2643,7 +2645,7 @@
       var mx = 0;
       for (p = 0; p < P; p++) { var I = reS[p] * reS[p] + imS[p] * imS[p]; reS[p] = I; if (I > mx) mx = I; }
       if (mx <= 1e-18) continue;
-      var inv = 1 / mx, wgt = 1 / Math.sqrt(pk.a);
+      var inv = 1 / mx, wgt = 1 / Math.pow(Math.max(pk.a, 0.02), 1.5);   // quieter components get only their stillest lines
       for (p = 0; p < P; p++) { if (isCirc && rIdx[p] < 0) continue; var v = Math.sqrt(reS[p] * inv) * wgt; if (v < S[p]) S[p] = v; }
     }
     return top;
