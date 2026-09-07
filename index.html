@@ -1,0 +1,1491 @@
+<title>Chladni Fields</title>
+<meta name="description" content="Eight famous crop formations translated into tones, shown beside the resonance pattern each frequency would raise on a vibrating plate." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+
+<style>
+  :root {
+    /* light — ordnance-survey paper, overcast noon */
+    --bg: #e3e4db;
+    --panel: #eef0e7;
+    --panel-2: #e8eae0;
+    --edge: #c4c7b4;
+    --ink: #21261d;
+    --muted: #59634c;
+    --accent: #856611;      /* dry brass / standing wheat, darkened for paper */
+    --accent-soft: #9c7c28;
+    --sound: #1f6472;       /* the acoustic domain — cold, foreign to the field */
+    --plate-bg: #0b0e0b;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(20,26,16,.35);
+
+    --font-display: 'Chakra Petch', 'Bahnschrift', 'DIN Alternate', system-ui, sans-serif;
+    --font-body: 'Spectral', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    --maxw: 1180px;
+    --r: 3px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      /* dark — the aerial night survey, infrared pass over Wiltshire */
+      --bg: #0d120e;
+      --panel: #151b14;
+      --panel-2: #1b2119;
+      --edge: #2c3326;
+      --ink: #e9e5d7;
+      --muted: #8b9568;
+      --accent: #d3a851;
+      --accent-soft: #b98f3f;
+      --sound: #64bac8;
+      --plate-bg: #090c09;
+      --shadow: 0 1px 0 rgba(0,0,0,.3), 0 24px 50px -24px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d120e;
+    --panel: #151b14;
+    --panel-2: #1b2119;
+    --edge: #2c3326;
+    --ink: #e9e5d7;
+    --muted: #8b9568;
+    --accent: #d3a851;
+    --accent-soft: #b98f3f;
+    --sound: #64bac8;
+    --plate-bg: #090c09;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 24px 50px -24px rgba(0,0,0,.7);
+  }
+  :root[data-theme="light"] {
+    --bg: #e3e4db;
+    --panel: #eef0e7;
+    --panel-2: #e8eae0;
+    --edge: #c4c7b4;
+    --ink: #21261d;
+    --muted: #59634c;
+    --accent: #856611;
+    --accent-soft: #9c7c28;
+    --sound: #1f6472;
+    --plate-bg: #0b0e0b;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(20,26,16,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: .003em;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: clamp(18px, 3.4vw, 44px) clamp(14px, 3.2vw, 40px) 64px; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 22px 28px;
+    align-items: end;
+    border-bottom: 1px solid var(--edge);
+    padding-bottom: 26px;
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 7vw, 4.4rem);
+    line-height: .96;
+    letter-spacing: -.01em;
+    margin: .28em 0 .12em;
+    text-wrap: balance;
+  }
+  .masthead h1 .amp { color: var(--accent); font-weight: 500; }
+  .premise {
+    max-width: 62ch;
+    margin: .4em 0 0;
+    color: var(--muted);
+    font-size: 1.02rem;
+  }
+  .premise b { color: var(--ink); font-weight: 600; }
+
+  .theme-toggle {
+    justify-self: end;
+    align-self: start;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
+
+  /* ---------- transport ---------- */
+  .transport {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 26px;
+    align-items: flex-end;
+    padding: 16px 18px;
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    box-shadow: var(--shadow);
+    border-radius: var(--r);
+  }
+  .ctl { display: flex; flex-direction: column; gap: 6px; }
+  .ctl > label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .play {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--plate-bg);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--r);
+    padding: 11px 26px;
+    cursor: pointer;
+    min-width: 148px;
+    transition: filter .12s ease;
+  }
+  .play:hover { filter: brightness(1.07); }
+  .play[data-on="1"] {
+    background: transparent;
+    color: var(--accent);
+  }
+  select, input[type="range"] { font-family: var(--font-mono); accent-color: var(--accent); }
+  select {
+    font-size: 12.5px;
+    color: var(--ink);
+    background: var(--panel-2);
+    border: 1px solid var(--edge);
+    border-radius: var(--r);
+    padding: 8px 10px;
+  }
+  input[type="range"] { width: 128px; }
+
+  /* ---------- formation strip ---------- */
+  .strip-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 40px 0 12px;
+    gap: 16px;
+  }
+  .strip {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 132px;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .chip {
+    display: grid;
+    grid-template-rows: 84px auto auto;
+    gap: 3px;
+    text-align: left;
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: var(--r);
+    padding: 10px 10px 11px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: border-color .14s ease, background .14s ease;
+  }
+  .chip:hover { border-color: var(--muted); }
+  .chip[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--panel-2);
+  }
+  .chip canvas { width: 100%; height: 84px; display: block; }
+  .chip-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.15;
+  }
+  .chip-year {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+
+  /* ---------- console ---------- */
+  .console {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 116px 1fr;
+    border: 1px solid var(--edge);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .panel { position: relative; min-width: 0; }
+  .panel--field { border-right: 1px solid var(--edge); }
+  .panel--plate { border-left: 1px solid var(--edge); }
+  .panel canvas.stage { display: block; width: 100%; aspect-ratio: 1 / 1; }
+  .panel--plate canvas.stage { background: var(--plate-bg); }
+
+  .panel-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--panel) 78%, transparent);
+    padding: 3px 7px;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .panel--plate .panel-tag { color: var(--sound); }
+
+  .field-caption {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    pointer-events: none;
+  }
+  .field-caption .fc-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 2.3vw, 1.5rem);
+    line-height: 1;
+    text-shadow: 0 1px 10px var(--panel);
+  }
+  .field-caption .fc-meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    top: 0;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: .5;
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  .gutter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 6px;
+    gap: 10px;
+    background: var(--panel-2);
+  }
+  .gutter canvas.scope { width: 100%; height: 118px; display: block; }
+  .readf {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+  .readf small { display: block; font-size: .62rem; letter-spacing: .2em; color: var(--muted); font-weight: 500; margin-top: 3px; }
+  .gutter dl {
+    margin: 2px 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    width: 100%;
+    text-align: center;
+  }
+  .gutter dt {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .gutter dd {
+    margin: 1px 0 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- partial meter ---------- */
+  .meter {
+    margin-top: 14px;
+    border: 1px solid var(--edge);
+    background: var(--panel);
+    border-radius: var(--r);
+    padding: 16px 18px 12px;
+  }
+  .meter-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .meter-head h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .meter-head span { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); letter-spacing: .1em; }
+  .bars {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    align-items: end;
+    gap: clamp(3px, 1vw, 9px);
+    height: 120px;
+  }
+  .bar { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
+  .bar i {
+    display: block;
+    width: 100%;
+    background: var(--muted);
+    opacity: .5;
+    border-radius: 1px 1px 0 0;
+    transition: height .09s linear;
+    min-height: 2px;
+  }
+  .bar.harm i { background: var(--accent); opacity: 1; }
+  .bar b {
+    position: absolute;
+    bottom: -18px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .bar.harm b { color: var(--accent); }
+  .meter .axis {
+    margin-top: 24px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: .05em;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ---------- notes ---------- */
+  .lower {
+    margin-top: 44px;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(24px, 5vw, 60px);
+    align-items: start;
+  }
+  .method h2, .dossier h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: .02em;
+    margin: 0 0 4px;
+  }
+  .method ol {
+    list-style: none;
+    counter-reset: step;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+  }
+  .method li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  .method li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding-top: 4px;
+  }
+  .method li b {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+  .method li span { color: var(--muted); display: block; font-size: .96rem; }
+
+  .dossier .lede {
+    font-style: italic;
+    color: var(--muted);
+    margin: 14px 0 0;
+  }
+  .dossier .facts {
+    margin: 16px 0 0;
+    border-top: 1px solid var(--edge);
+  }
+  .dossier .facts div {
+    display: grid;
+    grid-template-columns: 128px 1fr;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--edge);
+  }
+  .dossier .facts dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .dossier .facts dd { margin: 0; font-size: .96rem; }
+
+  footer {
+    margin-top: 52px;
+    padding-top: 20px;
+    border-top: 1px solid var(--edge);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  @media (max-width: 900px) {
+    .console { grid-template-columns: 1fr; }
+    .panel--field { border-right: 0; border-bottom: 1px solid var(--edge); }
+    .panel--plate { border-left: 0; border-top: 1px solid var(--edge); }
+    .gutter { flex-direction: row; flex-wrap: wrap; justify-content: space-around; padding: 14px; }
+    .gutter canvas.scope { width: 100%; height: 70px; order: -1; }
+    .gutter dl { grid-template-columns: repeat(3, 1fr); width: auto; gap: 4px 18px; }
+    .lower { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .masthead { grid-template-columns: 1fr; }
+    .theme-toggle { justify-self: start; }
+    .bar b { font-size: 7.5px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scanline { display: none; }
+    .bar i { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">Chladni Fields: eight famous crop formations, each converted into a fundamental frequency and a set of partials, and shown next to the Chladni nodal pattern that frequency would raise on a vibrating plate.</h2>
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Cymatics&nbsp;·&nbsp;field register</p>
+      <h1>Chladni <span class="amp">Fields</span></h1>
+      <p class="premise">
+        A vibrating plate scattered with sand sorts itself into figures — the sand
+        settling wherever the plate holds still. This runs that idea backwards.
+        Eight of the best-known crop formations are read as <b>sound</b>: the geometry
+        sets a fundamental and a stack of partials, and beside each one is the
+        pattern that frequency would raise in sand on <b>Ernst Chladni's</b> plate.
+      </p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+  </header>
+
+  <div class="transport" role="group" aria-label="Playback">
+    <div class="ctl">
+      <label for="playBtn">Transport</label>
+      <button class="play" id="playBtn" type="button" data-on="0">Play tone</button>
+    </div>
+    <div class="ctl">
+      <label for="modeSel">Sustain</label>
+      <select id="modeSel">
+        <option value="drone">Drone — hold</option>
+        <option value="pluck">Struck — decay</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="timbreSel">Voice</label>
+      <select id="timbreSel">
+        <option value="pure">Pure — sine stack</option>
+        <option value="reed">Reed — triangle</option>
+        <option value="bowed">Bowed — like a plate</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="volSel">Level</label>
+      <input type="range" id="volSel" min="0" max="100" value="70" aria-label="Level" />
+    </div>
+  </div>
+
+  <div class="strip-head">
+    <p class="eyebrow">The formations</p>
+    <p class="eyebrow" aria-hidden="true">select one ▸</p>
+  </div>
+  <div class="strip" id="strip" role="tablist" aria-label="Crop formations"></div>
+
+  <section class="console" aria-label="Reading">
+    <div class="panel panel--field">
+      <span class="panel-tag">Formation · aerial</span>
+      <canvas class="stage" id="fieldCanvas" width="600" height="600"></canvas>
+      <div class="scanline" id="scan"></div>
+      <div class="field-caption">
+        <div class="fc-name" id="fcName">—</div>
+        <div class="fc-meta" id="fcMeta">—</div>
+      </div>
+    </div>
+
+    <div class="gutter">
+      <canvas class="scope" id="scopeCanvas" width="120" height="240"></canvas>
+      <div class="readf" id="readF">—<small>Fundamental&nbsp;·&nbsp;Hz</small></div>
+      <dl>
+        <div><dt>Symmetry</dt><dd id="readSym">—</dd></div>
+        <div><dt>Span</dt><dd id="readSpan">—</dd></div>
+        <div><dt>Plate mode</dt><dd id="readMode">—</dd></div>
+      </dl>
+    </div>
+
+    <div class="panel panel--plate">
+      <span class="panel-tag">Chladni plate · nodal lines</span>
+      <canvas class="stage" id="plateCanvas" width="600" height="600"></canvas>
+    </div>
+  </section>
+
+  <section class="meter" aria-label="Partial stack">
+    <div class="meter-head">
+      <h3>Partial stack</h3>
+      <span id="meterNote">harmonics of the fundamental · lit bars fall on multiples of the symmetry</span>
+    </div>
+    <div class="bars" id="bars"></div>
+    <div class="axis"><span>1st</span><span>partial number →</span><span>14th</span></div>
+  </section>
+
+  <section class="lower">
+    <div class="method">
+      <p class="eyebrow">How the translation works</p>
+      <h2>Five readings off one drawing</h2>
+      <ol>
+        <li><b>Span → pitch.</b><span>The formation's overall diameter sets the fundamental. A wider mark in the crop sounds lower, the way a longer string or a larger plate does.</span></li>
+        <li><b>Symmetry → harmony.</b><span>N-fold rotational symmetry lifts the Nth partial and its multiples — the same partials a plate divides into when it carries N nodal diameters.</span></li>
+        <li><b>Rings → timbre.</b><span>Concentric bands in the design push energy higher or lower in the partial stack, giving each formation its colour.</span></li>
+        <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
+        <li><b>Then the plate.</b><span>The fundamental is fed to a square-plate Chladni model. The nodal lines it draws are the still places — where the sand would gather.</span></li>
+      </ol>
+    </div>
+
+    <div class="dossier">
+      <p class="eyebrow">Dossier</p>
+      <h2 id="dosName">—</h2>
+      <p class="lede" id="dosLede">—</p>
+      <dl class="facts">
+        <div><dt>Location</dt><dd id="dosLoc">—</dd></div>
+        <div><dt>Reported</dt><dd id="dosDate">—</dd></div>
+        <div><dt>Form</dt><dd id="dosForm">—</dd></div>
+        <div><dt>Span (used)</dt><dd id="dosSpan">—</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <span>Figures follow widely published accounts. Formation drawings are schematic, generated in-browser — not survey-accurate.</span>
+    <span>Web Audio · additive synthesis · analytic Chladni model</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ============================ DATA ============================ */
+  var FORMATIONS = [
+    {
+      id: "milkhill", name: "Milk Hill", place: "Alton Barnes, Wiltshire, England",
+      date: "Reported 12 August 2001", form: "Six-arm spiral · 409 circles",
+      diameter: 238, sym: 6, spiral: true, density: 0.95,
+      rings: [0.10, 0.30, 0.52, 0.74, 0.95],
+      draw: { kind: "spiral", arms: 6, count: 409, turns: 0.58, csize: 0.052, dir: 1 },
+      lede: "The largest formation most people can name — six curved arms of graded circles, each arm its own small galaxy. Surveyors counted four hundred and nine circles across roughly two hundred and forty metres of standing wheat."
+    },
+    {
+      id: "juliaset", name: "Julia Set", place: "Beside Stonehenge, Wiltshire, England",
+      date: "Reported 7 July 1996", form: "Logarithmic spiral · 151 circles",
+      diameter: 45, sym: 1, spiral: true, density: 0.7,
+      rings: [0.22, 0.55, 0.88],
+      draw: { kind: "spiral", arms: 1, count: 151, turns: 2.45, csize: 0.05, dir: 1 },
+      lede: "A single sweep of 151 circles curling in on itself like the fractal it was named for, laid in a field of wheat next to the stones. Witnesses reported it filled in under an hour on a bright afternoon beside a busy road."
+    },
+    {
+      id: "barbury", name: "Barbury Castle", place: "Below the hillfort, Wiltshire, England",
+      date: "Reported 17 July 1991", form: "Triangle with three satellites",
+      diameter: 90, sym: 3, spiral: false, density: 0.55,
+      rings: [0.18, 0.62, 1.0],
+      draw: { kind: "barbury" },
+      lede: "An equilateral triangle with a circle at each vertex — one plain, one ringed, one a stepped 'ratchet' spiral — and straight paths ruled between them. An early, sharply geometric formation still argued over decades later."
+    },
+    {
+      id: "windmill", name: "Windmill Hill", place: "Near Avebury, Wiltshire, England",
+      date: "Reported 29 July 1996", form: "Triple spiral · 194 circles",
+      diameter: 82, sym: 3, spiral: true, density: 0.8,
+      rings: [0.16, 0.44, 0.72, 0.96],
+      draw: { kind: "spiral", arms: 3, count: 194, turns: 0.72, csize: 0.05, dir: -1 },
+      lede: "A triskelion — three spiral arms of shrinking circles turning about a common centre, 194 in all. A more organic cousin of the geometric formations, close to the great henge at Avebury."
+    },
+    {
+      id: "mandelbrot", name: "Mandelbrot Set", place: "Ickleton, Cambridgeshire, England",
+      date: "Reported 11 August 1991", form: "Escape-time fractal outline",
+      diameter: 60, sym: 1, spiral: false, density: 0.6,
+      rings: [0.35, 0.7, 0.95],
+      draw: { kind: "mandelbrot" },
+      lede: "The unmistakable cardioid-and-bulb of the Mandelbrot set, pressed into a barley field the same summer the equation was in every popular-science magazine. Its edge is fractal, so its partials never quite settle."
+    },
+    {
+      id: "sriyantra", name: "Sri Yantra", place: "Mickey Hot Springs dry lakebed, Oregon, USA",
+      date: "Found August 1990", form: "Nine interlocked triangles",
+      diameter: 400, sym: 9, spiral: false, density: 0.9,
+      rings: [0.12, 0.3, 0.5, 0.72, 0.92],
+      draw: { kind: "sriyantra" },
+      lede: "A quarter-mile-wide Sri Yantra scored into cracked alkali flat in eastern Oregon — nine overlapping triangles, lotus rings and square gates, said to run to some thirteen miles of line. Not wheat, but the most precise large figure of its kind."
+    },
+    {
+      id: "chilbolton", name: "Arecibo Reply", place: "By the Chilbolton radio telescope, Hampshire, England",
+      date: "Reported 19 August 2001", form: "Rectangular binary raster",
+      diameter: 30, sym: 2, spiral: false, density: 0.5,
+      rings: [0.5, 0.9],
+      draw: { kind: "chilbolton" },
+      lede: "A rectangular bitmap that reads as an answer to the 1974 Arecibo radio message — altered atomic numbers, a doubled strand, a big-headed figure, a different broadcast dish. Sonified from its rows rather than any rotational symmetry."
+    },
+    {
+      id: "crabwood", name: "Crabwood Face", place: "Crabwood, near Winchester, Hampshire, England",
+      date: "Reported 15 August 2002", form: "Halftone face and coded disc",
+      diameter: 110, sym: 1, spiral: true, density: 0.75,
+      rings: [0.2, 0.45, 0.7, 0.92],
+      draw: { kind: "crabwood" },
+      lede: "A face rendered in raster lines like a newspaper photo, beside a round disc holding a spiral of ASCII text. The scan-line lay gives it a grainy, high-partial voice."
+    }
+  ];
+
+  /* ============================ DOM ============================ */
+  var $ = function (s) { return document.querySelector(s); };
+  var stripEl = $("#strip");
+  var fieldCv = $("#fieldCanvas"), plateCv = $("#plateCanvas"), scopeCv = $("#scopeCanvas");
+  var fieldCtx = fieldCv.getContext("2d");
+  var plateCtx = plateCv.getContext("2d");
+  var scopeCtx = scopeCv.getContext("2d");
+  var barsEl = $("#bars");
+  var playBtn = $("#playBtn"), modeSel = $("#modeSel"), timbreSel = $("#timbreSel"), volSel = $("#volSel");
+  var scanEl = $("#scan");
+
+  var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+  function hexToRgb(h) {
+    h = h.replace("#", "");
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+  var COL = {};
+  function refreshColors() {
+    COL.accent = css("--accent"); COL.sound = css("--sound");
+    COL.muted = css("--muted"); COL.ink = css("--ink");
+    COL.panel = css("--panel"); COL.plateBg = css("--plate-bg");
+    COL.accentRgb = hexToRgb(COL.accent);
+    COL.soundRgb = hexToRgb(COL.sound);
+    COL.mutedRgb = hexToRgb(COL.muted);
+  }
+
+  /* ============================ THEME ============================ */
+  (function initTheme() {
+    var stored = null;
+    try { stored = localStorage.getItem("chladni-theme"); } catch (e) {}
+    if (stored === "light" || stored === "dark") document.documentElement.setAttribute("data-theme", stored);
+    $("#themeBtn").addEventListener("click", function () {
+      var cur = document.documentElement.getAttribute("data-theme");
+      if (!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      var next = cur === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try { localStorage.setItem("chladni-theme", next); } catch (e) {}
+      refreshColors();
+      renderFormation();
+      buildPlateBitmap();
+      drawPlate(0);
+      drawScope();
+    });
+  })();
+
+  /* ============================ CANVAS SIZING ============================ */
+  function fitSquare(cv, ctx) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = cv.getBoundingClientRect();
+    var size = Math.max(120, rect.width);
+    cv.width = Math.round(size * dpr);
+    cv.height = Math.round(size * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return size;
+  }
+  function fitScope() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = scopeCv.getBoundingClientRect();
+    scopeCv.width = Math.round(rect.width * dpr);
+    scopeCv.height = Math.round(rect.height * dpr);
+    scopeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: rect.width, h: rect.height };
+  }
+  var fieldSize = 600, plateSize = 600, scopeDim = { w: 120, h: 118 };
+
+  /* ============================ FORMATION DRAWING ============================ */
+  function frame(ctx, S, label) {
+    // faint survey grid + tramlines, drawn behind every formation
+    ctx.save();
+    ctx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.14)";
+    ctx.lineWidth = 1;
+    var rings = 4, cx = S / 2, cy = S / 2;
+    for (var i = 1; i <= rings; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, (S * 0.46) * i / rings, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    // tramlines — a pair of parallel wheel tracks across the field
+    ctx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.10)";
+    var off = S * 0.09;
+    ctx.beginPath(); ctx.moveTo(0, cy - off); ctx.lineTo(S, cy - off + S * 0.06);
+    ctx.moveTo(0, cy + off); ctx.lineTo(S, cy + off + S * 0.06); ctx.stroke();
+    ctx.restore();
+  }
+
+  function spiralCircles(ctx, S, d) {
+    var cx = S / 2, cy = S / 2, R = S * 0.44;
+    var per = Math.max(1, Math.round(d.count / d.arms));
+    ctx.save();
+    for (var a = 0; a < d.arms; a++) {
+      var a0 = (a / d.arms) * Math.PI * 2;
+      for (var i = 0; i < per; i++) {
+        var t = per === 1 ? 0.5 : i / (per - 1);
+        var ang = a0 + d.dir * t * d.turns * Math.PI * 2;
+        var rad = 0.05 + 0.93 * t;
+        var px = cx + Math.cos(ang) * rad * R;
+        var py = cy + Math.sin(ang) * rad * R;
+        var cr = R * (d.csize * (1 - 0.62 * t) + 0.006);
+        ctx.beginPath();
+        ctx.arc(px, py, cr, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.12)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.85)";
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
+      }
+    }
+    // hub
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.03, 0, Math.PI * 2);
+    ctx.fillStyle = COL.accent; ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBarbury(ctx, S) {
+    var cx = S / 2, cy = S / 2 + S * 0.03, R = S * 0.36;
+    ctx.save();
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
+    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.1)";
+    ctx.lineWidth = 1.4;
+    var v = [];
+    for (var k = 0; k < 3; k++) {
+      var ang = -Math.PI / 2 + k * (Math.PI * 2 / 3);
+      v.push([cx + Math.cos(ang) * R, cy + Math.sin(ang) * R]);
+    }
+    ctx.beginPath();
+    ctx.moveTo(v[0][0], v[0][1]); ctx.lineTo(v[1][0], v[1][1]); ctx.lineTo(v[2][0], v[2][1]); ctx.closePath();
+    ctx.stroke();
+    // rays from centre
+    for (var j = 0; j < 3; j++) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(v[j][0], v[j][1]); ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(cx, cy, S * 0.02, 0, Math.PI * 2); ctx.fillStyle = COL.accent; ctx.fill();
+    // vertex 0: plain disc
+    ctx.beginPath(); ctx.arc(v[0][0], v[0][1], S * 0.06, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.16)"; ctx.fill();
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)"; ctx.stroke();
+    // vertex 1: concentric rings
+    for (var r = 1; r <= 3; r++) {
+      ctx.beginPath(); ctx.arc(v[1][0], v[1][1], S * 0.028 * r, 0, Math.PI * 2); ctx.stroke();
+    }
+    // vertex 2: ratchet spiral
+    ctx.beginPath();
+    for (var s2 = 0; s2 <= 30; s2++) {
+      var pr = S * 0.008 + s2 * S * 0.0022;
+      var pa = s2 * 0.6;
+      var x = v[2][0] + Math.cos(pa) * pr, y = v[2][1] + Math.sin(pa) * pr;
+      if (s2 === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMandelbrot(ctx, S) {
+    var img = ctx.createImageData(S, S);
+    var dat = img.data;
+    var a = COL.accentRgb, m = COL.mutedRgb;
+    var minR = -2.2, maxR = 0.8, minI = -1.5, maxI = 1.5;
+    for (var py = 0; py < S; py++) {
+      for (var px = 0; px < S; px++) {
+        var x0 = minR + (px / S) * (maxR - minR);
+        var y0 = minI + (py / S) * (maxI - minI);
+        var x = 0, y = 0, it = 0, maxit = 90;
+        while (x * x + y * y <= 4 && it < maxit) {
+          var xt = x * x - y * y + x0;
+          y = 2 * x * y + y0; x = xt; it++;
+        }
+        var idx = (py * S + px) * 4;
+        if (it === maxit) {
+          dat[idx] = a[0]; dat[idx + 1] = a[1]; dat[idx + 2] = a[2]; dat[idx + 3] = 235;
+        } else if (it > 6) {
+          var g = (it - 6) / (maxit - 6);
+          dat[idx] = m[0]; dat[idx + 1] = m[1]; dat[idx + 2] = m[2];
+          dat[idx + 3] = Math.round(70 * (1 - g));
+        } else {
+          dat[idx + 3] = 0;
+        }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  function tri(ctx, cx, cy, w, h, up) {
+    ctx.beginPath();
+    if (up) { ctx.moveTo(cx, cy - h); ctx.lineTo(cx - w, cy + h); ctx.lineTo(cx + w, cy + h); }
+    else { ctx.moveTo(cx, cy + h); ctx.lineTo(cx - w, cy - h); ctx.lineTo(cx + w, cy - h); }
+    ctx.closePath(); ctx.stroke();
+  }
+  function drawSriYantra(ctx, S) {
+    var cx = S / 2, cy = S / 2, U = S * 0.30;
+    ctx.save();
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.92)";
+    ctx.lineWidth = 1.15;
+    var ups = [[1.0, 0.0], [0.74, 0.16], [0.5, 0.06], [0.26, 0.22]];
+    var dns = [[1.06, -0.02], [0.82, -0.2], [0.58, -0.08], [0.36, -0.26], [0.2, -0.12]];
+    var i;
+    for (i = 0; i < ups.length; i++) tri(ctx, cx, cy + ups[i][1] * U, ups[i][0] * U * 0.92, ups[i][0] * U, true);
+    for (i = 0; i < dns.length; i++) tri(ctx, cx, cy + dns[i][1] * U, dns[i][0] * U * 0.92, dns[i][0] * U, false);
+    ctx.beginPath(); ctx.arc(cx, cy, S * 0.012, 0, Math.PI * 2); ctx.fillStyle = COL.accent; ctx.fill();
+    // lotus rings
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.55)";
+    [1.16, 1.28].forEach(function (rr, ri) {
+      ctx.beginPath(); ctx.arc(cx, cy, U * rr, 0, Math.PI * 2); ctx.stroke();
+      var petals = ri === 0 ? 16 : 24;
+      for (var p = 0; p < petals; p++) {
+        var ang = p / petals * Math.PI * 2;
+        var r1 = U * rr, r2 = U * (rr + 0.07);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1);
+        ctx.lineTo(cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2);
+        ctx.stroke();
+      }
+    });
+    // square gates
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.7)";
+    [1.42, 1.52, 1.62].forEach(function (g) {
+      var s = U * g;
+      ctx.strokeRect(cx - s, cy - s, s * 2, s * 2);
+    });
+    ctx.restore();
+  }
+
+  function drawChilbolton(ctx, S) {
+    // stylised binary raster: header ticks, double helix, blocky figure, dish
+    var gw = 22, gh = 28;
+    var cell = Math.min(S * 0.62 / gw, S * 0.82 / gh);
+    var ox = S / 2 - cell * gw / 2, oy = S / 2 - cell * gh / 2;
+    ctx.save();
+    ctx.fillStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
+    function cellOn(gx, gy) { ctx.fillRect(ox + gx * cell + 0.5, oy + gy * cell + 0.5, cell - 1, cell - 1); }
+    var row;
+    // header counting strip
+    for (row = 2; row < 20; row += 2) cellOn(row, 1);
+    // atomic-number bars
+    for (row = 0; row < 5; row++) {
+      var len = [3, 5, 4, 6, 5][row];
+      for (var c = 0; c < len; c++) cellOn(4 + c, 3 + row);
+    }
+    // double helix
+    for (var y = 9; y < 20; y++) {
+      var ph = (y - 9) / 11 * Math.PI * 2;
+      var xa = Math.round(11 + Math.sin(ph) * 5);
+      var xb = Math.round(11 - Math.sin(ph) * 5);
+      cellOn(xa, y); cellOn(xb, y);
+      if (y % 2 === 0) for (var xr = Math.min(xa, xb) + 1; xr < Math.max(xa, xb); xr++) cellOn(xr, y);
+    }
+    // big-headed figure
+    for (var hx = 9; hx <= 13; hx++) cellOn(hx, 21);
+    for (var hy = 21; hy <= 22; hy++) { cellOn(9, hy); cellOn(13, hy); }
+    for (var bx = 10; bx <= 12; bx++) for (var by = 23; by <= 25; by++) cellOn(bx, by);
+    // broadcast dish
+    for (var dx = 6; dx <= 16; dx++) { var dh = Math.round(2 - Math.abs(dx - 11) * 0.28); for (var dy = 0; dy <= dh; dy++) cellOn(dx, 26 + dy); }
+    ctx.restore();
+  }
+
+  function drawCrabwood(ctx, S) {
+    ctx.save();
+    // right: coded disc — spiral of arcs + broken tick ring
+    var dcx = S * 0.68, dcy = S * 0.5, dR = S * 0.24;
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.85)";
+    ctx.lineWidth = 1;
+    for (var i = 0; i < 26; i++) {
+      var rr = dR * (0.12 + 0.88 * i / 25);
+      var a0 = i * 0.5, a1 = a0 + Math.PI * 1.7;
+      ctx.beginPath(); ctx.arc(dcx, dcy, rr, a0, a1); ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.5)";
+    for (var t = 0; t < 60; t++) {
+      if (t % 5 === 0) continue;
+      var ta = t / 60 * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(dcx + Math.cos(ta) * dR * 1.04, dcy + Math.sin(ta) * dR * 1.04);
+      ctx.lineTo(dcx + Math.cos(ta) * dR * 1.12, dcy + Math.sin(ta) * dR * 1.12);
+      ctx.stroke();
+    }
+    // left: halftone face — scan lines whose dash length follows a coarse brightness map
+    var fcx = S * 0.32, fcy = S * 0.5, fw = S * 0.2, fh = S * 0.28;
+    var lines = 30;
+    ctx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.9)";
+    ctx.lineWidth = Math.max(1, fh / lines * 0.62);
+    for (var L = 0; L < lines; L++) {
+      var v = L / (lines - 1);
+      var yy = fcy - fh + v * fh * 2;
+      // elliptical head mask
+      var edge = 1 - Math.pow((v - 0.5) / 0.5, 2);
+      if (edge <= 0) continue;
+      var halfW = fw * Math.sqrt(edge);
+      // brightness: darker brow band and eyes -> shorter dashes (gaps)
+      var bright = 0.6;
+      if (v > 0.30 && v < 0.40) bright = 0.2;          // brow
+      if (v > 0.40 && v < 0.52) bright = 0.85;         // eyes region (light) with holes
+      if (v > 0.66 && v < 0.76) bright = 0.35;         // mouth
+      var segs = 26;
+      for (var sx = 0; sx < segs; sx++) {
+        var u = sx / (segs - 1);
+        var xx = fcx - halfW + u * halfW * 2;
+        var local = bright;
+        // carve two eye holes
+        if (v > 0.40 && v < 0.52 && (Math.abs(u - 0.32) < 0.09 || Math.abs(u - 0.68) < 0.09)) local = 0.05;
+        if (Math.random() < local) {
+          ctx.beginPath();
+          ctx.moveTo(xx, yy);
+          ctx.lineTo(xx + halfW * 2 / segs * 0.9, yy);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawFormation(ctx, S, f, mini) {
+    ctx.clearRect(0, 0, S, S);
+    if (!mini) frame(ctx, S);
+    var d = f.draw;
+    if (d.kind === "spiral") spiralCircles(ctx, S, d);
+    else if (d.kind === "barbury") drawBarbury(ctx, S);
+    else if (d.kind === "mandelbrot") {
+      // render mandelbrot to a temp canvas at modest res then scale
+      var res = mini ? 90 : 280;
+      var tmp = document.createElement("canvas"); tmp.width = res; tmp.height = res;
+      drawMandelbrot(tmp.getContext("2d"), res);
+      ctx.save();
+      ctx.translate(S / 2, S / 2); ctx.scale(S * 0.92 / res, S * 0.92 / res); ctx.translate(-res / 2, -res / 2);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(tmp, 0, 0);
+      ctx.restore();
+    }
+    else if (d.kind === "sriyantra") drawSriYantra(ctx, S);
+    else if (d.kind === "chilbolton") drawChilbolton(ctx, S);
+    else if (d.kind === "crabwood") drawCrabwood(ctx, S);
+  }
+
+  /* ============================ SONIFICATION MATH ============================ */
+  var SAMPLE_RATE = 44100;
+  var NPART = 14;
+  function computeReading(f) {
+    var refD = 26, FMIN = 40, FMAX = 300;
+    var f0 = FMAX * Math.pow(refD / f.diameter, 0.69);
+    f0 = Math.max(FMIN, Math.min(FMAX, f0));
+    var sym = f.sym < 2 ? 2 : f.sym;
+    var parts = [];
+    var n, amp;
+    for (n = 1; n <= NPART; n++) {
+      var pos = (n - 1) / (NPART - 1);
+      var rad = 0.18;
+      for (var ri = 0; ri < f.rings.length; ri++) {
+        rad += Math.exp(-Math.pow(pos - f.rings[ri], 2) / (2 * 0.06 * 0.06));
+      }
+      var symW = 1 + (n % sym === 0 ? 1.4 : 0) + (n % sym === 1 ? 0.22 : 0);
+      var roll = f.spiral ? Math.pow(n, -0.8) : Math.pow(n, -0.42);
+      amp = (0.24 + rad) * symW * roll * (0.6 + 0.5 * f.density);
+      parts.push({ n: n, freq: f0 * n, amp: amp, harm: (n % sym === 0) });
+    }
+    var mx = 0;
+    parts.forEach(function (p) { if (p.amp > mx) mx = p.amp; });
+    parts.forEach(function (p) { p.amp = p.amp / mx; });
+    parts = parts.filter(function (p) { return p.amp >= 0.02 && p.freq < 19000; });
+    var m = Math.max(2, Math.min(10, sym));
+    var nn = Math.max(m + 1, Math.min(12, m + Math.round((f0 - FMIN) / 24)));
+    return { f0: f0, parts: parts, mode: { n: nn, m: m }, sym: sym };
+  }
+
+  /* ============================ AUDIO ENGINE ============================ */
+  var actx = null, master = null, dry = null, wet = null, conv = null, analyser = null;
+  var td = null, fd = null;
+  var voiceBus = null, oscs = [], lfo = null, playing = false, pluckTimer = null;
+
+  function ensureCtx() {
+    if (actx) return;
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    SAMPLE_RATE = actx.sampleRate;
+    master = actx.createGain(); master.gain.value = 0.0001;
+    dry = actx.createGain(); dry.gain.value = 0.82;
+    wet = actx.createGain(); wet.gain.value = 0.3;
+    conv = actx.createConvolver(); conv.buffer = makeImpulse(2.4, 2.6);
+    analyser = actx.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.75;
+    td = new Uint8Array(analyser.fftSize);
+    fd = new Uint8Array(analyser.frequencyBinCount);
+    dry.connect(master); conv.connect(wet); wet.connect(master);
+    master.connect(analyser); master.connect(actx.destination);
+  }
+  function makeImpulse(sec, decay) {
+    var rate = actx.sampleRate, len = Math.floor(rate * sec);
+    var buf = actx.createBuffer(2, len, rate);
+    for (var ch = 0; ch < 2; ch++) {
+      var d = buf.getChannelData(ch);
+      for (var i = 0; i < len; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+      }
+    }
+    return buf;
+  }
+  function volTarget() { return Math.pow(volSel.value / 100, 1.7) * 0.9; }
+
+  function stopVoice(hard) {
+    if (pluckTimer) { clearTimeout(pluckTimer); pluckTimer = null; }
+    var t = actx ? actx.currentTime : 0;
+    if (voiceBus) {
+      try {
+        voiceBus.gain.cancelScheduledValues(t);
+        voiceBus.gain.setTargetAtTime(0.0001, t, 0.12);
+      } catch (e) {}
+    }
+    var toStop = oscs.slice(); var vb = voiceBus, lf = lfo;
+    setTimeout(function () {
+      toStop.forEach(function (o) { try { o.stop(); o.disconnect(); } catch (e) {} });
+      if (lf) try { lf.stop(); lf.disconnect(); } catch (e) {}
+      if (vb) try { vb.disconnect(); } catch (e) {}
+    }, 420);
+    oscs = []; voiceBus = null; lfo = null;
+    if (hard) {
+      if (master) { master.gain.setTargetAtTime(0.0001, t, 0.15); }
+      playing = false;
+      playBtn.textContent = "Play tone";
+      playBtn.setAttribute("data-on", "0");
+    }
+  }
+
+  function startVoice() {
+    ensureCtx();
+    if (actx.state === "suspended") actx.resume();
+    stopVoice(false);
+    var R = current.reading;
+    var timbre = timbreSel.value, mode = modeSel.value;
+    voiceBus = actx.createGain(); voiceBus.gain.value = 0.0001;
+    var tail = voiceBus;
+    if (timbre === "bowed") {
+      var lp = actx.createBiquadFilter();
+      lp.type = "lowpass"; lp.frequency.value = Math.min(9000, R.f0 * 7); lp.Q.value = 5;
+      voiceBus.connect(lp); tail = lp;
+      lfo = actx.createOscillator(); var lg = actx.createGain();
+      lfo.type = "sine"; lfo.frequency.value = 6.3; lg.gain.value = R.f0 * 1.1;
+      lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+    }
+    tail.connect(dry); tail.connect(conv);
+    var otype = timbre === "reed" ? "triangle" : (timbre === "bowed" ? "sawtooth" : "sine");
+    var detunes = current.f.density > 0.72 ? [0, -5, 5] : [0];
+    R.parts.forEach(function (p) {
+      detunes.forEach(function (ct) {
+        var o = actx.createOscillator();
+        o.type = otype; o.frequency.value = p.freq; o.detune.value = ct;
+        var g = actx.createGain();
+        g.gain.value = p.amp * (ct === 0 ? 1 : 0.32) * 0.26;
+        o.connect(g); g.connect(voiceBus); o.start();
+        oscs.push(o);
+      });
+    });
+    var t = actx.currentTime;
+    master.gain.cancelScheduledValues(t);
+    master.gain.setTargetAtTime(volTarget(), t, 0.05);
+    voiceBus.gain.setValueAtTime(0.0001, t);
+    if (mode === "pluck") {
+      voiceBus.gain.linearRampToValueAtTime(1, t + 0.012);
+      voiceBus.gain.setTargetAtTime(0.0001, t + 0.05, 1.15);
+      pluckTimer = setTimeout(function () { stopVoice(true); }, 6500);
+    } else {
+      voiceBus.gain.linearRampToValueAtTime(1, t + 0.5);
+    }
+    playing = true;
+    playBtn.textContent = mode === "pluck" ? "Strike again" : "Stop";
+    playBtn.setAttribute("data-on", "1");
+  }
+
+  /* ============================ CHLADNI PLATE ============================ */
+  var plateBmp = null;   // offscreen nodal-line bitmap
+  var particles = [];
+  var PN = reduceMotion ? 900 : 1300;
+
+  function zAt(x, y, n, m) {
+    return Math.sin(n * Math.PI * x) * Math.sin(m * Math.PI * y) -
+           Math.sin(m * Math.PI * x) * Math.sin(n * Math.PI * y);
+  }
+  function gradAt(x, y, n, m) {
+    var pin = Math.PI * n, pim = Math.PI * m;
+    var dx = pin * Math.cos(pin * x) * Math.sin(pim * y) - pim * Math.cos(pim * x) * Math.sin(pin * y);
+    var dy = pim * Math.sin(pin * x) * Math.cos(pim * y) - pin * Math.sin(pim * x) * Math.cos(pin * y);
+    return [dx, dy];
+  }
+
+  function buildPlateBitmap() {
+    var G = 240;
+    var off = document.createElement("canvas"); off.width = G; off.height = G;
+    var octx = off.getContext("2d");
+    var img = octx.createImageData(G, G);
+    var dat = img.data;
+    var n = current.reading.mode.n, m = current.reading.mode.m;
+    var s = COL.soundRgb;
+    for (var yy = 0; yy < G; yy++) {
+      for (var xx = 0; xx < G; xx++) {
+        var z = Math.abs(zAt(xx / (G - 1), yy / (G - 1), n, m));
+        var idx = (yy * G + xx) * 4;
+        // nodal line: z near 0
+        var line = Math.max(0, 1 - z / 0.16);
+        line = Math.pow(line, 1.6);
+        // faint antinode wash
+        var wash = Math.min(1, z) * 0.10;
+        dat[idx] = s[0]; dat[idx + 1] = s[1]; dat[idx + 2] = s[2];
+        dat[idx + 3] = Math.round(line * 210 + wash * 40);
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    plateBmp = off;
+  }
+
+  function seedParticles() {
+    particles = [];
+    for (var i = 0; i < PN; i++) {
+      particles.push({ x: Math.random(), y: Math.random(), settle: 0 });
+    }
+  }
+  function stepParticles(energy) {
+    var n = current.reading.mode.n, m = current.reading.mode.m;
+    var lr = 0.010 + energy * 0.006;
+    var jit = 0.0016 + 0.004 * (1 - avgSettle);
+    var sumS = 0;
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var z = zAt(p.x, p.y, n, m);
+      var g = gradAt(p.x, p.y, n, m);
+      var gl = Math.hypot(g[0], g[1]) || 1e-6;
+      var dir = z >= 0 ? 1 : -1;
+      p.x -= dir * (g[0] / gl) * lr + (Math.random() - 0.5) * jit;
+      p.y -= dir * (g[1] / gl) * lr + (Math.random() - 0.5) * jit;
+      if (p.x < 0) p.x = -p.x; if (p.x > 1) p.x = 2 - p.x;
+      if (p.y < 0) p.y = -p.y; if (p.y > 1) p.y = 2 - p.y;
+      var near = 1 - Math.min(1, Math.abs(zAt(p.x, p.y, n, m)) / 0.12);
+      p.settle += (near - p.settle) * 0.05;
+      sumS += p.settle;
+    }
+    avgSettle = sumS / particles.length;
+  }
+  var avgSettle = 0;
+
+  function drawPlate(energy) {
+    var S = plateSize;
+    plateCtx.clearRect(0, 0, S, S);
+    plateCtx.fillStyle = COL.plateBg;
+    plateCtx.fillRect(0, 0, S, S);
+    if (plateBmp) {
+      plateCtx.save();
+      plateCtx.globalAlpha = 0.55 + 0.4 * Math.min(1, energy * 2);
+      plateCtx.imageSmoothingEnabled = true;
+      plateCtx.drawImage(plateBmp, 0, 0, S, S);
+      plateCtx.restore();
+    }
+    // sand
+    plateCtx.fillStyle = "rgba(233,229,215," + (0.5 + 0.4 * avgSettle) + ")";
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var sz = 0.8 + p.settle * 1.1;
+      plateCtx.fillRect(p.x * S - sz / 2, p.y * S - sz / 2, sz, sz);
+    }
+    // brass rim
+    plateCtx.strokeStyle = "rgba(" + COL.accentRgb.join(",") + ",0.5)";
+    plateCtx.lineWidth = 2;
+    plateCtx.strokeRect(1, 1, S - 2, S - 2);
+  }
+
+  /* ============================ SCOPE ============================ */
+  function drawScope() {
+    var w = scopeDim.w, h = scopeDim.h;
+    scopeCtx.clearRect(0, 0, w, h);
+    scopeCtx.strokeStyle = "rgba(" + COL.mutedRgb.join(",") + ",0.25)";
+    scopeCtx.lineWidth = 1;
+    scopeCtx.beginPath(); scopeCtx.moveTo(w / 2, 0); scopeCtx.lineTo(w / 2, h); scopeCtx.stroke();
+    var grad = scopeCtx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, COL.accent);
+    grad.addColorStop(1, COL.sound);
+    scopeCtx.strokeStyle = grad;
+    scopeCtx.lineWidth = 1.4;
+    scopeCtx.beginPath();
+    if (playing && analyser) {
+      analyser.getByteTimeDomainData(td);
+      var step = td.length / h;
+      for (var y = 0; y < h; y++) {
+        var v = (td[Math.floor(y * step)] - 128) / 128;
+        var x = w / 2 + v * (w / 2 - 3);
+        if (y === 0) scopeCtx.moveTo(x, y); else scopeCtx.lineTo(x, y);
+      }
+    } else {
+      scopeCtx.moveTo(w / 2, 0); scopeCtx.lineTo(w / 2, h);
+    }
+    scopeCtx.stroke();
+  }
+
+  /* ============================ METER ============================ */
+  var barEls = [];
+  function buildMeter() {
+    barsEl.innerHTML = "";
+    barEls = [];
+    for (var i = 1; i <= NPART; i++) {
+      var b = document.createElement("div");
+      b.className = "bar";
+      var inner = document.createElement("i");
+      var lab = document.createElement("b");
+      lab.textContent = i;
+      b.appendChild(inner); b.appendChild(lab);
+      barsEl.appendChild(b);
+      barEls.push({ wrap: b, inner: inner, lab: lab });
+    }
+  }
+  function refreshMeter() {
+    var R = current.reading;
+    var byN = {};
+    R.parts.forEach(function (p) { byN[p.n] = p; });
+    for (var i = 0; i < NPART; i++) {
+      var n = i + 1, p = byN[n];
+      var el = barEls[i];
+      var base = p ? p.amp : 0;
+      el.baseAmp = base;
+      el.harm = p ? p.harm : false;
+      el.wrap.classList.toggle("harm", !!el.harm);
+      el.inner.style.height = (base * 100) + "%";
+      el.lab.textContent = el.harm ? "×" : n;
+      el.lab.title = "partial " + n;
+    }
+    $("#meterNote").textContent = "harmonics of " + Math.round(R.f0) + " Hz · × marks multiples of " + R.sym + "-fold symmetry";
+  }
+  function liveMeter() {
+    if (!(playing && analyser)) return;
+    analyser.getByteFrequencyData(fd);
+    var R = current.reading;
+    for (var i = 0; i < NPART; i++) {
+      var el = barEls[i];
+      if (!el.baseAmp) continue;
+      var freq = R.f0 * (i + 1);
+      var bin = Math.round(freq * analyser.fftSize / SAMPLE_RATE);
+      var e = bin < fd.length ? fd[bin] / 255 : 0;
+      var h = el.baseAmp * (0.55 + 1.0 * e) * 100;
+      el.inner.style.height = Math.min(120, h) + "%";
+    }
+  }
+
+  /* ============================ RENDER LOOP ============================ */
+  var t0 = performance.now();
+  function loop(now) {
+    var energy = 0;
+    if (playing && analyser) {
+      analyser.getByteTimeDomainData(td);
+      var s = 0;
+      for (var i = 0; i < td.length; i += 8) { var v = (td[i] - 128) / 128; s += v * v; }
+      energy = Math.min(1, Math.sqrt(s / (td.length / 8)) * 3.2);
+    }
+    stepParticles(energy);
+    drawPlate(energy);
+    drawScope();
+    liveMeter();
+    // scanline
+    if (!reduceMotion) {
+      var y = ((now - t0) / 2600 % 1) * fieldSize;
+      scanEl.style.transform = "translateY(" + y + "px)";
+      scanEl.style.opacity = playing ? "0.6" : "0.28";
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* ============================ WIRING ============================ */
+  var current = { f: null, reading: null };
+
+  function renderFormation() {
+    fieldSize = fitSquare(fieldCv, fieldCtx);
+    drawFormation(fieldCtx, fieldSize, current.f, false);
+  }
+
+  function selectFormation(f, fromClick) {
+    current.f = f;
+    current.reading = computeReading(f);
+    // captions + dossier
+    $("#fcName").textContent = f.name;
+    $("#fcMeta").textContent = f.place;
+    $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Fundamental&nbsp;·&nbsp;Hz</small>";
+    $("#readSym").textContent = f.sym <= 1 ? "none" : f.sym + "-fold";
+    $("#readSpan").textContent = f.diameter + " m";
+    $("#readMode").textContent = "(" + current.reading.mode.n + "," + current.reading.mode.m + ")";
+    $("#dosName").textContent = f.name;
+    $("#dosLede").textContent = f.lede;
+    $("#dosLoc").textContent = f.place;
+    $("#dosDate").textContent = f.date;
+    $("#dosForm").textContent = f.form;
+    $("#dosSpan").textContent = "~" + f.diameter + " m across";
+    // visuals
+    renderFormation();
+    buildPlateBitmap();
+    seedParticles();
+    avgSettle = 0;
+    refreshMeter();
+    // chip state
+    Array.prototype.forEach.call(stripEl.children, function (c) {
+      c.setAttribute("aria-pressed", c.dataset.id === f.id ? "true" : "false");
+    });
+    // if a tone is playing, retune to the new formation
+    if (playing) startVoice();
+    if (reduceMotion) { for (var k = 0; k < 260; k++) stepParticles(0); drawPlate(0); }
+  }
+
+  function buildStrip() {
+    FORMATIONS.forEach(function (f) {
+      var btn = document.createElement("button");
+      btn.className = "chip";
+      btn.type = "button";
+      btn.dataset.id = f.id;
+      btn.setAttribute("role", "tab");
+      btn.setAttribute("aria-pressed", "false");
+      var cv = document.createElement("canvas");
+      var nm = document.createElement("span"); nm.className = "chip-name"; nm.textContent = f.name;
+      var yr = document.createElement("span"); yr.className = "chip-year";
+      yr.textContent = f.date.replace("Reported ", "").replace("Found ", "").replace(/^\w+ /, "").replace(/.*?(\d{4}).*/, "$1");
+      btn.appendChild(cv); btn.appendChild(nm); btn.appendChild(yr);
+      btn.addEventListener("click", function () { selectFormation(f, true); });
+      stripEl.appendChild(btn);
+      // draw mini glyph
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var rect = cv.getBoundingClientRect();
+      var w = rect.width || 112;
+      cv.width = w * dpr; cv.height = 84 * dpr;
+      var mctx = cv.getContext("2d");
+      mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // square glyph centred in the 84 tall box
+      mctx.save();
+      var gs = Math.min(w, 84);
+      mctx.translate((w - gs) / 2, (84 - gs) / 2);
+      drawFormation(mctx, gs, f, true);
+      mctx.restore();
+    });
+  }
+
+  playBtn.addEventListener("click", function () {
+    if (playing && modeSel.value === "drone") { stopVoice(true); }
+    else { startVoice(); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.code === "Space" && e.target === document.body) {
+      e.preventDefault();
+      if (playing && modeSel.value === "drone") stopVoice(true); else startVoice();
+    }
+  });
+  modeSel.addEventListener("change", function () {
+    playBtn.textContent = playing ? (modeSel.value === "pluck" ? "Strike again" : "Stop") : "Play tone";
+    if (playing && modeSel.value === "drone") startVoice();
+  });
+  timbreSel.addEventListener("change", function () { if (playing) startVoice(); });
+  volSel.addEventListener("input", function () {
+    if (actx && master) master.gain.setTargetAtTime(volTarget(), actx.currentTime, 0.05);
+  });
+
+  var rz;
+  window.addEventListener("resize", function () {
+    clearTimeout(rz);
+    rz = setTimeout(function () {
+      fieldSize = fitSquare(fieldCv, fieldCtx);
+      plateSize = fitSquare(plateCv, plateCtx);
+      scopeDim = fitScope();
+      renderFormation();
+      buildPlateBitmap();
+      drawPlate(0);
+      drawScope();
+    }, 160);
+  });
+
+  /* ============================ BOOT ============================ */
+  function boot() {
+    refreshColors();
+    fieldSize = fitSquare(fieldCv, fieldCtx);
+    plateSize = fitSquare(plateCv, plateCtx);
+    scopeDim = fitScope();
+    buildStrip();
+    buildMeter();
+    selectFormation(FORMATIONS[0], false);
+    if (!reduceMotion) requestAnimationFrame(loop);
+    else { drawPlate(0); drawScope(); }
+  }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      // redraw glyphs/labels once fonts land
+      renderFormation();
+    });
+  }
+  boot();
+})();
+</script>
