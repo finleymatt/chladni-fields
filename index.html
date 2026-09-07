@@ -829,24 +829,24 @@
         </div>
       </div>
       <div class="ctl ctl--slider free-only">
+        <label for="dampSel">Plate damping</label>
+        <div class="row">
+          <input type="range" id="dampSel" min="0.01" max="0.15" step="0.005" value="0.035" />
+          <span class="val" id="dampVal">0.035</span>
+        </div>
+      </div>
+      <div class="ctl ctl--slider free-only">
         <label for="smoothSel">Smoothing</label>
         <div class="row">
-          <input type="range" id="smoothSel" min="0.5" max="0.98" step="0.01" value="0.86" />
-          <span class="val" id="smoothVal">0.86</span>
+          <input type="range" id="smoothSel" min="0.3" max="0.97" step="0.01" value="0.7" />
+          <span class="val" id="smoothVal">0.70</span>
         </div>
       </div>
       <div class="ctl ctl--slider free-only">
         <label for="sharpSel">Line sharp</label>
         <div class="row">
-          <input type="range" id="sharpSel" min="6" max="60" step="1" value="26" />
-          <span class="val" id="sharpVal">26</span>
-        </div>
-      </div>
-      <div class="ctl ctl--slider free-only">
-        <label for="gainSel">Gain</label>
-        <div class="row">
-          <input type="range" id="gainSel" min="0.5" max="5" step="0.1" value="2.2" />
-          <span class="val" id="gainVal">2.2</span>
+          <input type="range" id="sharpSel" min="4" max="40" step="1" value="14" />
+          <span class="val" id="sharpVal">14</span>
         </div>
       </div>
       <div class="ctl preset-only">
@@ -872,7 +872,7 @@
         </div>
       </div>
     </div>
-    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Fifteen plate modes on a 160² grid; the microphone is analysed in your browser and never recorded.</p>
+    <p class="hint free-only">Sing low → big lazy loops. Go up top → fine filigree. Bright lines are nodes — where the sand settles. Both plates are driven-vibration models: every mode answers by how near it sits to resonance with each spectral peak of what's sounding, so the figures morph continuously with pitch and blend when several notes sound. The microphone is analysed in your browser and never recorded.</p>
   </div>
 
   <section class="console" id="console" aria-label="Reading">
@@ -922,7 +922,7 @@
         <li><b>Lay → attack.</b><span>A swept, spiral lay rolls the upper partials off gently and warm; a hard geometric lay keeps them bright and present.</span></li>
         <li><b>Then the plate.</b><span>The fundamental is fed to a square-plate Chladni model. The nodal lines it draws are the still places — where the sand would gather.</span></li>
       </ol>
-      <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then the plate stops following a figure and follows sound: fifteen plate modes are each weighted by how much of the live spectrum falls at their frequency, and the sand settles on whatever the mix holds still. Drag the tone slider and play, or use the microphone and sing — low notes make big lazy loops, high notes fine filigree. On the left, the formation your tone would lay is drawn from the loudest mode.</p>
+      <p class="own"><b>Raise your own.</b> Pick <em>Your own tone</em> at the end of the strip. Then both plates stop following a figure and follow sound. The model is a driven plate's: each mode responds with amplitude 1 / (ω<sub>k</sub>² − ω² + i·2ζω<sub>k</sub>ω), so whichever modes sit nearest each spectral peak carry the figure, and it morphs continuously as the pitch moves rather than jumping between pictures. Square-plate modes go as m² + n² (bending stiffness); the circular plate on the left uses Bessel-function modes with a free edge — rings and spokes, the crop-circle family — drawn as flattened crop. Drag the tone slider and play, or use the microphone and sing, bow, or play a record: several notes at once excite several figures, and you see their sum.</p>
     </div>
 
     <div class="dossier">
@@ -1151,7 +1151,7 @@
     id: "free", group: "free", name: "Your own tone", place: "Set a tone, or sing",
     date: "live", form: "Audio-reactive free plate", diameter: 0, sym: 0, spiral: false, density: 0.7, rings: [],
     draw: { kind: "free" },
-    lede: "The plate is following sound now, not a figure. Drag the tone slider and press Play, or switch on the microphone and sing, hum, whistle. Fifteen plate modes each light up in proportion to how much of the spectrum lands on them; the sand settles on whatever the mix holds still. The formation on the left is the one your loudest mode would lay in a field."
+    lede: "Both plates are following sound now, not a figure. Drag the tone slider and press Test tone, or switch on the microphone and sing, play, or put a song on. Each plate mode answers by how close it sits to resonance with every peak in the spectrum — a driven plate's physics — so the figures morph continuously with pitch and blend when several notes sound. Left: a circular plate, the crop-circle shape, its still lines drawn as flattened crop. Right: Chladni's square plate with sand."
   };
 
   /* Source material per figure. Photographs are embedded only where an open licence exists
@@ -1275,7 +1275,7 @@
   var transportEl = $("#transport");
   var playBtn = $("#playBtn"), micBtn = $("#micBtn"), modeSel = $("#modeSel"), timbreSel = $("#timbreSel"), volSel = $("#volSel");
   var freqSel = $("#freqSel"), freqVal = $("#freqVal"), sharpSel = $("#sharpSel"), sharpVal = $("#sharpVal");
-  var smoothSel = $("#smoothSel"), smoothVal = $("#smoothVal"), gainSel = $("#gainSel"), gainVal = $("#gainVal"), volVal = $("#volVal");
+  var smoothSel = $("#smoothSel"), smoothVal = $("#smoothVal"), dampSel = $("#dampSel"), dampVal = $("#dampVal"), volVal = $("#volVal");
   var statusEl = $("#status"), consoleEl = $("#console");
   var scanEl = $("#scan");
   function setStatus(text, live) { statusEl.textContent = text; statusEl.setAttribute("data-live", live ? "1" : "0"); }
@@ -1755,7 +1755,7 @@
       case "giza": drawGiza(ctx, S); break;
       case "free":
         if (mini) drawFreeGlyph(ctx, S);
-        else spiralCircles(ctx, S, freeFormationArgs());
+        else blitCircular(ctx, S);
         break;
     }
   }
@@ -1821,7 +1821,7 @@
     dry = actx.createGain(); dry.gain.value = 0.82;
     wet = actx.createGain(); wet.gain.value = 0.3;
     conv = actx.createConvolver(); conv.buffer = makeImpulse(2.4, 2.6);
-    analyser = actx.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.75;
+    analyser = actx.createAnalyser(); analyser.fftSize = 4096; analyser.smoothingTimeConstant = 0.5;
     td = new Uint8Array(analyser.fftSize);
     fd = new Uint8Array(analyser.frequencyBinCount);
     ffd = new Float32Array(analyser.frequencyBinCount);
@@ -1930,7 +1930,7 @@
         if (playing) stopVoice(true);
         micStream = stream;
         micSrc = actx.createMediaStreamSource(stream);
-        micAn = actx.createAnalyser(); micAn.fftSize = 2048; micAn.smoothingTimeConstant = 0.6;
+        micAn = actx.createAnalyser(); micAn.fftSize = 4096; micAn.smoothingTimeConstant = 0.45;
         micTd = new Float32Array(micAn.fftSize); micFfd = new Float32Array(micAn.frequencyBinCount);
         micSrc.connect(micAn);   // analysis only — never routed to the speakers
         micOn = true;
@@ -2015,120 +2015,240 @@
     avgSettle = sumS / particles.length;
   }
 
-  /* ============================ CHLADNI PLATE — free (audio-weighted superposition) ============================ */
-  var MODES_N = 6, MODES = [];
+  /* ============================ CHLADNI PLATE — free (forced-vibration modal superposition) ============================ */
+  // Physics, in brief. A thin plate driven at angular frequency w answers in each mode k with the complex amplitude
+  //     A_k(w) = 1 / (w_k² − w² + i·2ζ·w_k·w)          (unit modal mass; ζ = damping ratio)
+  // so its deflection is U(x,y) = Σ_k A_k φ_k(x,y), and sand settles where |U| is smallest. Between resonances several
+  // modes share the load and the figure morphs continuously; at a resonance one mode wins by about 1/(2ζ).
+  //   Square plate, free edges (Chladni's own): φ = cos(mπx)cos(nπy) ± cos(nπx)cos(mπy),  f_k ∝ m² + n²  (bending stiffness).
+  //   Circular plate (the crop-circle analogue): φ = R_ns(r)·cos(nθ) with R from Bessel J_n and a free edge (J_n′ = 0),
+  //                                              f ∝ (edge wavenumber)²  — Chladni's law.
+  // Sound with several components drives the plate incoherently: intensity I = Σ_peaks |U_p|².
+  var FG = window.innerWidth < 700 ? 128 : 160;
+  var SQ = [], CIRC = [], cosT = [];
+  var SQ_N = 8, SQ_F1 = 12;                 // f = SQ_F1·(m² + n²): (1,2) = 60 Hz … (8,8) = 1536 Hz
   (function () {
-    // one of each (m,n)/(n,m) pair only: the antisymmetric term for (n,m) is the exact
-    // negative of the one for (m,n), and equal weights on both would cancel to a flat plate
-    for (var m = 2; m <= MODES_N; m++) for (var n = 1; n < m; n++) MODES.push({ m: m, n: n, f: Math.sqrt(m * m + n * n) });
-    var fMin = Infinity, fMax = 0;
-    MODES.forEach(function (o) { fMin = Math.min(fMin, o.f); fMax = Math.max(fMax, o.f); });
-    MODES.forEach(function (o) { o.fn = (o.f - fMin) / (fMax - fMin); o.hz = 60 * Math.pow(1500 / 60, o.fn); });
+    for (var k = 0; k <= SQ_N; k++) { var row = new Float32Array(FG); for (var i = 0; i < FG; i++) row[i] = Math.cos(k * Math.PI * (i + 0.5) / FG); cosT.push(row); }
+    for (var m = 1; m <= SQ_N; m++) for (var n = m; n <= SQ_N; n++) {
+      var base = SQ_F1 * (m * m + n * n);
+      // the degenerate (m,n)/(n,m) pair splits slightly on a real plate into two distinct figures
+      SQ.push({ m: m, n: n, sign: 1, f: base * 1.02 });
+      if (m !== n) SQ.push({ m: m, n: n, sign: -1, f: base * 0.98 });
+    }
+    SQ.forEach(function (o) { o.w = 2 * Math.PI * o.f; o.w2 = o.w * o.w; });
   })();
-  var W = new Float32Array(MODES.length);
-  var FG = 160, field = new Float32Array(FG * FG), cosT = [];
-  (function () { for (var k = 0; k <= MODES_N; k++) { var row = new Float32Array(FG); for (var i = 0; i < FG; i++) row[i] = Math.cos(k * Math.PI * (i + 0.5) / FG); cosT.push(row); } })();
-  var freeBmpCv = document.createElement("canvas"); freeBmpCv.width = FG; freeBmpCv.height = FG;
-  var freeBmpCtx = freeBmpCv.getContext("2d"), freeImg = freeBmpCtx.createImageData(FG, FG);
-  var tSeed = 0, dominant = { m: 3, n: 2 };
 
-  function updateWeights() {
-    tSeed += 0.008;
-    var live = (micOn && micAn) || (playing && analyser);
-    var an = micOn ? micAn : analyser, data = micOn ? micFfd : ffd;
-    var total = 0, i, sm = parseFloat(smoothSel.value);
-    if (live) {
-      an.getFloatFrequencyData(data);
-      var nyq = SAMPLE_RATE / 2, DB_FLOOR = -90, DB_CEIL = -20;
-      for (i = 0; i < MODES.length; i++) {
-        var centre = Math.round(MODES[i].hz / nyq * data.length), db = -140;
-        for (var k = -2; k <= 2; k++) { var b = Math.min(data.length - 1, Math.max(0, centre + k)); if (data[b] > db) db = data[b]; }
-        var amp = Math.min(1, Math.max(0, (db - DB_FLOOR) / (DB_CEIL - DB_FLOOR))); amp *= amp;
-        var baseline = 0.06 * (0.5 + 0.5 * Math.sin(tSeed + i * 1.7)) * (i < 10 ? 1 : 0.3);
-        W[i] = sm * W[i] + (1 - sm) * Math.max(amp, baseline);
-        total += W[i];
+  // Bessel J_n by power series (accurate to x ≈ 40 in doubles), its derivative, and the zeros of J_n′ (free edge)
+  function besselJ(n, x) {
+    var half = x / 2, term = 1, k;
+    for (k = 1; k <= n; k++) term *= half / k;
+    var sum = term, x2 = -half * half;
+    for (k = 1; k < 80; k++) { term *= x2 / (k * (k + n)); sum += term; if (Math.abs(term) < 1e-15 * Math.abs(sum)) break; }
+    return sum;
+  }
+  function besselJp(n, x) { return n === 0 ? -besselJ(1, x) : 0.5 * (besselJ(n - 1, x) - besselJ(n + 1, x)); }
+  function jpZeros(n, count) {
+    var out = [], x = 0.4, step = 0.05, prev = besselJp(n, x);
+    while (out.length < count && x < 40) {
+      var nx = x + step, cur = besselJp(n, nx);
+      if (prev * cur < 0) {
+        var a = x, b = nx, fa = prev;
+        for (var i = 0; i < 40; i++) { var mid = (a + b) / 2, fm = besselJp(n, mid); if (fa * fm <= 0) b = mid; else { a = mid; fa = fm; } }
+        out.push((a + b) / 2);
       }
-    } else {
-      // no audio yet: shape the plate from the slider alone, using a virtual harmonic spectrum of the
-      // chosen tone, over a slow idle drift so the plate is never still (as on a real bowed plate)
-      var f = parseFloat(freqSel.value), t = timbreSel.value;
-      for (i = 0; i < MODES.length; i++) {
-        var a = 0;
-        for (var h = 1; h <= 8; h++) {
-          var ha = t === "pure" ? (h === 1 ? 1 : 0) : t === "reed" ? (h % 2 ? 1 / (h * h) : 0) : 1 / h;
-          if (!ha) continue;
-          var d = Math.log(MODES[i].hz / (f * h));
-          a += ha * Math.exp(-(d * d) / (2 * 0.13 * 0.13));
+      x = nx; prev = cur;
+    }
+    return out;
+  }
+  var RN = 200, CIRC_F1 = 60, CIRC_NMAX = 12;   // f(n = 2 spokes, s = 1) = 60 Hz
+  var cosNT = [], rIdx = new Int16Array(FG * FG);
+  (function () {
+    var k21 = jpZeros(2, 1)[0];
+    for (var n = 0; n <= CIRC_NMAX; n++) {
+      var zs = jpZeros(n, 6);
+      for (var s = 0; s < zs.length; s++) {
+        var kk = zs[s], f = CIRC_F1 * (kk * kk) / (k21 * k21);
+        if (f > 1700) continue;
+        var R = new Float32Array(RN + 1), mx = 0, i;
+        for (i = 0; i <= RN; i++) { R[i] = besselJ(n, kk * i / RN); if (Math.abs(R[i]) > mx) mx = Math.abs(R[i]); }
+        for (i = 0; i <= RN; i++) R[i] /= mx;
+        CIRC.push({ n: n, s: s + 1, f: f, w: 2 * Math.PI * f, w2: 4 * Math.PI * Math.PI * f * f, R: R });
+      }
+    }
+    for (var nn = 0; nn <= CIRC_NMAX; nn++) cosNT.push(new Float32Array(FG * FG));
+    for (var y = 0; y < FG; y++) for (var x = 0; x < FG; x++) {
+      var u = (x + 0.5) / FG * 2 - 1, v = (y + 0.5) / FG * 2 - 1, r = Math.hypot(u, v), th = Math.atan2(v, u), p = y * FG + x;
+      rIdx[p] = r <= 1 ? Math.round(r * RN) : -1;
+      for (nn = 0; nn <= CIRC_NMAX; nn++) cosNT[nn][p] = Math.cos(nn * th);
+    }
+  })();
+
+  /* ---- excitation: spectral peaks of whatever is sounding, or the slider's virtual spectrum ---- */
+  var peaks = [], specLin = null, sigS = 0;
+  function idlePeaks() {
+    var f = parseFloat(freqSel.value), t = timbreSel.value, out = [];
+    for (var h = 1; h <= 8; h++) {
+      var a = t === "pure" ? (h === 1 ? 1 : 0) : t === "reed" ? (h % 2 ? 1 / (h * h) : 0) : 1 / h;
+      if (a > 0.02 && f * h < 3000) out.push({ f: f * h, a: a });
+    }
+    return out;
+  }
+  function spectrumPeaks(an, data) {
+    an.getFloatFrequencyData(data);
+    var N = data.length, binHz = SAMPLE_RATE / an.fftSize, i;
+    if (!specLin || specLin.length !== N) specLin = new Float32Array(N);
+    var lo = Math.max(2, Math.floor(35 / binHz)), hi = Math.min(N - 2, Math.ceil(3000 / binHz));
+    var sorted = [];
+    for (i = lo; i <= hi; i++) { specLin[i] = Math.pow(10, data[i] / 20); sorted.push(specLin[i]); }
+    sorted.sort(function (a, b) { return a - b; });
+    var floor = sorted[Math.floor(sorted.length * 0.5)] || 1e-7;     // median = noise floor
+    var cands = [];
+    for (i = lo + 1; i < hi; i++) {
+      var v = specLin[i];
+      if (v > specLin[i - 1] && v >= specLin[i + 1] && v > floor * 4 && v > 2e-5) {
+        var l = Math.log(specLin[i - 1] + 1e-12), c = Math.log(v + 1e-12), r = Math.log(specLin[i + 1] + 1e-12);
+        var den = l - 2 * c + r, off = den !== 0 ? 0.5 * (l - r) / den : 0;   // parabolic sub-bin interpolation
+        cands.push({ f: (i + off) * binHz, a: v });
+      }
+    }
+    cands.sort(function (a, b) { return b.a - a.a; });
+    var out = cands.slice(0, 5), mx = out.length ? out[0].a : 1;
+    out.forEach(function (p) { p.a /= mx; });
+    return out;
+  }
+
+  /* ---- modal response and the intensity fields ---- */
+  var ISQ = new Float32Array(FG * FG), ISQs = new Float32Array(FG * FG);
+  var ICR = new Float32Array(FG * FG), ICRs = new Float32Array(FG * FG);
+  var reS = new Float32Array(FG * FG), imS = new Float32Array(FG * FG);
+  var topSq = null, topCirc = null;
+  function modalAmps(modes, fHz, zeta) {
+    var w = 2 * Math.PI * fHz, w2 = w * w, out = [], mx = 0, i;
+    for (i = 0; i < modes.length; i++) {
+      var k = modes[i], dr = k.w2 - w2, di = 2 * zeta * k.w * w, den = dr * dr + di * di;
+      var re = dr / den, im = -di / den, mag = Math.sqrt(re * re + im * im);
+      out.push({ k: k, re: re, im: im, mag: mag }); if (mag > mx) mx = mag;
+    }
+    var keep = [];
+    for (i = 0; i < out.length; i++) if (out[i].mag >= mx * 0.05) { out[i].re /= mx; out[i].im /= mx; out[i].mag /= mx; keep.push(out[i]); }
+    return keep;
+  }
+  // S(x,y) = the smallest normalised displacement among the sounding notes' figures at that point, louder notes
+  // weighted heavier — so several notes show as their figures laid over one another, each as bright as it is loud.
+  var S_DARK = 4;
+  function computeStillness(modes, S, isCirc, zeta) {
+    var P = FG * FG, p, i, top = null, topMag = 0;
+    for (p = 0; p < P; p++) S[p] = S_DARK;
+    for (var pi = 0; pi < peaks.length; pi++) {
+      var pk = peaks[pi], amps = modalAmps(modes, pk.f, zeta);
+      if (!amps.length) continue;
+      for (p = 0; p < P; p++) { reS[p] = 0; imS[p] = 0; }
+      for (i = 0; i < amps.length; i++) {
+        var a = amps[i], k = a.k, re = a.re, im = a.im;
+        if (a.mag * pk.a > topMag) { topMag = a.mag * pk.a; top = k; }
+        if (isCirc) {
+          var C = cosNT[k.n], R = k.R;
+          for (p = 0; p < P; p++) { var ri = rIdx[p]; if (ri < 0) continue; var ph = R[ri] * C[p]; reS[p] += re * ph; imS[p] += im * ph; }
+        } else {
+          var cm = cosT[k.m], cn = cosT[k.n], sg = k.sign;
+          p = 0;
+          for (var y = 0; y < FG; y++) { var cmy = cm[y], cny = cn[y]; for (var x = 0; x < FG; x++, p++) { var ph2 = cm[x] * cny + sg * cn[x] * cmy; reS[p] += re * ph2; imS[p] += im * ph2; } }
         }
-        var drift = 0.22 * (0.5 + 0.5 * Math.sin(tSeed * 0.9 + i * 1.7));
-        W[i] = sm * W[i] + (1 - sm) * Math.max(Math.min(1, a), drift);
-        total += W[i];
       }
+      var mx = 0;
+      for (p = 0; p < P; p++) { var I = reS[p] * reS[p] + imS[p] * imS[p]; reS[p] = I; if (I > mx) mx = I; }
+      if (mx <= 1e-18) continue;
+      var inv = 1 / mx, wgt = 1 / Math.sqrt(pk.a);
+      for (p = 0; p < P; p++) { if (isCirc && rIdx[p] < 0) continue; var v = Math.sqrt(reS[p] * inv) * wgt; if (v < S[p]) S[p] = v; }
     }
-    // exposure stays constant, only the pattern responds: loudest mode is always 1,
-    // and the sum is capped so a broad spectrum doesn't wash the plate out
-    var mx = 0;
-    for (i = 0; i < MODES.length; i++) if (W[i] > mx) mx = W[i];
-    if (mx > 1e-6) {
-      var up = 1 / mx;
-      total *= up;
-      var cap = total > 3 ? 3 / total : 1;
-      for (i = 0; i < MODES.length; i++) W[i] *= up * cap;
-    }
-    var bi = 0; for (i = 1; i < MODES.length; i++) if (W[i] > W[bi]) bi = i;
-    if (MODES[bi].m !== dominant.m || MODES[bi].n !== dominant.n) { dominant = { m: MODES[bi].m, n: MODES[bi].n }; onDominantChange(); }
+    return top;
   }
-  function computeFreeField() {
-    var i, x, y, idx = 0;
-    for (y = 0; y < FG; y++) for (x = 0; x < FG; x++) {
-      var acc = 0;
-      for (i = 0; i < MODES.length; i++) {
-        var w = W[i]; if (w <= 0.0001) continue;
-        var m = MODES[i].m, n = MODES[i].n;
-        acc += w * (cosT[m][x] * cosT[n][y] - cosT[n][x] * cosT[m][y]);
-      }
-      field[idx++] = acc;
-    }
+  function smoothField(S, Ss, sm) {
+    var P = FG * FG;
+    for (var p = 0; p < P; p++) Ss[p] = sm * Ss[p] + (1 - sm) * (S[p] < S_DARK ? S[p] : S_DARK);
   }
-  function sampleField(u, v) {
+  function freeStep() {
+    var zeta = parseFloat(dampSel.value), sm = parseFloat(smoothSel.value);
+    var live = (micOn && micAn) || (playing && analyser);
+    if (live) {
+      peaks = spectrumPeaks(micOn ? micAn : analyser, micOn ? micFfd : ffd);
+      if (!peaks.length && playing && !micOn) peaks = idlePeaks();   // tone still ramping up
+    } else peaks = idlePeaks();
+    sigS = 0.88 * sigS + 0.12 * (peaks.length ? 1 : 0);
+    topSq = computeStillness(SQ, ISQ, false, zeta);
+    topCirc = computeStillness(CIRC, ICR, true, zeta);
+    smoothField(ISQ, ISQs, sm);
+    smoothField(ICR, ICRs, sm);
+  }
+
+  /* ---- sand on the square plate: descend the intensity ---- */
+  function sampleI(I, u, v) {
     var fx = Math.min(FG - 1.001, Math.max(0, u * FG - 0.5)), fy = Math.min(FG - 1.001, Math.max(0, v * FG - 0.5));
     var x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0;
-    var a = field[y0 * FG + x0], b = field[y0 * FG + x0 + 1], c = field[(y0 + 1) * FG + x0], d = field[(y0 + 1) * FG + x0 + 1];
+    var a = I[y0 * FG + x0], b = I[y0 * FG + x0 + 1], c = I[(y0 + 1) * FG + x0], d = I[(y0 + 1) * FG + x0 + 1];
     return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
   }
   function stepFreeParticles() {
-    var h = 1 / FG, lr = 0.008, jit = 0.003, sumS = 0;
+    var h = 1.5 / FG, lr = 0.007, jit = 0.0025 + 0.004 * (1 - sigS), sumS = 0;
     for (var i = 0; i < particles.length; i++) {
-      var p = particles[i], z = sampleField(p.x, p.y);
-      var gx = (sampleField(p.x + h, p.y) - sampleField(p.x - h, p.y)) / (2 * h);
-      var gy = (sampleField(p.x, p.y + h) - sampleField(p.x, p.y - h)) / (2 * h);
-      var gl = Math.hypot(gx, gy) || 1e-6, dir = z >= 0 ? 1 : -1;
-      p.x -= dir * (gx / gl) * lr + (Math.random() - 0.5) * jit;
-      p.y -= dir * (gy / gl) * lr + (Math.random() - 0.5) * jit;
+      var p = particles[i];
+      var gx = (sampleI(ISQs, p.x + h, p.y) - sampleI(ISQs, p.x - h, p.y)) / (2 * h);
+      var gy = (sampleI(ISQs, p.x, p.y + h) - sampleI(ISQs, p.x, p.y - h)) / (2 * h);
+      var gl = Math.hypot(gx, gy);
+      if (gl > 1e-4) { p.x -= (gx / gl) * lr * sigS; p.y -= (gy / gl) * lr * sigS; }
+      p.x += (Math.random() - 0.5) * jit; p.y += (Math.random() - 0.5) * jit;
       if (p.x < 0) p.x = -p.x; if (p.x > 1) p.x = 2 - p.x;
       if (p.y < 0) p.y = -p.y; if (p.y > 1) p.y = 2 - p.y;
-      var near = Math.exp(-6 * Math.abs(sampleField(p.x, p.y)));
+      var near = Math.exp(-7 * sampleI(ISQs, p.x, p.y)) * sigS;
       p.settle += (near - p.settle) * 0.05; sumS += p.settle;
     }
     avgSettle = sumS / particles.length;
   }
-  function renderFreeBitmap() {
-    var s = COL.soundRgb, sharp = parseFloat(sharpSel.value), gain = parseFloat(gainSel.value), d = freeImg.data;
-    for (var i = 0; i < FG * FG; i++) {
-      var line = Math.exp(-sharp * Math.abs(field[i]) * gain), o = i * 4;
-      d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235);
+
+  /* ---- bitmaps: square plate (sound colour) and circular plate laid in the crop (wheat colour) ---- */
+  var freeBmpCv = document.createElement("canvas"); freeBmpCv.width = FG; freeBmpCv.height = FG;
+  var freeBmpCtx = freeBmpCv.getContext("2d"), freeImg = freeBmpCtx.createImageData(FG, FG);
+  var circBmpCv = document.createElement("canvas"); circBmpCv.width = FG; circBmpCv.height = FG;
+  var circBmpCtx = circBmpCv.getContext("2d"), circImg = circBmpCtx.createImageData(FG, FG);
+  function renderFreeBitmaps() {
+    var s = COL.soundRgb, a = COL.accentRgb, sharp = parseFloat(sharpSel.value), d = freeImg.data, e = circImg.data, P = FG * FG;
+    for (var i = 0; i < P; i++) {
+      var o = i * 4;
+      var line = Math.exp(-sharp * ISQs[i]);
+      d[o] = s[0]; d[o + 1] = s[1]; d[o + 2] = s[2]; d[o + 3] = Math.round(line * 235 * sigS);
+      if (rIdx[i] < 0) { e[o + 3] = 0; continue; }
+      var lay = Math.exp(-sharp * 0.75 * ICRs[i]);       // flattened crop is a little wider than a sand line
+      e[o] = a[0]; e[o + 1] = a[1]; e[o + 2] = a[2]; e[o + 3] = Math.round((0.06 + 0.94 * lay) * 235 * sigS);
     }
     freeBmpCtx.putImageData(freeImg, 0, 0);
+    circBmpCtx.putImageData(circImg, 0, 0);
   }
-  function freeFormationArgs() {
-    var m = dominant.m, n = dominant.n, big = Math.max(m, n), small = Math.min(m, n);
-    return { arms: Math.min(9, big + small - 1), count: 80 + 30 * (big + small), turns: 0.25 + 0.09 * small, csize: 0.05, dir: (m > n) ? 1 : -1 };
+  function blitCircular(ctx, S) {
+    var pad = S * 0.05, side = S - 2 * pad;
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(circBmpCv, pad, pad, side, side);
+    ctx.strokeStyle = rgba(COL.accentRgb, 0.45); ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(S / 2, S / 2, side / 2, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
   }
-  function onDominantChange() {
-    if (!isFree()) return;
-    renderFormation();
-    $("#readMode").textContent = "(" + dominant.n + "," + dominant.m + ")";
-    $("#readSym").textContent = (dominant.m + dominant.n - 1) + "-fold";
+  function updateFreeReadouts() {
+    if (micOn && micAn) {
+      micAn.getFloatTimeDomainData(micTd);
+      // autocorrelation gives the true period (on a chord, the common sub-harmonic); trust it only when a spectral
+      // peak actually sits there, otherwise report the strongest peak — what a listener would call the note
+      var ac = detectPitch(micTd, SAMPLE_RATE), top = peaks.length ? peaks[0].f : 0, hz = top;
+      if (ac) { for (var q = 0; q < peaks.length; q++) if (Math.abs(peaks[q].f - ac) < ac * 0.06) { hz = ac; break; } }
+      if (hz) detectedHz = detectedHz ? detectedHz * 0.6 + hz * 0.4 : hz;
+      $("#readF").innerHTML = (hz ? Math.round(detectedHz) : "—") + "<small>Detected&nbsp;·&nbsp;Hz</small>";
+      $("#readSpan").textContent = hz ? "≈ " + fmtSpan(spanFromPitch(detectedHz)) : "—";
+    }
+    $("#readSym").textContent = topCirc && sigS > 0.2 ? topCirc.n + (topCirc.n === 1 ? " spoke · " : " spokes · ") + topCirc.s + (topCirc.s === 1 ? " ring" : " rings") : "—";
+    $("#readMode").textContent = topSq && sigS > 0.2 ? "(" + topSq.n + "," + topSq.m + ")" + (topSq.sign > 0 ? "+" : "−") : "—";
+  }
+  function resetFree() {
+    peaks = []; sigS = 0; topSq = null; topCirc = null;
+    for (var p = 0; p < FG * FG; p++) { ISQs[p] = S_DARK; ICRs[p] = S_DARK; }
   }
 
   /* ============================ DRAW: plate, scope ============================ */
@@ -2222,17 +2342,11 @@
       energy = Math.min(1, Math.sqrt(s / (td.length / 8)) * 3.2);
     }
     if (isFree()) {
-      updateWeights();
-      computeFreeField();
-      renderFreeBitmap();
+      freeStep();
+      renderFreeBitmaps();
       stepFreeParticles();
-      if (micOn && micAn && frameNo % 6 === 0) {
-        micAn.getFloatTimeDomainData(micTd);
-        var hz = detectPitch(micTd, SAMPLE_RATE);
-        if (hz) detectedHz = detectedHz ? detectedHz * 0.6 + hz * 0.4 : hz;
-        $("#readF").innerHTML = (hz ? Math.round(detectedHz) : "—") + "<small>Detected&nbsp;·&nbsp;Hz</small>";
-        $("#readSpan").textContent = hz ? "≈ " + fmtSpan(spanFromPitch(detectedHz)) : "—";
-      }
+      drawFormation(fieldCtx, fieldSize, FREE, false);
+      if (frameNo % 6 === 0) updateFreeReadouts();
     } else {
       stepParticles(energy);
     }
@@ -2271,8 +2385,8 @@
     $("#transportLbl").textContent = free ? "Your own tone · free plate" : "Playback";
     if (scrollTo && !reduceMotion) transportEl.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (scrollTo) transportEl.scrollIntoView();
-    $("#fieldTag").textContent = free ? "Formation your tone would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
-    $("#plateTag").textContent = free ? "Free plate · audio-reactive" : "Chladni plate · nodal lines";
+    $("#fieldTag").textContent = free ? "Circular plate · the formation this sound would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");
+    $("#plateTag").textContent = free ? "Square plate · audio-reactive" : "Chladni plate · nodal lines";
     $("#fcName").textContent = f.name;
     $("#fcMeta").textContent = f.place;
     $("#dosName").textContent = f.name;
@@ -2282,12 +2396,12 @@
     $("#dosForm").textContent = f.form;
     if (free) {
       $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Tone&nbsp;·&nbsp;Hz</small>";
-      $("#readSymLbl").textContent = "Loudest mode"; $("#readSpanLbl").textContent = "Field equivalent";
-      $("#readSym").textContent = (dominant.m + dominant.n - 1) + "-fold";
+      $("#readSymLbl").textContent = "Field mode"; $("#readSpanLbl").textContent = "Field equivalent";
+      $("#readSym").textContent = "—";
       $("#readSpan").textContent = "≈ " + fmtSpan(spanFromPitch(current.reading.f0));
-      $("#readMode").textContent = "(" + dominant.n + "," + dominant.m + ")";
+      $("#readMode").textContent = "—";
       $("#dosSpan").textContent = "≈ " + fmtSpan(spanFromPitch(current.reading.f0)) + " — a field this tone would fit";
-      for (var w = 0; w < W.length; w++) W[w] = 0;
+      resetFree();
     } else {
       $("#readF").innerHTML = Math.round(current.reading.f0) + "<small>Fundamental&nbsp;·&nbsp;Hz</small>";
       $("#readSymLbl").textContent = "Symmetry"; $("#readSpanLbl").textContent = "Span";
@@ -2370,7 +2484,7 @@
   });
   $("#ctaFree").addEventListener("click", function () { selectFormation(FREE, true); });
   smoothSel.addEventListener("input", function () { smoothVal.textContent = parseFloat(smoothSel.value).toFixed(2); });
-  gainSel.addEventListener("input", function () { gainVal.textContent = parseFloat(gainSel.value).toFixed(1); });
+  dampSel.addEventListener("input", function () { dampVal.textContent = parseFloat(dampSel.value).toFixed(3); });
   freqSel.addEventListener("input", function () {
     var f = parseFloat(freqSel.value);
     freqVal.textContent = f;
