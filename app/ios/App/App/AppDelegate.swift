@@ -1,4 +1,5 @@
 import UIKit
+import AVFoundation
 import Capacitor
 
 @UIApplicationMain
@@ -7,7 +8,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // A tone app behaves like a music app: it plays through the ring/silent switch, and (with the
+        // audio background mode) keeps the Resonance Room sounding when the screen locks.
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("audio session: \(error)")
+        }
         return true
     }
 
@@ -31,6 +39,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        // Google Sign-In returns to the app through its reversed-client-id URL scheme. The SDK is linked
+        // through the social-login plugin's package, so it is reached here by name rather than by import.
+        if let cls = NSClassFromString("GIDSignIn") as? NSObject.Type,
+           let shared = cls.value(forKey: "sharedInstance") as? NSObject {
+            let sel = NSSelectorFromString("handleURL:")
+            if shared.responds(to: sel), let imp = shared.method(for: sel) {
+                typealias HandleURL = @convention(c) (AnyObject, Selector, URL) -> Bool
+                let handle = unsafeBitCast(imp, to: HandleURL.self)
+                if handle(shared, sel, url) { return true }
+            }
+        }
+        return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
     func application(_ application: UIApplication,

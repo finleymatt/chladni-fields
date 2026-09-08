@@ -44,9 +44,18 @@ jobs:
         run: npm ci
 
       - name: Bundle the site into www/ and sync the iOS project
+        env:
+          GOOGLE_IOS_CLIENT_ID: ${{ secrets.GOOGLE_IOS_CLIENT_ID }}
         run: |
           node build-www.js
           npx cap sync ios
+          if [ -n "$GOOGLE_IOS_CLIENT_ID" ]; then
+            REV=$(echo "$GOOGLE_IOS_CLIENT_ID" | awk -F. '{ for (i = NF; i > 0; i--) printf "%s%s", $i, (i > 1 ? "." : "") }')
+            sed -i '' "s/GOOGLE_REVERSED_CLIENT_ID/$REV/; s/GOOGLE_IOS_CLIENT_ID/$GOOGLE_IOS_CLIENT_ID/" ios/App/App/Info.plist
+            echo "Google sign-in configured"
+          else
+            echo "No GOOGLE_IOS_CLIENT_ID secret: the app offers Sign in with Apple only"
+          fi
 
       - name: Work out version and build number
         id: ver

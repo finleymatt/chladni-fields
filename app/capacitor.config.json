@@ -11,11 +11,11 @@
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 600,
-      "launchAutoHide": true,
+      "launchShowDuration": 0,
+      "launchAutoHide": false,
+      "launchFadeOutDuration": 220,
       "backgroundColor": "#0d120e",
-      "showSpinner": false,
-      "iosSpinnerStyle": "small"
+      "showSpinner": false
     },
     "StatusBar": {
       "style": "DARK",

@@ -56,10 +56,20 @@ First release.
 
 The microphone is used only in the "Your own tone" section: tap Use microphone, allow it, then sing or hum and the square plate responds. The audio is analysed on-device and never recorded or transmitted. Everything else works without permissions. The app is fully functional offline; the ⓘ source panels fetch reference images from Wikimedia Commons when online.
 
+## In-app purchases (shown on the listing)
+
+Chladni Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99 / $2.99 / $9.99. Product IDs and setup in `monetization.md`. Add to the description's end: "Chladni Plus is optional: sleep mode with the screen locked, unlimited saved mixes and clean shares. Subscriptions renew until cancelled in Settings. Terms: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/ · Privacy: https://iamra.lol/privacy.html"
+
 ## App privacy (nutrition label)
 
-Data collection: **No, we do not collect data from this app.**
-(The microphone stream is processed in memory and never stored or sent, so it is not "collected" under Apple's definition.)
+- Microphone audio: processed in memory, never stored or sent — not "collected" under Apple's definition.
+- If the user signs in (optional): **Name** and **Email address**, linked to the user, not used for tracking, purpose App Functionality. Stored on the device only.
+- Purchases are handled by Apple; the app stores no payment data.
+- Answer "Yes, we collect data" → select Name and Email Address → Linked to user, not tracking, App Functionality. Everything else: not collected.
+
+## App review notes (add)
+
+Sign-in is optional (Sign in with Apple and Google); the app is fully usable without it, and "Delete my data" in the You tab removes the account and everything stored. Purchases: Chladni Plus (auto-renewable monthly/yearly, non-consumable lifetime) unlocks sleep-mode background playback, unlimited saved mixes and watermark-free shares; the tip jar is consumable and unlocks nothing. Restore purchases is in the You tab and on the paywall.
 
 ## Screenshots
 

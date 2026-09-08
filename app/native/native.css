@@ -1,10 +1,26 @@
-/* Native-app layer: the web view runs edge to edge under the status bar and home indicator,
-   so the page keeps clear of both. Everything else is the site as published. */
-html.native { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-html.native body { overscroll-behavior-y: none; }
-html.native .wrap { padding-top: calc(env(safe-area-inset-top) + 12px) !important; padding-bottom: calc(env(safe-area-inset-bottom) + 44px) !important; }
+/* Native-app layer. The page is the website as published; this file makes it behave like an iPhone app:
+   edge-to-edge under the status bar with the page keeping clear of it, a bottom tab bar for the three
+   sections, dialogs as bottom sheets, instant pressed states, 44pt hit targets, no text-selection on chrome. */
+
+/* ---- feel ---- */
+html.native { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-font-smoothing: antialiased; }
+html.native button, html.native a, html.native label, html.native select, html.native input[type="range"] { touch-action: manipulation; }
+html.native .site-nav, html.native .console, html.native .transport, html.native .strip, html.native .strip-head, html.native .gutter,
+html.native .meter, html.native .controls, html.native .presets-ctl, html.native .tone .foot, html.native .mini-now, html.native button, html.native label,
+html.native .tabbar { -webkit-user-select: none; user-select: none; }
+/* a tap answers at once: iPhone has no hover, so every control dims and settles while the finger is down */
+html.native button:active, html.native .chip:active, html.native .preset:active, html.native .tone .go:active, html.native .ra-jump:active,
+html.native .nav-links a:active, html.native .theme-toggle:active, html.native .src-btn:active, html.native .back:active, html.native .tabbar a:active {
+  opacity: .62; transform: scale(.985); transition: opacity 60ms ease, transform 60ms ease;
+}
+html.native button, html.native .chip, html.native .preset, html.native .ra-jump { transition: opacity 160ms ease, transform 160ms ease; }
+/* pages cross-fade when moving between sections (Safari 18.2+; ignored elsewhere) */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 180ms; }
+
+/* ---- safe areas: the web view runs under the status bar and the home indicator ---- */
+html.native .wrap { padding-top: calc(env(safe-area-inset-top) + 10px) !important; padding-bottom: calc(49px + env(safe-area-inset-bottom) + 28px) !important; }
 html.native .site-nav { padding-top: 2px; }
-/* things pinned to the top on phones sit below the status bar, with the page colour behind the bar */
 @media (max-width: 900px) {
   html.native .console, html.native .mini-now { top: env(safe-area-inset-top) !important; }
   html.native .console::before, html.native .mini-now::before {
@@ -12,6 +28,145 @@ html.native .site-nav { padding-top: 2px; }
     background: var(--bg); pointer-events: none;
   }
 }
-html.native dialog { max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px); }
-/* the app has no address bar or share sheet to point at; the web-only help lines are hidden */
+
+/* ---- 44pt hit targets on the small controls the site draws tighter on the web ---- */
+html.native .theme-toggle { min-height: 40px; padding: 9px 14px; }
+html.native .nav-arrow { width: 44px; min-height: 44px; }
+html.native .info-close { min-height: 44px; padding: 10px 14px; }
+html.native .strip-nav { display: none !important; }
+html.native .field-caption .fc-name { font-size: 1rem; }
+
+/* ---- the top links are replaced by the tab bar; brand and theme toggles stay ---- */
+html.native .site-nav .nav-links { display: none; }
+html.native .site-nav { border-bottom: 0; margin-bottom: 10px; padding-bottom: 6px; }
+html.native .masthead { margin-top: 0; }
+/* the header's jump buttons duplicate the tab bar on the plates page */
+html.native .masthead-side .side-row { display: none; }
+html.native .masthead .credit { margin-top: 0; }
+
+/* ---- tab bar ---- */
+html.native .tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  display: flex; align-items: stretch;
+  height: calc(49px + env(safe-area-inset-bottom)); padding: 0 0 env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-top: .5px solid color-mix(in srgb, var(--edge) 80%, transparent);
+}
+@supports not (background: color-mix(in srgb, red 50%, blue)) { html.native .tabbar { background: var(--panel); } }
+html.native .tabbar a {
+  flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 49px; text-decoration: none; color: var(--muted);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; font-size: 10px; font-weight: 500; letter-spacing: .01em;
+}
+html.native .tabbar a svg { width: 26px; height: 26px; display: block; }
+html.native .tabbar a[aria-current="page"] { color: var(--accent); }
+html.native .tabbar a:active { opacity: .55; transform: none; }
+html.native .tabbar a[aria-current="page"] svg { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 45%, transparent)); }
+html.native .tabbar span { line-height: 1; }
+/* the phone now-playing bar on the Resonance page sits above the tab bar's shelf */
+html.native .mini-now { z-index: 55; }
+
+/* ---- dialogs become bottom sheets ---- */
+html.native dialog.info {
+  position: fixed; inset: auto 0 0 0; margin: 0; width: 100%; max-width: none;
+  max-height: calc(100% - env(safe-area-inset-top) - 36px);
+  border: 0; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, .45); overflow: hidden;
+  will-change: transform;
+}
+html.native dialog.info[open] { animation: sheet-up 420ms cubic-bezier(.32, .72, 0, 1); }
+html.native dialog.info[data-closing="1"] { animation: sheet-down 260ms cubic-bezier(.4, 0, 1, 1) forwards; }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sheet-down { to { transform: translateY(105%); } }
+html.native dialog.info::backdrop { background: rgba(0, 0, 0, .42); backdrop-filter: none; animation: dim-in 260ms ease; }
+@keyframes dim-in { from { opacity: 0; } }
+html.native dialog.info .info-head { position: relative; padding-top: 22px; }
+html.native dialog.info .info-head::before {
+  content: ""; position: absolute; top: 8px; left: 50%; width: 36px; height: 5px; margin-left: -18px; border-radius: 3px;
+  background: var(--muted); opacity: .55;
+}
+html.native dialog.info .info-body, html.native dialog.info .info-grid { max-height: calc(100vh - env(safe-area-inset-top) - 110px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+html.native dialog.info .info-text { padding-bottom: 28px; }
+
+/* ---- toast ---- */
+.cf-toast {
+  position: fixed; left: 16px; right: 16px; bottom: calc(49px + env(safe-area-inset-bottom) + 14px); z-index: 70;
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px;
+  background: color-mix(in srgb, var(--panel-2) 92%, transparent); color: var(--ink); border: 1px solid var(--edge);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-size: 14px; line-height: 1.35;
+  opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity 200ms ease, transform 260ms cubic-bezier(.32, .72, 0, 1);
+}
+.cf-toast[data-show="1"] { opacity: 1; transform: none; pointer-events: auto; }
+.cf-toast span { flex: 1 1 auto; }
+.cf-toast button { flex: 0 0 auto; background: transparent; border: 0; color: var(--accent); font: inherit; font-weight: 600; padding: 6px 4px; }
+
+/* ---- Plus, tips, account, welcome: sheet contents and the You page ---- */
+.cf-text h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.55rem; line-height: 1.05; margin: 4px 0 10px; text-wrap: balance; }
+.cf-text h2 .amp { color: var(--accent); font-weight: 500; }
+.cf-reason { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--sound); margin: 0 0 10px; }
+.cf-perks { list-style: none; margin: 8px 0 16px; padding: 0; display: grid; gap: 8px; }
+.cf-perks li { position: relative; padding-left: 22px; font-size: .97rem; line-height: 1.4; }
+.cf-perks li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); }
+.cf-perks b { font-family: var(--font-display); font-weight: 600; }
+.cf-plans { display: grid; gap: 10px; }
+.cf-plan { position: relative; display: grid; grid-template-columns: 1fr auto; grid-template-areas: "label price" "note price"; align-items: center; gap: 2px 12px; text-align: left; width: 100%;
+  background: var(--panel-2); color: var(--ink); border: 1.5px solid var(--edge); border-radius: 14px; padding: 13px 16px; min-height: 64px; font: inherit; }
+.cf-plan b { grid-area: label; font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+.cf-plan span { grid-area: price; font-family: var(--font-display); font-weight: 700; font-size: 18px; text-align: right; }
+.cf-plan span em { display: block; font-style: normal; font-family: var(--font-mono); font-weight: 400; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cf-plan small { grid-area: note; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+.cf-plan i { position: absolute; top: -9px; left: 14px; font-style: normal; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: #0b0e0b; background: var(--accent); border-radius: 999px; padding: 3px 8px; }
+.cf-plan--best { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.cf-plan[data-busy="1"], .cf-tip[data-busy="1"], .cf-apple[data-busy="1"], .cf-google[data-busy="1"] { opacity: .5; }
+.cf-fine { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.6; color: var(--muted); letter-spacing: .02em; margin: 14px 0 0; }
+.cf-fine a { color: var(--muted); }
+.cf-row { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.cf-link { background: transparent; border: 0; color: var(--sound); font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; padding: 12px 8px; min-height: 44px; }
+.cf-primary { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: .02em; color: #0b0e0b; background: var(--accent); border: 0; border-radius: 12px; padding: 14px 20px; min-height: 50px; }
+.cf-tips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.cf-tip { display: grid; gap: 2px; text-align: center; background: var(--panel-2); color: var(--ink); border: 1.5px solid var(--edge); border-radius: 14px; padding: 14px 8px; min-height: 72px; font: inherit; }
+.cf-tip b { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.cf-tip span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cf-thanks { text-align: center; padding: 10px 0 6px; }
+.cf-thanks svg { width: 72px; height: 72px; color: var(--accent); margin: 0 auto 10px; display: block; }
+.cf-signin { display: grid; gap: 10px; margin-top: 14px; }
+.cf-apple, .cf-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 50px; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-size: 17px; font-weight: 600; }
+.cf-apple { background: #000; color: #fff; border: 1px solid #000; }
+:root[data-theme="dark"] .cf-apple { background: #fff; color: #000; border-color: #fff; }
+.cf-apple svg { width: 20px; height: 20px; }
+.cf-google { background: #fff; color: #1f1f1f; border: 1px solid #dadce0; }
+.cf-google svg { width: 20px; height: 20px; }
+.cf-steps { list-style: none; margin: 6px 0 18px; padding: 0; display: grid; gap: 14px; }
+.cf-steps li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; }
+.cf-steps .cf-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--panel-2); color: var(--accent); }
+.cf-steps .cf-ic svg { width: 24px; height: 24px; }
+.cf-steps b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; margin-bottom: 2px; }
+.cf-steps div { font-size: .95rem; line-height: 1.4; color: var(--muted); }
+.cf-steps div b { color: var(--ink); }
+html.native .tabbar a[data-plus="1"] svg { color: var(--accent); }
+
+/* saved mixes, in the Resonance Room's presets block */
+.cf-mixes { margin-bottom: 12px; }
+.cf-mixes-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.cf-save { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--sound); background: transparent; border: 1px solid var(--sound); border-radius: 999px; padding: 8px 14px; min-height: 40px; }
+.cf-mix-row { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }
+.cf-mix-row::-webkit-scrollbar { display: none; }
+.cf-mix { flex: 0 0 auto; display: grid; gap: 2px; text-align: left; background: var(--panel-2); color: var(--ink); border: 1px solid var(--edge); border-radius: 12px; padding: 10px 14px; min-height: 52px; max-width: 220px; font: inherit; }
+.cf-mix b { font-family: var(--font-display); font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-mix small { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-mixes-empty { margin: 0; font-size: .9rem; color: var(--muted); }
+
+/* share button on the plate panel */
+html.native .panel--plate .panel-tag { right: 48px; }
+.cf-share { position: absolute; top: 5px; right: 5px; z-index: 3; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--panel) 82%, transparent); color: var(--sound); border: 1px solid var(--edge); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.cf-share svg { width: 20px; height: 20px; }
+.cf-share[data-busy="1"] { opacity: .5; }
+
+/* the app has no address bar or share sheet to point at; web-only help lines are hidden */
 html.native .web-only { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html.native dialog.info[open], html.native dialog.info[data-closing="1"] { animation-duration: 1ms; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

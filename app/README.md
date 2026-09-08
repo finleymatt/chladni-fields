@@ -19,6 +19,8 @@ Nothing here needs a Mac on your desk: GitHub builds, signs and uploads the app 
    | `ASC_ISSUER_ID` | the Issuer ID |
    | `ASC_KEY_P8` | the whole text of the `.p8` file, `-----BEGIN PRIVATE KEY-----` to `-----END PRIVATE KEY-----` |
 
+6. **Products.** App Store Connect → the app → Subscriptions and In-App Purchases: create the six products in [store/monetization.md](store/monetization.md) (exact IDs matter), and sign the **Paid Apps Agreement** under Business. Optional: a Google OAuth iOS client ID as the secret `GOOGLE_IOS_CLIENT_ID` turns on "Continue with Google"; without it the app offers Sign in with Apple only.
+
 ## Shipping a build
 
 Actions → **iOS · build and upload** → Run workflow. About 15 minutes later the build shows in App Store Connect → TestFlight; Apple's processing adds 5–20 minutes. The build number is the workflow run number; the version comes from `package.json` (or the box on the Run workflow form).
@@ -55,8 +57,15 @@ npm run fonts          # re-download the self-hosted fonts
 
 ## What differs from the website
 
+- **Feels like an iPhone app:** bottom tab bar (Plates · Resonance · Law of One · You), dialogs as bottom sheets with a grabber and flick-down to dismiss, instant pressed states, 44pt hit targets, haptics on figure changes, mic start, presets and purchases, edge-swipe back on pushed pages, cross-fade between sections, a three-line welcome on first launch.
+- **Audio like a music app:** plays through the ring/silent switch (AVAudioSession playback), background audio mode, lock-screen Now Playing with pause for the Resonance Room.
 - Fonts ship in the bundle; everything works offline.
 - Microphone permission is the app's own (Settings → Chladni Fields → Microphone). The web-only "open in Safari" advice is not shown.
 - Outside links open in an in-app Safari sheet with a Done button.
 - The page keeps clear of the status bar and home indicator; the status-bar text follows the theme.
+- **You tab:** optional Sign in with Apple / Google, Chladni Plus (StoreKit 2 in `ios/App/App/PurchasesPlugin.swift`), tip jar, saved mixes, restore purchases, delete my data. Free vs Plus is in [store/monetization.md](store/monetization.md); the gating lives in `native/native.js` (timers, sleep mode, mixes, share watermark).
 - iPhone only, portrait only. iPad support would need iPad screenshots and a landscape pass.
+
+## Testing purchases and sign-in
+
+Purchases and sign-in only work on a real device: install a TestFlight build, sign out of the App Store on the phone, and use a **Sandbox tester** (App Store Connect → Users and Access → Sandbox). Sandbox subscriptions renew every few minutes so you can watch expiry and restore. The plates, mic, mixes and sheets can be checked in the simulator.
