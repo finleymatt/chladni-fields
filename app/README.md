@@ -21,6 +21,10 @@ Nothing here needs a Mac on your desk: GitHub builds, signs and uploads the app 
 
 6. **Products.** App Store Connect → the app → Subscriptions and In-App Purchases: create the six products in [store/monetization.md](store/monetization.md) (exact IDs matter), and sign the **Paid Apps Agreement** under Business. Optional: a Google OAuth iOS client ID as the secret `GOOGLE_IOS_CLIENT_ID` turns on "Continue with Google"; without it the app offers Sign in with Apple only.
 
+## Checking it compiles (no Apple account needed)
+
+Every push that touches `app/` runs a **compile check** on GitHub's Mac runner: the project is built for the iOS Simulator with signing off. Actions → iOS · build and upload → Run workflow → mode `compile-check` runs it on demand. Green means the Swift, the plugins and the package resolution are fine; the only things it can't prove are signing and StoreKit.
+
 ## Shipping a build
 
 Actions → **iOS · build and upload** → Run workflow. About 15 minutes later the build shows in App Store Connect → TestFlight; Apple's processing adds 5–20 minutes. The build number is the workflow run number; the version comes from `package.json` (or the box on the Run workflow form).
