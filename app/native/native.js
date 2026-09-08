@@ -189,7 +189,7 @@
   function sharePlate(btn) {
     var cp = CP(), clean = cp && cp.has();
     var field = $("#fieldCanvas"), plate = $("#plateCanvas"); if (!field || !plate) return;
-    var name = ($("#fcName") || {}).textContent || "Chladni Fields", hz = (($("#readF") || {}).textContent || "").replace(/[^\d.]/g, "");
+    var name = ($("#fcName") || {}).textContent || "Slowtide", hz = (($("#readF") || {}).textContent || "").replace(/[^\d.]/g, "");
     var sym = ($("#readSym") || {}).textContent || "", span = ($("#readSpan") || {}).textContent || "";
     var W = 1080, Hh = 1350, c = document.createElement("canvas"); c.width = W; c.height = Hh; var x = c.getContext("2d");
     var cs = getComputedStyle(root), bg = cs.getPropertyValue("--bg").trim() || "#0d120e", ink = cs.getPropertyValue("--ink").trim() || "#e9e5d7", accent = cs.getPropertyValue("--accent").trim() || "#d3a851", muted = cs.getPropertyValue("--muted").trim() || "#8b9568", edge = cs.getPropertyValue("--edge").trim() || "#2c3326";
@@ -207,7 +207,7 @@
     var data = c.toDataURL("image/png").split(",")[1];
     btn.setAttribute("data-busy", "1");
     P.Filesystem.writeFile({ path: "chladni-" + name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".png", data: data, directory: "CACHE" })
-      .then(function (r) { return P.Share.share({ title: name + " · Chladni Fields", text: name + (hz ? " sounds at " + hz + " Hz" : "") + " — iamra.lol", files: [r.uri] }); })
+      .then(function (r) { return P.Share.share({ title: name + " · Slowtide", text: name + (hz ? " sounds at " + hz + " Hz" : "") + " — iamra.lol", files: [r.uri] }); })
       .then(function () { if (!clean) toast("Shared with a small iamra.lol mark — Plus shares clean.", { action: "See Plus", onAction: function () { if (cp) cp.paywall("A clean share"); } }); })
       .catch(function () {}).then(function () { btn.removeAttribute("data-busy"); });
   }
@@ -230,7 +230,7 @@
         var live = status.getAttribute("data-live") === "1", text = status.textContent.replace(/^playing\s+/i, "");
         try {
           if (live) {
-            navigator.mediaSession.metadata = new MediaMetadata({ title: text, artist: "Chladni Fields · Resonance Room", album: "iamra.lol", artwork: [{ src: "icon-512.png", sizes: "512x512", type: "image/png" }] });
+            navigator.mediaSession.metadata = new MediaMetadata({ title: text, artist: "Slowtide · Resonance Room", album: "iamra.lol", artwork: [{ src: "icon-512.png", sizes: "512x512", type: "image/png" }] });
             navigator.mediaSession.playbackState = "playing";
           } else { navigator.mediaSession.playbackState = "none"; }
         } catch (e) {}
@@ -289,8 +289,9 @@
             looping file ahead of time and, when the screen locks, hands that file to the native player (Plus,
             or the one free trial lock). Coming back, the native player stops and the engine resumes. ---- */
     var room = window.ChladniRoom;
-    var hand = { file: "", key: "", rendering: null, active: false, trial: false, since: 0, timer: null };
+    var hand = { file: "", key: "", rendering: null, active: false, trial: false, since: 0, timer: null, wasLive: false, armedEnds: 0 };
     function canSleep() { var cp = CP(); return !!(cp && (cp.has() || !cp.store.get("sleepTrial"))); }
+    function slog(s) { var cp = CP(); if (!cp) return; var l = cp.store.get("sleepLog", []); l.push(new Date().toTimeString().slice(0, 8) + " js " + s); if (l.length > 40) l = l.slice(-40); cp.store.set("sleepLog", l); }
     function wavBase64(buf) {
       var ch = buf.numberOfChannels, n = buf.length, sr = buf.sampleRate, bytes = 44 + n * ch * 2, ab = new ArrayBuffer(bytes), dv = new DataView(ab);
       function str(o, s) { for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); }
@@ -301,28 +302,39 @@
       var u8 = new Uint8Array(ab), parts = [], CH = 0x8000; for (var p = 0; p < u8.length; p += CH) parts.push(String.fromCharCode.apply(null, u8.subarray(p, p + CH)));
       return btoa(parts.join(""));
     }
+    /* the native player is told about the file while the app is still in the foreground; it starts the file
+       itself when the app goes to the background, so nothing here has to run at the moment of the lock */
+    function armNative() {
+      var cp = CP(); if (!SA || !cp || !hand.file || !room || !room.live()) return Promise.resolve();
+      var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrial");
+      if (!plus && !trial) return disarmNative();
+      var title = ((status && status.textContent) || "").replace(/^playing\s+/i, "").split(" · ")[0] || "Resonance Room";
+      var endsAt = room.timerEnds() ? room.timerEnds() / 1000 : 0;
+      return SA.arm({ path: hand.file, title: title, subtitle: trial ? "Sleep mode · your free lock" : "Sleep mode", volume: 1, endsAt: endsAt, maxSeconds: trial ? 1200 : 0, trial: trial })
+        .then(function () { hand.armedEnds = endsAt; hand.trial = trial; }).catch(function (e) { slog("arm failed " + (e && e.message)); });
+    }
+    function disarmNative() { hand.trial = false; if (!SA) return Promise.resolve(); return SA.disarm().catch(function () {}); }
     function prerender() {
-      if (!room || !SA || !P.Filesystem || !room.live()) { hand.file = ""; hand.key = ""; return Promise.resolve(false); }
-      var key = room.key(); if (key === hand.key && hand.file) return Promise.resolve(true);
+      if (!room || !SA || !P.Filesystem || !room.live()) { hand.file = ""; hand.key = ""; return disarmNative().then(function () { return false; }); }
+      var key = room.key(); if (key === hand.key && hand.file) return armNative().then(function () { return true; });
       if (hand.rendering) return hand.rendering;
-      hand.rendering = room.render(40).then(function (buf) {
+      var t0 = Date.now();
+      hand.rendering = room.render(30).then(function (buf) {
         if (!buf) return false;
         var data = wavBase64(buf), name = "sleep-" + (hand.file.indexOf("sleep-a") >= 0 ? "b" : "a") + ".wav";
-        return P.Filesystem.writeFile({ path: name, data: data, directory: "CACHE" }).then(function (r) { hand.file = r.uri; hand.key = key; return true; });
-      }).catch(function () { return false; }).then(function (ok) { hand.rendering = null; return ok; });
+        return P.Filesystem.writeFile({ path: name, data: data, directory: "CACHE" }).then(function (r) { hand.file = r.uri; hand.key = key; slog("rendered " + name + " in " + (Date.now() - t0) + " ms"); return armNative(); }).then(function () { return true; });
+      }).catch(function (e) { slog("render failed " + (e && e.message)); return false; }).then(function (ok) { hand.rendering = null; return ok; });
       return hand.rendering;
     }
-    function schedulePrerender() { clearTimeout(hand.timer); hand.timer = setTimeout(function () { if (canSleep()) prerender(); }, 2500); }
+    function schedulePrerender() {
+      clearTimeout(hand.timer);
+      var live = room ? room.live() : false;
+      if (!live) { hand.wasLive = false; hand.file = ""; hand.key = ""; disarmNative(); return; }
+      var first = !hand.wasLive; hand.wasLive = true;
+      hand.timer = setTimeout(function () { if (canSleep()) prerender(); }, first ? 300 : 2000);
+    }
     if (status) new MutationObserver(schedulePrerender).observe(status, { childList: true, characterData: true, subtree: true, attributes: true });
     document.addEventListener("input", function (e) { if (e.target && e.target.matches && e.target.matches("input[type=range], select")) schedulePrerender(); });
-    function handOff(cp, trial) {
-      if (!document.hidden || !room.live() || !hand.file) return;
-      var left = room.timerEnds() ? Math.max(30, Math.round((room.timerEnds() - Date.now()) / 1000)) : 0;
-      var title = ((status && status.textContent) || "").replace(/^playing\s+/i, "").split(" · ")[0] || "Resonance Room";
-      SA.play({ path: hand.file, title: title, subtitle: trial ? "Sleep mode · your free lock" : "Sleep mode", volume: 1, fadeIn: 0.3, fadeOutAfter: left, maxSeconds: trial ? 1200 : 0 })
-        .then(function () { hand.active = true; hand.trial = trial; hand.since = Date.now(); room.suspend(); if (trial) cp.store.set("sleepTrial", Date.now()); })
-        .catch(function () {});
-    }
     var pausedByLock = false;
     document.addEventListener("visibilitychange", function () {
       var cp = CP(), live = room ? room.live() : (status && status.getAttribute("data-live") === "1");
@@ -330,20 +342,25 @@
         if (!live || !cp) return;
         var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrial");
         if ((plus || trial) && SA && room) {
-          if (hand.file && hand.key === room.key()) handOff(cp, trial); else prerender().then(function () { handOff(cp, trial); });
+          hand.active = true; hand.since = Date.now(); slog("hidden, armed=" + !!hand.file);
+          room.suspend();
+          if (!hand.file) prerender();
         } else {
+          slog("hidden, fading (free)");
           if (room) room.stopAll(1.0); else { var s = $("#stopAll"); if (s) s.click(); }
           pausedByLock = true;
         }
       } else if (hand.active) {
         hand.active = false;
-        var wasTrial = hand.trial, mins = Math.max(1, Math.round((Date.now() - hand.since) / 60000)); hand.trial = false;
         SA.state().then(function (st) {
-          var by = (st && st.stoppedBy) || "";
-          return SA.stop({ fade: 0.5 }).then(function () {
-            if (by) { room.stopAll(0); if (by === "timer") toast("Faded out while the screen was locked — the timer ended."); }
+          try { if (st && st.log) { var cp2 = CP(); if (cp2) cp2.store.set("sleepLog", (cp2.store.get("sleepLog", [])).concat(st.log.map(function (x) { return x + " (native)"; })).slice(-40)); } } catch (e) {}
+          var ran = !!(st && st.ran), by = (st && st.stoppedBy) || "", wasTrial = !!(st && st.trial);
+          var mins = Math.max(1, Math.round(((st && st.elapsed) || (Date.now() - hand.since) / 1000) / 60));
+          return (st && st.playing ? SA.stop({ fade: 0.4 }) : Promise.resolve()).then(function () {
+            if (ran && (by === "timer" || by === "trial" || by === "remote" || by === "interrupted")) { room.stopAll(0); if (by === "timer") toast("Faded out while the screen was locked — the timer ended."); }
             else room.resume();
-            if (wasTrial) setTimeout(function () { if (cp && cp.trialEnded) cp.trialEnded(mins); }, 700);
+            if (ran && wasTrial) { cp.store.set("sleepTrial", Date.now()); disarmNative(); setTimeout(function () { if (cp.trialEnded) cp.trialEnded(mins); }, 700); }
+            else if (!ran && wasTrial) toast("Sleep mode didn't start: " + ((st && st.error) || "the mix wasn't ready yet. Give it a few seconds after pressing play, then lock."), { ms: 7000 });
           });
         }).catch(function () { room.resume(); });
       } else if (pausedByLock) {

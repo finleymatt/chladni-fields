@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0d120e" />
-<title>You · Chladni Fields</title>
+<title>You · Slowtide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
@@ -73,7 +73,7 @@
 <body>
 <div class="wrap">
   <nav class="site-nav" aria-label="Site">
-    <a class="brand" href="index.html">Chladni <span class="amp">Fields</span></a>
+    <a class="brand" href="index.html">Slow<span class="amp">tide</span></a>
     <div class="nav-links"><a href="index.html">Plates</a><a href="frequencies.html">Resonance Room</a><a href="law-of-one.html">The Law of One</a></div>
     <div class="side-row">
       <button class="theme-toggle vibe-toggle" id="vibeBtn" type="button" data-on="0" aria-pressed="false" aria-label="Toggle the DMT visionary theme">✺ DMT</button>
@@ -83,10 +83,10 @@
 
   <p class="eyebrow">You</p>
   <h1 id="hello">Hello<span class="amp">.</span></h1>
-  <p class="lede" id="ledeLine">Your account, Chladni Plus, saved mixes and the small print.</p>
+  <p class="lede" id="ledeLine">Your account, Slowtide Plus, saved mixes and the small print.</p>
 
   <div class="hero" id="plusHero">
-    <h2 id="plusTitle">Chladni <span class="amp">Plus</span></h2>
+    <h2 id="plusTitle">Slowtide <span class="amp">Plus</span></h2>
     <p id="plusText">Rain, surf and every tone keep playing with the screen locked, timers to 8 hours, unlimited saved mixes, clean shares. From $0.99 a month.</p>
     <ul class="perks" id="plusPerks">
       <li><span class="pk"></span><b>Sleep mode</b><span>keeps playing with the screen locked</span></li>
@@ -112,6 +112,7 @@
     <div class="list">
       <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3a6 6 0 0 0-6 6v3.5L4.5 16h15L18 12.5V9a6 6 0 0 0-6-6ZM10 19a2 2 0 0 0 4 0"/></svg></span><span class="t"><b>Wind-down reminder</b><span>A nudge each evening, at a time you choose.</span></span><span class="v"><input type="time" id="remTime" value="22:00" aria-label="Reminder time" /><button class="sw" id="remBtn" type="button" role="switch" aria-checked="false" aria-label="Wind-down reminder"><i></i></button></span></div>
       <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="t"><b>Quiet-room nudges</b><span>If the room sits unused for a while, one note to come back.</span></span><span class="v"><button class="sw" id="nudgeBtn" type="button" role="switch" aria-checked="true" aria-label="Nudges"><i></i></button></span></div>
+      <button class="row tap" id="sleepLogBtn" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 17l4-8 3 5 3-9 4 12"/></svg></span><span class="t"><b>Sleep mode diagnostics</b><span>What happened the last times the screen locked.</span></span><span class="chev">›</span></button>
       <button class="row tap" id="widgetBtn" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span><span class="t"><b>Home Screen widget</b><span>Presets and your mixes, one tap from the Home Screen.</span></span><span class="chev">›</span></button>
     </div>
   </div>
@@ -136,7 +137,7 @@
     </div>
   </div>
 
-  <p class="foot" id="footLine">Chladni Fields · designed by Matt Finley</p>
+  <p class="foot" id="footLine">Slowtide · made by Iamra</p>
 </div>
 
 <script>
@@ -151,7 +152,7 @@
   paint();
 
   var CP = window.ChladniPlus;
-  if (!CP) { $("#plusText").textContent = "Open this page in the Chladni Fields app."; return; }
+  if (!CP) { $("#plusText").textContent = "Open this page in the Slowtide app."; return; }
   var ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5"/></svg>';
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
   function initials(n) { return (n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join("") || "•"; }
@@ -179,7 +180,7 @@
       $("#plusBtn").textContent = e.lifetime ? "Plus is active" : "Manage subscription"; $("#plusBtn").disabled = !!e.lifetime;
       $("#manageBtn").hidden = !!e.lifetime;
     } else {
-      $("#plusTitle").innerHTML = 'Chladni <span class="amp">Plus</span>';
+      $("#plusTitle").innerHTML = 'Slowtide <span class="amp">Plus</span>';
       $("#plusText").textContent = "Rain, surf and every tone keep playing with the screen locked, timers to 8 hours, unlimited saved mixes, clean shares. From " + (CP.plans[1].price) + " a month.";
       $("#plusBtn").textContent = "See Plus"; $("#plusBtn").disabled = false; $("#manageBtn").hidden = true;
     }
@@ -210,15 +211,16 @@
   $("#remBtn").addEventListener("click", function () {
     var on = this.getAttribute("aria-checked") !== "true";
     if (!on) { saveReminders({ bedtime: false }); return; }
-    (NN.reminders ? NN.reminders.ask() : Promise.resolve(false)).then(function (ok) { if (ok) saveReminders({ bedtime: true }); else alert("Notifications are off for Chladni Fields. Turn them on in Settings → Notifications to use reminders."); });
+    (NN.reminders ? NN.reminders.ask() : Promise.resolve(false)).then(function (ok) { if (ok) saveReminders({ bedtime: true }); else alert("Notifications are off for Slowtide. Turn them on in Settings → Notifications to use reminders."); });
   });
   $("#remTime").addEventListener("change", function () { saveReminders({ time: this.value || "22:00" }); });
   $("#nudgeBtn").addEventListener("click", function () {
     var on = this.getAttribute("aria-checked") !== "true";
     if (!on) { saveReminders({ nudges: false }); return; }
-    (NN.reminders ? NN.reminders.ask() : Promise.resolve(false)).then(function (ok) { if (ok) saveReminders({ nudges: true }); else alert("Notifications are off for Chladni Fields. Turn them on in Settings → Notifications."); });
+    (NN.reminders ? NN.reminders.ask() : Promise.resolve(false)).then(function (ok) { if (ok) saveReminders({ nudges: true }); else alert("Notifications are off for Slowtide. Turn them on in Settings → Notifications."); });
   });
-  $("#widgetBtn").addEventListener("click", function () { alert("Hold an empty spot on your Home Screen, tap +, search “Chladni Fields” and add the small or medium widget. It shows your saved mixes first, then the presets; tapping one opens the app and starts it playing."); });
+  $("#sleepLogBtn").addEventListener("click", function () { var l = CP.store.get("sleepLog", []); alert(l.length ? l.slice(-24).join("\n") : "Nothing logged yet. Start a sound in the Resonance Room, lock the phone, come back, then look here."); });
+  $("#widgetBtn").addEventListener("click", function () { alert("Hold an empty spot on your Home Screen, tap +, search “Slowtide” and add the small or medium widget. It shows your saved mixes first, then the presets; tapping one opens the app and starts it playing."); });
   paintReminders();
   $("#plusBtn").addEventListener("click", function () { if (CP.has() && !CP.ent().lifetime) CP.manage(); else if (!CP.has()) CP.paywall(""); });
   $("#tipBtn").addEventListener("click", function () { CP.tipJar(); });
@@ -228,7 +230,7 @@
   document.addEventListener("cf:plus", paintPlus); document.addEventListener("cf:account", paintAccount); document.addEventListener("cf:mixes", paintMixes); document.addEventListener("cf:tips", paintPlus);
   paintAccount(); paintPlus(); paintMixes();
   CP.ready.then(function () { paintPlus(); paintAccount(); CP.loadProducts().then(paintPlus); });
-  $("#footLine").textContent = "Chladni Fields " + (CP.version ? "· v" + CP.version + " " : "") + "· designed by Matt Finley";
+  $("#footLine").textContent = "Slowtide " + (CP.version ? "· v" + CP.version + " " : "") + "· made by Iamra";
 })();
 </script>
 </body>

@@ -1,13 +1,13 @@
-# App Store listing · Chladni Fields
+# App Store listing · Slowtide
 
-Paste these into App Store Connect → My Apps → Chladni Fields → 1.0 Prepare for Submission.
+Paste these into App Store Connect → My Apps → Slowtide → 1.0 Prepare for Submission.
 
 ## App information
 
 | Field | Value |
 |---|---|
-| Name | Chladni Fields |
-| Subtitle (30) | Crop circles, turned into sound |
+| Name | Slowtide |
+| Subtitle (30) | Tones to sleep, focus and heal |
 | Bundle ID | lol.iamra.chladni |
 | SKU | chladni-fields-ios |
 | Primary language | English (U.S.) |
@@ -26,7 +26,7 @@ Tones, rain and surf to fall asleep to, and a vibrating plate that answers your 
 
 ## Description (4000)
 
-A vibrating plate scattered with sand sorts itself into figures, the sand settling wherever the plate holds still. Chladni Fields runs that idea backwards.
+A vibrating plate scattered with sand sorts itself into figures, the sand settling wherever the plate holds still. Slowtide runs that idea backwards.
 
 Famous crop formations, and the ancient figures they echo, are read as sound. The geometry of each one sets a fundamental and a stack of partials, and beside it is the pattern that frequency would raise in sand on Ernst Chladni's plate. Play the tone. Hear what Milk Hill, the Julia Set, the Barbury Castle π formation or the Flower of Life sound like.
 
@@ -63,7 +63,7 @@ The microphone is used only in the "Your own tone" section: tap Use microphone, 
 
 ## In-app purchases (shown on the listing)
 
-Chladni Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99 / $2.99 / $9.99. Product IDs and setup in `monetization.md`. Add to the description's end: "Chladni Plus is optional: sleep mode with the screen locked, unlimited saved mixes and clean shares. Subscriptions renew until cancelled in Settings. Terms: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/ · Privacy: https://iamra.lol/privacy.html"
+Slowtide Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99 / $2.99 / $9.99. Product IDs and setup in `monetization.md`. Add to the description's end: "Slowtide Plus is optional: sleep mode with the screen locked, unlimited saved mixes and clean shares. Subscriptions renew until cancelled in Settings. Terms: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/ · Privacy: https://iamra.lol/privacy.html"
 
 ## App privacy (nutrition label)
 
@@ -74,7 +74,7 @@ Chladni Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99
 
 ## App review notes (add)
 
-Sign-in is optional (Sign in with Apple and Google); the app is fully usable without it, and "Delete my data" in the You tab removes the account and everything stored. Purchases: Chladni Plus (auto-renewable monthly/yearly, non-consumable lifetime) unlocks sleep-mode background playback, unlimited saved mixes and watermark-free shares; the tip jar is consumable and unlocks nothing. Restore purchases is in the You tab and on the paywall.
+Sign-in is optional (Sign in with Apple and Google); the app is fully usable without it, and "Delete my data" in the You tab removes the account and everything stored. Purchases: Slowtide Plus (auto-renewable monthly/yearly, non-consumable lifetime) unlocks sleep-mode background playback, unlimited saved mixes and watermark-free shares; the tip jar is consumable and unlocks nothing. Restore purchases is in the You tab and on the paywall.
 
 Background audio: the app uses the audio background mode only for sleep mode. When the screen locks while sounds are playing, the current mix (rendered on-device to a short looping file) plays through AVAudioPlayer with lock-screen controls; it stops when the user returns to the app, pauses from the lock screen, or when the fade-out timer ends. Free users get this once, for up to 20 minutes, as a trial; afterwards free playback fades out on lock. Local notifications are optional (wind-down reminder and pomodoro turns, set by the user in the You tab or the Resonance Room) and are scheduled on-device; there are no remote push notifications. The widget extension shows presets and saved mixes from the app group and deep-links back into the app.
 

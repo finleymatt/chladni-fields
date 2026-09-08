@@ -4,14 +4,14 @@ The decisions, the Apple rules that shaped them, and the exact things to create 
 
 ## The two rules that decide the shape
 
-1. **Sign-in cannot be required.** App Review guideline 5.1.1(v): an app without significant account-based features must be usable without a login. Chladni Fields plays tones and draws plates; nothing in it needs an account, so a mandatory sign-in is a guaranteed rejection. Sign-in is therefore **optional**, lives in the You tab, and is framed honestly as "attaches your mixes and settings to you". Guideline 4.8: because Google sign-in is offered, **Sign in with Apple must be offered too** (it is, and it's listed first). Guideline 5.1.1(v) also requires an in-app way to delete the account: **Delete my data** in the You tab.
+1. **Sign-in cannot be required.** App Review guideline 5.1.1(v): an app without significant account-based features must be usable without a login. Slowtide plays tones and draws plates; nothing in it needs an account, so a mandatory sign-in is a guaranteed rejection. Sign-in is therefore **optional**, lives in the You tab, and is framed honestly as "attaches your mixes and settings to you". Guideline 4.8: because Google sign-in is offered, **Sign in with Apple must be offered too** (it is, and it's listed first). Guideline 5.1.1(v) also requires an in-app way to delete the account: **Delete my data** in the You tab.
 2. **Money for digital things goes through Apple.** Guideline 3.1.1: subscriptions, unlocks and tips to the developer are in-app purchases, never Stripe or PayPal links. Purchases are done with StoreKit 2 directly (no RevenueCat account needed); Apple takes 15% under the Small Business Program (enrol at developer.apple.com → Small Business Program once the Paid Apps agreement is active).
 
 The consequence worth knowing: the Plus unlock is tied to the buyer's **Apple ID**, not to the optional account. That's the normal iOS model (Restore purchases brings it to another iPhone), and it's why Plus works even for people who never sign in.
 
 ## Tiers
 
-| | Free | Chladni Plus |
+| | Free | Slowtide Plus |
 |---|---|---|
 | All 20 figures, both plates, microphone, Resonance Room, Law of One | ✓ | ✓ |
 | All sleep sounds (rain, ocean, stream, wind, fire, summer night, fan, brown and pink noise), layered with any tone | ✓ | ✓ |
@@ -31,7 +31,7 @@ Why these: sleep sounds are the one thing people leave running for hours, and no
 
 | Product | Type | Reference name | Product ID | Price |
 |---|---|---|---|---|
-| Plus monthly | Auto-renewable, group "Chladni Plus" | Plus Monthly | `lol.iamra.chladni.plus.monthly` | $0.99 / month |
+| Plus monthly | Auto-renewable, group "Slowtide Plus" | Plus Monthly | `lol.iamra.chladni.plus.monthly` | $0.99 / month |
 | Plus yearly | Auto-renewable, same group, higher rank | Plus Yearly | `lol.iamra.chladni.plus.yearly` | $7.99 / year |
 | Plus lifetime | Non-consumable | Plus Lifetime | `lol.iamra.chladni.plus.lifetime` | $14.99 |
 | Tip · coffee | Consumable | Tip Small | `lol.iamra.chladni.tip.small` | $0.99 |
@@ -41,9 +41,9 @@ Why these: sleep sounds are the one thing people leave running for hours, and no
 Each needs a display name and a one-line description (used in Apple's purchase sheet), and a review screenshot (any screenshot of the paywall). Optional: a 7-day free trial on the yearly plan as an introductory offer; the paywall shows it automatically.
 
 Display names / descriptions to paste:
-- Plus Monthly — "Chladni Plus" / "Sleep mode, unlimited saved mixes, clean shares."
-- Plus Yearly — "Chladni Plus (yearly)" / same.
-- Plus Lifetime — "Chladni Plus, forever" / same.
+- Plus Monthly — "Slowtide Plus" / "Sleep mode, unlimited saved mixes, clean shares."
+- Plus Yearly — "Slowtide Plus (yearly)" / same.
+- Plus Lifetime — "Slowtide Plus, forever" / same.
 - Tips — "A coffee for the plates" / "A one-off thank-you. Nothing unlocks."
 
 ### Other one-time setup

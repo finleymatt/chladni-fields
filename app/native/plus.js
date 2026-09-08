@@ -1,4 +1,4 @@
-// Account, Chladni Plus and the tip jar. Loaded after native.js on every page; inert in a browser.
+// Account, Slowtide Plus and the tip jar. Loaded after native.js on every page; inert in a browser.
 // Purchases go through the app's StoreKit plugin (Apple verifies and remembers them per Apple ID);
 // sign-in is optional and, for now, an identity kept on this phone.
 (function () {
@@ -118,7 +118,7 @@
     var n = N(); if (n.haptic) n.haptic.impact("LIGHT");
     var selected = PLANS[0].id;
     var d = sheet(
-      '<div class="info-head"><p class="eyebrow">Chladni Plus</p><button class="info-close" type="button" data-close>Not now</button></div>' +
+      '<div class="info-head"><p class="eyebrow">Slowtide Plus</p><button class="info-close" type="button" data-close>Not now</button></div>' +
       '<div class="info-text cf-text">' +
       '<h2>Keep the room <span class="amp">humming</span>.</h2>' +
       (reason ? '<p class="cf-reason">' + esc(reason) + ' is part of Plus.</p>' : "") +
@@ -255,7 +255,7 @@
   function toast(t, opts) { var n = N(); if (n.toast) n.toast(t, opts); }
 
   /* ---- boot ---- */
-  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded", "sleepTrial", "reminders"]).then(function () {
+  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded", "sleepTrial", "reminders", "sleepLog"]).then(function () {
     ent = store.get("ent", ent); account = store.get("account", account);
     return refresh();
   });

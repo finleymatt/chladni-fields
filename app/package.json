@@ -2,8 +2,8 @@
   "name": "chladni-fields-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Chladni Fields for iOS: the iamra.lol site bundled as a native app with Capacitor.",
-  "author": "Matt Finley",
+  "description": "Slowtide for iOS: the iamra.lol site bundled as a native app with Capacitor.",
+  "author": "Iamra",
   "license": "UNLICENSED",
   "type": "commonjs",
   "scripts": {

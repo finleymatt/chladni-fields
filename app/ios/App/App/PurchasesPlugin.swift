@@ -3,7 +3,7 @@ import Capacitor
 import StoreKit
 import UIKit
 
-/// Chladni Plus and the tip jar, on StoreKit 2. Nothing leaves the device: Apple verifies the
+/// Slowtide Plus and the tip jar, on StoreKit 2. Nothing leaves the device: Apple verifies the
 /// transactions, the App Store remembers them per Apple ID, and `entitlements` reads them back.
 @objc(PurchasesPlugin)
 public class PurchasesPlugin: CAPPlugin, CAPBridgedPlugin {
