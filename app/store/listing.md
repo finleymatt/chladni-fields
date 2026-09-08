@@ -40,6 +40,10 @@ WHAT'S INSIDE
 • "Why this shape" explains, for every figure, how close the plate can come to the original and why
 • The Resonance Room: 174, 432, 528 and 963 Hz and more, binaural beats, three timbres, a breathing guide and a fade-out timer, with the research behind each tone labelled honestly and footnoted
 • Sleep sounds generated live so they never loop: rain, ocean waves, a stream, wind, a fireplace, a summer night of crickets, a fan, brown and pink noise — layer any of them under a tone
+• Sleep mode (Plus): the room keeps playing with the screen locked, with lock-screen controls and timers to eight hours; your first lock is free
+• Pomodoro work sprints with the room dipping for the rests, and a Work preset built around a 15 Hz beta beat
+• Saved mixes as a gallery, and Home Screen widgets that start a preset or a mix with one tap
+• Optional wind-down reminders, scheduled on your phone
 • The Law of One in nine readings, with the sessions they come from
 • Three themes: dark, light, and a visionary palette
 
@@ -71,6 +75,8 @@ Chladni Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99
 ## App review notes (add)
 
 Sign-in is optional (Sign in with Apple and Google); the app is fully usable without it, and "Delete my data" in the You tab removes the account and everything stored. Purchases: Chladni Plus (auto-renewable monthly/yearly, non-consumable lifetime) unlocks sleep-mode background playback, unlimited saved mixes and watermark-free shares; the tip jar is consumable and unlocks nothing. Restore purchases is in the You tab and on the paywall.
+
+Background audio: the app uses the audio background mode only for sleep mode. When the screen locks while sounds are playing, the current mix (rendered on-device to a short looping file) plays through AVAudioPlayer with lock-screen controls; it stops when the user returns to the app, pauses from the lock screen, or when the fade-out timer ends. Free users get this once, for up to 20 minutes, as a trial; afterwards free playback fades out on lock. Local notifications are optional (wind-down reminder and pomodoro turns, set by the user in the You tab or the Resonance Room) and are scheduled on-device; there are no remote push notifications. The widget extension shows presets and saved mixes from the app group and deep-links back into the app.
 
 ## Screenshots
 

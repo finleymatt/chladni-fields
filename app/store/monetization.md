@@ -23,6 +23,8 @@ The consequence worth knowing: the Plus unlock is tied to the buyer's **Apple ID
 
 Why these: sleep sounds are the one thing people leave running for hours, and nobody falls asleep with the screen on, so "keeps playing with the screen off" is the feature worth a dollar. The sounds themselves stay free so the app is genuinely useful (and reviewable) without paying: a free user hears rain for as long as the phone is awake, then the fade-out on lock is the honest nudge to Plus. The free tier stays exactly as generous as the website so nobody feels cheated; shares stay free because a watermarked share is marketing.
 
+**The free trial lock.** A free user's first screen lock while sounds play hands the mix to the native player for up to 20 minutes (`cf:sleepTrial` records it); on return a sheet explains what just happened and offers Plus. After that, free fades out on lock and a toast offers Plus. The paywall carries a "Try it first" row until the trial is used.
+
 **Products only reach the app once each one is "Ready to Submit".** StoreKit (sandbox and TestFlight included) returns nothing for a product in "Missing Metadata", and the usual missing piece is the App Review screenshot. `tools/asc-upload.js review-shots` uploads one to every product through the API.
 
 ### Prices and product IDs (create these in App Store Connect → the app → Subscriptions / In-App Purchases)

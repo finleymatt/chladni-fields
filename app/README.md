@@ -59,6 +59,10 @@ npm run screenshots    # eight App Store screenshots → store/screenshots (PNG 
 npm run fonts          # re-download the self-hosted fonts
 ```
 
+## Widgets and signing
+
+The `ChladniWidgets` target (WidgetKit, iOS 17+) reads presets and saved mixes from the App Group `group.lol.iamra.chladni` and deep-links into the app (`chladni://play?preset=rain`, `chladni://play?mix=<id>`). It has its own bundle ID (`lol.iamra.chladni.widgets`) and App Store profile; `node tools/asc-widgets-signing.js --key … --out <signing dir>` (re)creates both profiles with the existing distribution certificate. The App Group itself is created and assigned to both App IDs in developer.apple.com (no API). Secrets: `IOS_PROFILE_BASE64` and `IOS_PROFILE_WIDGET_BASE64`. Any capability change on an App ID invalidates its profile: re-run the script and update the secrets.
+
 ## What differs from the website
 
 - **Feels like an iPhone app:** bottom tab bar (Plates · Resonance · Law of One · You), dialogs as bottom sheets with a grabber and flick-down to dismiss, instant pressed states, 44pt hit targets, haptics on figure changes, mic start, presets and purchases, edge-swipe back on pushed pages, cross-fade between sections, a three-line welcome on first launch.
