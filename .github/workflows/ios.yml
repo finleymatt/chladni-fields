@@ -186,7 +186,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          sed -e "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" -e "s/PROFILE_NAME_PLACEHOLDER/$PROFILE_NAME/" -e "s/WIDGET_PROFILE_NAME_PLACEHOLDER/$WIDGET_PROFILE_NAME/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          sed -e "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" -e "s/PROFILE_NAME_PLACEHOLDER/$PROFILE_NAME/" -e "s/WIDGETPROFILE_PLACEHOLDER/$WIDGET_PROFILE_NAME/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
