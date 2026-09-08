@@ -498,6 +498,32 @@
         toast("Faded out when the screen locked. Plus keeps playing.", { action: "See Plus", onAction: function () { if (cp) cp.paywall("Playing with the screen locked"); } });
       }
     });
+    /* ---- the Live Activity: what plays (or the sprint countdown) in the Dynamic Island and on the Lock Screen ---- */
+    var LA = P.LiveActivity || (cap.registerPlugin ? cap.registerPlugin("LiveActivity") : null);
+    var la = { on: false, timer: null };
+    function laState() {
+      var ids = room.ids(), meta = {}; (room.tones || []).forEach(function (t) { meta[t.id] = t; });
+      var names = ids.map(function (id) { var t = meta[id]; return t ? (t.kind ? (t.short || t.name.toLowerCase()) : t.hz + " Hz") : id; });
+      var title = names.join(" · ") || "Resonance Room", subtitle = "Resonance Room";
+      var ends = room.timerEnds(); if (ends) subtitle = "fades in " + Math.max(1, Math.round((ends - Date.now()) / 60000)) + " min";
+      var ps = room.pomodoro ? room.pomodoro.state() : null, phase = "", pEnds = 0;
+      if (ps && ps.on) { phase = ps.phase; pEnds = ps.ends; subtitle = title; title = ps.phase === "work" ? "Sprint " + ps.round + " · work" : (ps.round % 4 === 0 ? "Long rest" : "Rest"); }
+      return { title: title, subtitle: subtitle, phase: phase, ends: pEnds, playing: true };
+    }
+    function laSync() {
+      if (!LA || !room) return;
+      clearTimeout(la.timer);
+      la.timer = setTimeout(function () {
+        if (!room.live()) { if (la.on) { la.on = false; LA.end().catch(function () {}); } return; }
+        var st = laState();
+        (la.on ? LA.update(st) : LA.start(st)).then(function () { la.on = true; }).catch(function (e) { slog("live activity: " + (e && e.message)); });
+      }, 400);
+    }
+    if (status && LA) new MutationObserver(laSync).observe(status, { childList: true, characterData: true, subtree: true, attributes: true });
+    document.addEventListener("room:pomodoro", laSync);
+    try { if (LA) LA.addListener("pause", function () { slog("pause from the Live Activity"); la.on = false; room.stopAll(1.5); }); } catch (e) {}
+    // the sprint clock on the activity only moves when the page tells it; keep it honest once a minute
+    setInterval(function () { if (la.on && room.live()) laSync(); }, 60000);
     if (SA) SA.state().then(function (st) { if (st && st.log && st.log.length) { var cp3 = CP(); if (cp3) cp3.store.set("sleepLog", (cp3.store.get("sleepLog", [])).concat(st.log.map(function (x) { return x + " (native)"; })).slice(-40)); } }).catch(function () {});
     var cpR = CP(); if (cpR) cpR.ready.then(paintSleepState);
     slog("room ready, plugin " + (SA ? "present" : "MISSING") + ", fs " + (P.Filesystem ? "present" : "MISSING"));

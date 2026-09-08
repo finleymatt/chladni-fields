@@ -46,7 +46,9 @@ public class SleepAudioPlugin: CAPPlugin, CAPBridgedPlugin {
         nc.addObserver(self, selector: #selector(wentBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         nc.addObserver(self, selector: #selector(cameForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         nc.addObserver(self, selector: #selector(interrupted(_:)), name: AVAudioSession.interruptionNotification, object: nil)
+        nc.addObserver(self, selector: #selector(pauseFromActivity), name: Notification.Name("SlowtidePause"), object: nil)
     }
+    @objc private func pauseFromActivity() { if player != nil { note("paused from the Live Activity"); finish(by: "remote", fade: 1.2) } }
 
     deinit { NotificationCenter.default.removeObserver(self) }
 
@@ -173,6 +175,7 @@ public class SleepAudioPlugin: CAPPlugin, CAPBridgedPlugin {
         stopWork?.cancel(); stopWork = nil
         guard let p = player else { return }
         stoppedBy = by
+        if by != "foreground" && by != "js" { NotificationCenter.default.post(name: Notification.Name("SlowtideEnded"), object: nil) }
         lastRun["stoppedBy"] = by
         lastRun["endedAt"] = Date().timeIntervalSince1970 * 1000
         note("stopped by \(by)")

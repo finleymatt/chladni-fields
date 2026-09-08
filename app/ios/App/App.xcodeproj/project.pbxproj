@@ -22,6 +22,10 @@
 		A1B2C3D4E5F60718293A4B71 /* SleepAudioPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */; };
 		A1B2C3D4E5F60718293A4B73 /* WidgetBridgePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */; };
 		B1B2C3D4E5F60718293A4C0A /* ChladniWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */; };
+		A1B2C3D4E5F60718293A4B75 /* LiveActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B74 /* LiveActivityPlugin.swift */; };
+		A1B2C3D4E5F60718293A4B77 /* SlowtideActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B76 /* SlowtideActivity.swift */; };
+		A1B2C3D4E5F60718293A4B78 /* SlowtideActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B76 /* SlowtideActivity.swift */; };
+		B1B2C3D4E5F60718293A4C14 /* SlowtideLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4C13 /* SlowtideLiveActivity.swift */; };
 		B1B2C3D4E5F60718293A4C0F /* ChladniWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -67,6 +71,9 @@
 		A1B2C3D4E5F60718293A4B64 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAudioPlugin.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBridgePlugin.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B74 /* LiveActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityPlugin.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B76 /* SlowtideActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowtideActivity.swift; sourceTree = "<group>"; };
+		B1B2C3D4E5F60718293A4C13 /* SlowtideLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowtideLiveActivity.swift; sourceTree = "<group>"; };
 		B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChladniWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChladniWidgets.swift; sourceTree = "<group>"; };
 		B1B2C3D4E5F60718293A4C0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -97,6 +104,7 @@
 			children = (
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
+				A1B2C3D4E5F60718293A4B79 /* Shared */,
 				B1B2C3D4E5F60718293A4C0D /* ChladniWidgets */,
 				504EC3051FED79650016851F /* Products */,
 			);
@@ -119,6 +127,7 @@
 				A1B2C3D4E5F60718293A4B60 /* PurchasesPlugin.swift */,
 				A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */,
 				A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */,
+				A1B2C3D4E5F60718293A4B74 /* LiveActivityPlugin.swift */,
 				A1B2C3D4E5F60718293A4B62 /* PrivacyInfo.xcprivacy */,
 				A1B2C3D4E5F60718293A4B64 /* App.entitlements */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
@@ -133,10 +142,19 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		A1B2C3D4E5F60718293A4B79 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F60718293A4B76 /* SlowtideActivity.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		B1B2C3D4E5F60718293A4C0D /* ChladniWidgets */ = {
 			isa = PBXGroup;
 			children = (
 				B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */,
+				B1B2C3D4E5F60718293A4C13 /* SlowtideLiveActivity.swift */,
 				B1B2C3D4E5F60718293A4C0B /* Info.plist */,
 				B1B2C3D4E5F60718293A4C0C /* ChladniWidgets.entitlements */,
 			);
@@ -264,6 +282,8 @@
 				A1B2C3D4E5F60718293A4B61 /* PurchasesPlugin.swift in Sources */,
 				A1B2C3D4E5F60718293A4B71 /* SleepAudioPlugin.swift in Sources */,
 				A1B2C3D4E5F60718293A4B73 /* WidgetBridgePlugin.swift in Sources */,
+				A1B2C3D4E5F60718293A4B75 /* LiveActivityPlugin.swift in Sources */,
+				A1B2C3D4E5F60718293A4B77 /* SlowtideActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,6 +292,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B1B2C3D4E5F60718293A4C0A /* ChladniWidgets.swift in Sources */,
+				B1B2C3D4E5F60718293A4C14 /* SlowtideLiveActivity.swift in Sources */,
+				A1B2C3D4E5F60718293A4B78 /* SlowtideActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

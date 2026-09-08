@@ -155,5 +155,6 @@ struct ChladniWidget: Widget {
 struct ChladniWidgetBundle: WidgetBundle {
     var body: some Widget {
         ChladniWidget()
+        SlowtideLiveActivity()
     }
 }

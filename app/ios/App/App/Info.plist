@@ -53,6 +53,10 @@
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Sing, hum or play into the microphone and the plate answers with a pattern. The sound is analysed on your device and never recorded or sent anywhere.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
