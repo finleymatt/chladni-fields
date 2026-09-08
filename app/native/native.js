@@ -68,8 +68,22 @@
     you: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9.25"/><circle cx="12" cy="10" r="3.2"/><path d="M5.8 18.6c1.4-2.6 3.6-3.9 6.2-3.9s4.8 1.3 6.2 3.9"/></svg>',
     play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>'
   };
-  var SA = P.SleepAudio || (cap.registerPlugin ? cap.registerPlugin("SleepAudio") : null);
-  var WB = P.WidgetBridge || (cap.registerPlugin ? cap.registerPlugin("WidgetBridge") : null);
+  /* the app's own plugins (Purchases, SleepAudio, WidgetBridge, LiveActivity) are registered natively; if the
+     bridge has not written a JS proxy for one, talk to the native registry directly through nativePromise */
+  function plug(name) {
+    if (P[name]) return P[name];
+    if (!cap.nativePromise) return null;
+    return new Proxy({}, { get: function (_, m) {
+      if (typeof m !== "string") return undefined;
+      if (m === "addListener") return function (ev, cb) {
+        if (cap.addListener) return cap.addListener(name, ev, cb);
+        var id = cap.nativeCallback(name, "addListener", { eventName: ev }, function (r) { cb(r); });
+        return { remove: function () { return cap.nativePromise(name, "removeListener", { eventName: ev, callbackId: id }); } };
+      };
+      return function (opts) { return cap.nativePromise(name, m, opts || {}); };
+    } });
+  }
+  var SA = plug("SleepAudio"), WB = plug("WidgetBridge");
   var TABS = [
     { id: "room", href: "frequencies.html", label: "Resonance" },
     { id: "plates", href: "index.html", label: "Plates" },
@@ -499,7 +513,7 @@
       }
     });
     /* ---- the Live Activity: what plays (or the sprint countdown) in the Dynamic Island and on the Lock Screen ---- */
-    var LA = P.LiveActivity || (cap.registerPlugin ? cap.registerPlugin("LiveActivity") : null);
+    var LA = plug("LiveActivity");
     var la = { on: false, timer: null };
     function laState() {
       var ids = room.ids(), meta = {}; (room.tones || []).forEach(function (t) { meta[t.id] = t; });
@@ -526,7 +540,8 @@
     setInterval(function () { if (la.on && room.live()) laSync(); }, 60000);
     if (SA) SA.state().then(function (st) { if (st && st.log && st.log.length) { var cp3 = CP(); if (cp3) cp3.store.set("sleepLog", (cp3.store.get("sleepLog", [])).concat(st.log.map(function (x) { return x + " (native)"; })).slice(-40)); } }).catch(function () {});
     var cpR = CP(); if (cpR) cpR.ready.then(paintSleepState);
-    slog("room ready, plugin " + (SA ? "present" : "MISSING") + ", fs " + (P.Filesystem ? "present" : "MISSING"));
+    slog("room ready · plugins: " + Object.keys(P).join(",") + " · headers: " + ((cap.PluginHeaders || []).map(function (h) { return h.name; }).join(",") || "none") + " · SleepAudio via " + (P.SleepAudio ? "proxy" : (SA ? "nativePromise" : "MISSING")));
+    if (SA) SA.state().then(function () { slog("SleepAudio answers"); }).catch(function (e) { slog("SleepAudio call failed: " + (e && (e.message || e.code || JSON.stringify(e)))); });
     if (/[?&]try=1/.test(location.search)) setTimeout(function () { toast("Now lock your phone. Your first lock keeps the room playing, free, for 20 minutes.", { ms: 7000 }); }, 1800);
     // pomodoro boundaries become notifications, so the turns land even with the screen off
     document.addEventListener("room:pomodoro", function (ev) { pomodoroNotify(ev.detail); });
@@ -688,7 +703,7 @@
 
   /* ---- boot ---- */
   function hideSplash() { try { if (P.SplashScreen) P.SplashScreen.hide({ fadeOutDuration: 220 }); } catch (e) {} }
-  window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify }, lockBadge: lockBadge, gate: gate, icons: { lock: LOCK, check: CHECK, play: ICONS.play },
+  window.ChladniNative = { plug: plug, sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify }, lockBadge: lockBadge, gate: gate, icons: { lock: LOCK, check: CHECK, play: ICONS.play },
     mixThumb: mixThumb, mixCard: mixCard, paintThumbs: paintThumbs, reminders: { schedule: scheduleReminders, ask: notifAsk, allowed: notifAllowed }, widgetSync: widgetSync };
   function ready() {
     buildTabBar();

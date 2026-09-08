@@ -5,7 +5,7 @@
   var cap = window.Capacitor;
   if (!cap || typeof cap.isNativePlatform !== "function" || !cap.isNativePlatform()) return;
   var P = cap.Plugins || {}, CFG = window.CHLADNI_CONFIG || {};
-  var Purchases = P.Purchases || (cap.registerPlugin ? cap.registerPlugin("Purchases") : null);
+  var Purchases = (window.ChladniNative && window.ChladniNative.plug) ? window.ChladniNative.plug("Purchases") : (P.Purchases || null);
   var Social = P.SocialLogin, Prefs = P.Preferences;
   var N = function () { return window.ChladniNative || {}; };
   var EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
