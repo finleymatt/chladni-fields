@@ -297,3 +297,10 @@ html.native .web-only { display: none !important; }
   html.native dialog.info[open], html.native dialog.info[data-closing="1"] { animation-duration: 1ms; }
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }
+/* the free lock, once used: the control says so instead of promising */
+.cf-sleep[data-state="used"] { border-color: var(--edge); }
+.cf-sleep[data-state="used"] .cf-lock-i { color: var(--muted); }
+.cf-sleep[data-state="ready"] { border-color: color-mix(in srgb, var(--sound) 60%, var(--edge)); }
+.cf-sleep[data-state="ready"] .cf-lock-i { color: var(--sound); }
+.cf-lock-chip[data-state="used"] { color: var(--muted); border-color: var(--edge); }
+.cf-lock-chip[data-state="ready"] { color: var(--sound); border-color: color-mix(in srgb, var(--sound) 55%, transparent); }
