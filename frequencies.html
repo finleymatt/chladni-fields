@@ -127,9 +127,16 @@
   .preset small { display: block; font-size: 9.5px; letter-spacing: .08em; text-transform: none; color: var(--muted); }
   .help { margin: 0; padding: 12px 14px; border: 1px solid var(--sound); border-radius: var(--r); background: color-mix(in srgb, var(--sound) 10%, var(--panel)); font-size: .95rem; line-height: 1.5; display: none; }
   .help[data-show="1"] { display: block; }
-  .pomo-line { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); align-self: center; font-variant-numeric: tabular-nums; min-height: 1em; }
-  .pomo-line[data-phase="work"] { color: var(--sound); }
-  .pomo-line[data-phase="rest"] { color: var(--accent); }
+  .pomo-ctl { padding: 12px 14px 12px; border: 1px solid var(--edge); border-radius: var(--r); background: var(--panel-2); }
+  .pomo-ctl[data-on="1"] { border-color: var(--sound); }
+  .pomo-presets .preset[data-on="1"] { border-color: var(--sound); color: var(--sound); }
+  .pomo-now { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+  .pomo-now[hidden] { display: none; }
+  .pomo-clock { font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: .01em; color: var(--sound); }
+  .pomo-ctl[data-phase="rest"] .pomo-clock { color: var(--accent); }
+  .pomo-line { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; flex: 1 1 auto; }
+  .pomo-help { margin: 2px 0 0; font-size: .86rem; line-height: 1.45; color: var(--muted); max-width: 60ch; }
+  .pomo-ctl[data-on="1"] .pomo-help { display: none; }
   .help b { font-family: var(--font-display); color: var(--sound); }
 
   /* ---------- tone cards ---------- */
@@ -181,7 +188,8 @@
     .breath { min-height: 200px; }
     .notes { grid-template-columns: 1fr; }
     .controls { padding: 14px 14px 16px; gap: 14px; }
-    .controls .presets-ctl { order: -1; }
+    .controls .presets-ctl { order: -2; }
+    .controls .pomo-ctl { order: -1; }
     .preset { flex: 1 1 45%; text-align: left; }
     .mini-now {
       display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: center;
@@ -317,18 +325,20 @@
           <span class="lbl">Breathing swell</span>
           <button class="toggle" id="breathBtn" type="button" data-on="1" aria-pressed="true">On · 6 breaths / min</button>
         </div>
-        <div class="ctl">
-          <span class="lbl">Pomodoro · work sprints</span>
-          <div class="row" style="gap:8px">
-            <select id="pomo" aria-label="Pomodoro sprints">
-              <option value="0" selected>Off</option>
-              <option value="25-5">25 min work · 5 rest</option>
-              <option value="50-10">50 · 10</option>
-              <option value="90-15">90 · 15</option>
-            </select>
-            <span class="pomo-line" id="pomoLine" aria-live="polite"></span>
-          </div>
+      </div>
+      <div class="ctl pomo-ctl" id="pomoCtl" data-on="0">
+        <span class="lbl">Pomodoro · work sprints</span>
+        <div class="presets pomo-presets">
+          <button class="preset" type="button" data-pomo="25-5">25 · 5<small>four sprints, then a long rest</small></button>
+          <button class="preset" type="button" data-pomo="50-10">50 · 10<small>deep work</small></button>
+          <button class="preset" type="button" data-pomo="90-15">90 · 15<small>one long block</small></button>
         </div>
+        <div class="pomo-now" id="pomoNow" hidden>
+          <b class="pomo-clock" id="pomoClock">25:00</b>
+          <span class="pomo-line" id="pomoLine" aria-live="polite"></span>
+          <button class="toggle" id="pomoStop" type="button">Stop</button>
+        </div>
+        <p class="pomo-help">The room plays through each sprint, dips to a murmur for the rest with a soft chime at every turn, and takes a longer rest after four rounds. With nothing playing it starts the Work preset.</p>
       </div>
       <div class="ctl presets-ctl">
         <span class="lbl">Presets</span>
@@ -795,8 +805,8 @@
      Phase ends are absolute times, so a phone that slept through a boundary catches up when it wakes. */
   var pomo = { on: false, work: 25, rest: 5, phase: "", ends: 0, round: 0 };
   function pomoStart(work, rest) {
-    pomo.on = true; pomo.work = work; pomo.rest = rest; pomo.round = 0;
     if (!Object.keys(playing).length) presetClick("work");
+    pomo.on = true; pomo.work = work; pomo.rest = rest; pomo.round = 0;
     pomoPhase("work", true);
   }
   function pomoStop(quiet) { if (!pomo.on) return; pomo.on = false; pomo.phase = ""; duck(false); paintPomo(); if (!quiet) chime("done"); pomoEvent(); }
@@ -813,11 +823,15 @@
   }
   setInterval(pomoTick, 1000);
   function paintPomo() {
-    var el = $("#pomoLine"); if (!el) return;
-    if (!pomo.on) { el.textContent = ""; el.removeAttribute("data-phase"); return; }
+    var ctl = $("#pomoCtl"), now = $("#pomoNow"), clock = $("#pomoClock"), line = $("#pomoLine"); if (!ctl) return;
+    ctl.setAttribute("data-on", pomo.on ? "1" : "0"); ctl.setAttribute("data-phase", pomo.phase || "");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-pomo]"), function (b) { b.setAttribute("data-on", pomo.on && b.getAttribute("data-pomo") === pomo.work + "-" + pomo.rest ? "1" : "0"); });
+    now.hidden = !pomo.on;
+    if (!pomo.on) { line.textContent = ""; return; }
     var left = Math.max(0, pomo.ends - Date.now()), m = Math.floor(left / 60000), s = Math.floor(left % 60000 / 1000);
-    el.setAttribute("data-phase", pomo.phase);
-    el.textContent = (pomo.phase === "work" ? "sprint " + pomo.round + " · " : "rest · ") + m + ":" + (s < 10 ? "0" : "") + s;
+    clock.textContent = m + ":" + (s < 10 ? "0" : "") + s;
+    line.textContent = pomo.phase === "work" ? "sprint " + pomo.round + " · work" : (pomo.round % 4 === 0 ? "long rest" : "rest") + " · sprint " + (pomo.round + 1) + " next";
+    var mt = $("#miniTimer"); if (mt && pomo.on) mt.textContent = (pomo.phase === "work" ? "sprint " + pomo.round : "rest") + " · " + clock.textContent;
   }
   function duck(on) { if (master && actx) master.gain.setTargetAtTime(on ? masterTarget() * 0.3 : masterTarget(), actx.currentTime, 1.5); }
   function chime(kind) {
@@ -830,11 +844,16 @@
     });
   }
   function pomoEvent() { document.dispatchEvent(new CustomEvent("room:pomodoro", { detail: { on: pomo.on, phase: pomo.phase, ends: pomo.ends, work: pomo.work, rest: pomo.rest, round: pomo.round } })); }
-  $("#pomo").addEventListener("change", function () {
-    var v = this.value; if (v === "0") { pomoStop(true); return; }
-    var p = v.split("-"); pomoStart(parseInt(p[0], 10), parseInt(p[1], 10));
+  Array.prototype.forEach.call(document.querySelectorAll("[data-pomo]"), function (b) {
+    b.addEventListener("click", function () {
+      var p = b.getAttribute("data-pomo").split("-"), w = parseInt(p[0], 10), r = parseInt(p[1], 10);
+      if (pomo.on && pomo.work === w && pomo.rest === r) { pomoStop(true); return; }
+      pomoStart(w, r);
+    });
   });
-  var _stopAll = stopAll; stopAll = function (f) { _stopAll(f); if (pomo.on && !Object.keys(playing).length) { $("#pomo").value = "0"; pomoStop(true); } };
+  $("#pomoStop").addEventListener("click", function () { pomoStop(true); });
+  // a preset swap stops everything for a moment before its tones start; only a room left silent ends the sprints
+  var _stopAll = stopAll; stopAll = function (f) { _stopAll(f); setTimeout(function () { if (pomo.on && !Object.keys(playing).length) pomoStop(true); }, 700); };
 
   /* what the app's native layer needs: render the mix, pause and resume the engine, read the state */
   window.ChladniRoom = {
