@@ -175,6 +175,37 @@ html.native dialog.info--cf .cf-text a { color: var(--accent); }
 .cf-steps div b { color: var(--ink); }
 html.native .tabbar a[data-plus="1"] svg { color: var(--accent); }
 
+/* ---- the Plus lock: padlock while locked, check once Plus is on (html.cf-plus flips every one) ---- */
+.cf-lock-i, .cf-check-i { width: 14px; height: 14px; flex: 0 0 auto; }
+.cf-check-i, html.native.cf-plus .cf-lock-i { display: none; }
+html.native.cf-plus .cf-check-i { display: block; }
+.cf-lock-u, html.native.cf-plus .cf-lock-l { display: none; }
+html.native.cf-plus .cf-lock-u { display: inline; }
+.cf-lock { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 999px; padding: 3px 8px 3px 6px; }
+.cf-lock .cf-lock-i, .cf-lock .cf-check-i { width: 12px; height: 12px; }
+html.native.cf-plus .cf-lock { color: var(--sound); border-color: color-mix(in srgb, var(--sound) 55%, transparent); }
+/* sleep mode, beside the timer */
+.cf-sleep { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: var(--ink); background: var(--panel-2); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--edge)); border-radius: 12px; padding: 10px 12px; min-height: 56px; }
+.cf-sleep .cf-lock-i, .cf-sleep .cf-check-i { width: 22px; height: 22px; color: var(--accent); }
+html.native.cf-plus .cf-sleep { border-color: color-mix(in srgb, var(--sound) 55%, var(--edge)); }
+html.native.cf-plus .cf-sleep .cf-check-i { color: var(--sound); }
+.cf-sleep-t { display: grid; gap: 2px; min-width: 0; }
+.cf-sleep-t b { font-family: var(--font-display); font-weight: 600; font-size: 14px; line-height: 1.2; }
+.cf-sleep-t small { font-family: var(--font-mono); font-size: 10px; letter-spacing: .04em; color: var(--muted); line-height: 1.4; }
+html.native.cf-plus .cf-sleep-t .cf-lock-u { display: block; }
+.cf-sleep-ctl { flex: 1 1 100%; }
+/* the chip in the now-playing bar and the note under Sleep sounds */
+.cf-lock-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 999px; padding: 6px 10px; min-height: 32px; }
+html.native.cf-plus .cf-lock-chip { color: var(--sound); border-color: color-mix(in srgb, var(--sound) 55%, transparent); }
+.cf-hint { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 100%; text-align: left; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; line-height: 1.4; color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 10px; padding: 8px 12px; margin-top: 4px; min-height: 40px; }
+.cf-hint .cf-lock-i, .cf-hint .cf-check-i { width: 16px; height: 16px; }
+html.native.cf-plus .cf-hint { color: var(--sound); background: color-mix(in srgb, var(--sound) 8%, transparent); border-color: color-mix(in srgb, var(--sound) 35%, transparent); }
+/* saved mixes: the count against the free allowance, and a locked Save once it's used */
+.cf-count { font-style: normal; color: var(--accent); margin-left: 6px; letter-spacing: .08em; }
+.cf-save { display: inline-flex; align-items: center; gap: 6px; }
+.cf-save--locked { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.cf-save .cf-lock-i { width: 13px; height: 13px; }
+
 /* saved mixes, in the Resonance Room's presets block */
 .cf-mixes { margin-bottom: 12px; }
 .cf-mixes-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
@@ -191,6 +222,8 @@ html.native .panel--plate .panel-tag { right: 48px; }
 .cf-share { position: absolute; top: 5px; right: 5px; z-index: 3; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--panel) 82%, transparent); color: var(--sound); border: 1px solid var(--edge); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .cf-share svg { width: 20px; height: 20px; }
 .cf-share[data-busy="1"] { opacity: .5; }
+/* free shares carry the iamra.lol mark: a small padlock on the button says a clean one is a Plus thing */
+html.native:not(.cf-plus) .cf-share::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--panel); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b0e0b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='10.5' width='14' height='10' rx='2.2'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E"); background-size: 9px; background-position: center; background-repeat: no-repeat; }
 
 /* the app has no address bar or share sheet to point at; web-only help lines are hidden */
 html.native .web-only { display: none !important; }

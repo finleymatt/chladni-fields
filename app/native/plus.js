@@ -177,6 +177,7 @@
         if (r.state === "purchased") {
           if (r.entitlements) setEnt(r.entitlements); else refresh();
           if (TIPS.some(function (t) { return t.id === id; })) { store.set("tips", (store.get("tips", 0) || 0) + 1); document.dispatchEvent(new CustomEvent("cf:tips")); }
+          else toast("Plus is on. Sleep mode, 8-hour timers, unlimited mixes and clean shares are unlocked.", { ms: 5000 });
           if (n.haptic) n.haptic.notify("SUCCESS");
           if (done) done(r);
         } else if (r.state === "pending") { toast("Waiting for approval — it unlocks once it's confirmed."); }

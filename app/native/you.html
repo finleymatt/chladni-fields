@@ -49,6 +49,13 @@
   .hero h2 .amp { color:var(--accent); font-weight:500; }
   .hero p { margin:0 0 12px; color:var(--muted); font-size:.98rem; }
   .hero .cf-primary { width:100%; }
+  .perks { list-style:none; margin:0 0 14px; padding:0; display:grid; gap:8px; position:relative; }
+  .perks li { display:grid; grid-template-columns:24px 1fr; grid-template-areas:"ic name" "ic note"; column-gap:10px; align-items:center; }
+  .perks .pk { grid-area:ic; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; color:var(--accent); border:1px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+  .perks .pk svg { width:13px; height:13px; }
+  .perks b { grid-area:name; font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.2; }
+  .perks li > span:last-child { grid-area:note; font-family:var(--font-mono); font-size:10.5px; color:var(--muted); letter-spacing:.04em; }
+  .perks.on .pk { color:#0b0e0b; background:var(--sound); border-color:var(--sound); }
   .avatar { width:34px; height:34px; border-radius:50%; background:var(--accent); color:#0b0e0b; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:14px; overflow:hidden; }
   .avatar img { width:100%; height:100%; object-fit:cover; }
   .danger { color:#d0655a; }
@@ -74,6 +81,12 @@
   <div class="hero" id="plusHero">
     <h2 id="plusTitle">Chladni <span class="amp">Plus</span></h2>
     <p id="plusText">Rain, surf and every tone keep playing with the screen locked, timers to 8 hours, unlimited saved mixes, clean shares. From $0.99 a month.</p>
+    <ul class="perks" id="plusPerks">
+      <li><span class="pk"></span><b>Sleep mode</b><span>keeps playing with the screen locked</span></li>
+      <li><span class="pk"></span><b>Timers to 8 hours</b><span>free stops at 90 minutes</span></li>
+      <li><span class="pk"></span><b>Unlimited saved mixes</b><span>free keeps one</span></li>
+      <li><span class="pk"></span><b>Clean shares</b><span>plate stills without the iamra.lol mark</span></li>
+    </ul>
     <button class="cf-primary" id="plusBtn" type="button">See Plus</button>
   </div>
 
@@ -138,8 +151,11 @@
       $("#signOutBtn").addEventListener("click", function () { CP.account.signOut().then(paintAccount); });
     }
   }
+  var NI = (window.ChladniNative || {}).icons || {};
   function paintPlus() {
     var e = CP.ent(), tips = CP.tipCount();
+    var perks = $("#plusPerks"); perks.classList.toggle("on", !!e.plus);
+    perks.querySelectorAll(".pk").forEach(function (p) { p.innerHTML = e.plus ? (NI.check || "✓") : (NI.lock || "🔒"); });
     if (e.plus) {
       $("#plusTitle").innerHTML = 'You have <span class="amp">Plus</span>';
       $("#plusText").textContent = e.lifetime ? "Lifetime. Sleep mode, unlimited mixes and clean shares are yours for good. Thank you." : "Sleep mode, unlimited mixes and clean shares are on" + (e.expires ? " · renews " + new Date(e.expires).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "") + ". Thank you.";

@@ -90,7 +90,14 @@
     document.body.appendChild(nav);
     document.addEventListener("cf:plus", paintPlusDot); paintPlusDot();
   }
-  function paintPlusDot() { var a = $('.tabbar a[data-tab="you"]'), cp = CP(); if (a) a.setAttribute("data-plus", cp && cp.has() ? "1" : "0"); }
+  function paintPlusDot() { var a = $('.tabbar a[data-tab="you"]'), cp = CP(); if (a) a.setAttribute("data-plus", cp && cp.has() ? "1" : "0"); root.classList.toggle("cf-plus", !!(cp && cp.has())); }
+
+  /* ---- the Plus lock: one small pill on every gated feature, a padlock while locked and a check once
+          Plus is active. The root carries .cf-plus so every badge flips at once on purchase. ---- */
+  var LOCK = '<svg class="cf-lock-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
+  var CHECK = '<svg class="cf-check-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  function lockBadge(locked, unlocked) { return '<span class="cf-lock">' + LOCK + CHECK + '<span class="cf-lock-l">' + escapeHtml(locked || "Plus") + '</span><span class="cf-lock-u">' + escapeHtml(unlocked || "Plus") + '</span></span>'; }
+  function gate(reason, onSuccess) { var cp = CP(); if (!cp) return; if (cp.has()) { if (onSuccess) onSuccess(); return; } hImpact("LIGHT"); cp.paywall(reason, onSuccess); }
 
   /* ---- bottom sheets: the site's dialogs, with a grabber and a flick-down to dismiss ---- */
   var openSheets = 0;
@@ -235,7 +242,9 @@
     // long timers (Plus)
     var timer = $("#timer");
     if (timer) {
-      [[120, "2 h"], [240, "4 h"], [480, "8 h"]].forEach(function (o) { var op = document.createElement("option"); op.value = String(o[0]); op.textContent = o[1] + " · Plus"; op.setAttribute("data-plus", "1"); timer.appendChild(op); });
+      [[120, "2 h"], [240, "4 h"], [480, "8 h"]].forEach(function (o) { var op = document.createElement("option"); op.value = String(o[0]); op.setAttribute("data-plus", "1"); op.setAttribute("data-label", o[1]); timer.appendChild(op); });
+      var paintTimer = function () { var cp = CP(), has = cp && cp.has(); Array.prototype.forEach.call(timer.querySelectorAll("[data-plus]"), function (op) { op.textContent = has ? op.getAttribute("data-label") : "🔒 " + op.getAttribute("data-label") + " · Plus"; }); };
+      paintTimer();
       var prev = timer.value;
       timer.addEventListener("change", function (ev) {
         var v = parseFloat(timer.value), cp = CP();
@@ -246,7 +255,32 @@
         }
         prev = timer.value;
       }, true);
-      document.addEventListener("cf:plus", function () { Array.prototype.forEach.call(timer.querySelectorAll("[data-plus]"), function (op) { var cp = CP(); op.textContent = op.textContent.replace(/ · Plus$/, "") + (cp && cp.has() ? "" : " · Plus"); }); });
+      document.addEventListener("cf:plus", paintTimer);
+      // the sleep-mode control sits beside the timer: the clearest place to say what Plus buys
+      var timerCtl = timer.closest(".ctl");
+      if (timerCtl) {
+        var sleepCtl = document.createElement("div"); sleepCtl.className = "ctl cf-sleep-ctl";
+        sleepCtl.innerHTML = '<span class="lbl">Sleep mode</span><button class="cf-sleep" type="button" id="cfSleep">' + LOCK + CHECK +
+          '<span class="cf-sleep-t"><b class="cf-lock-l">Keeps playing with the screen locked</b><b class="cf-lock-u">On · plays with the screen locked</b>' +
+          '<small class="cf-lock-l">Free fades out on lock · unlock with Plus</small><small class="cf-lock-u">Lock-screen controls, timers to 8 hours</small></span></button>';
+        timerCtl.parentNode.insertBefore(sleepCtl, timerCtl.nextSibling);
+        $("#cfSleep").addEventListener("click", function () { gate("Playing with the screen locked", function () { toast("Sleep mode is on. Lock the screen whenever you like."); }); });
+      }
+    }
+    // the sticky now-playing bar carries the same lock while sounds are on
+    var miniActions = $(".mini-actions");
+    if (miniActions) {
+      var chip = document.createElement("button"); chip.type = "button"; chip.className = "cf-lock-chip"; chip.innerHTML = LOCK + CHECK + '<span class="cf-lock-l">Sleep mode</span><span class="cf-lock-u">Sleep mode on</span>';
+      chip.addEventListener("click", function () { gate("Playing with the screen locked", function () { toast("Sleep mode is on. Lock the screen whenever you like."); }); });
+      miniActions.appendChild(chip);
+    }
+    // the sleep sounds are free to play; the note under the heading says what the lock is for
+    var sleepHead = document.querySelector("#sleep .group-head");
+    if (sleepHead) {
+      var hint = document.createElement("button"); hint.type = "button"; hint.className = "cf-hint";
+      hint.innerHTML = LOCK + CHECK + '<span class="cf-lock-l">Free to play · keep them playing with the screen locked with Plus</span><span class="cf-lock-u">Plus: these keep playing with the screen locked</span>';
+      hint.addEventListener("click", function () { gate("Playing with the screen locked", function () { toast("Sleep mode is on. Lock the screen whenever you like."); }); });
+      sleepHead.appendChild(hint);
     }
     // sleep mode: free plays while the app is open; Plus keeps sounding with the screen locked
     var pausedByLock = false;
@@ -291,8 +325,8 @@
   }
   function paintMixes() {
     var box = $("#cfMixes"), cp = CP(); if (!box || !cp) return;
-    var list = cp.mixes.list();
-    box.innerHTML = '<div class="cf-mixes-head"><span class="lbl">My mixes</span><button class="cf-save" type="button" id="cfSaveMix">Save mix</button></div>' +
+    var list = cp.mixes.list(), canSave = cp.mixes.canSave();
+    box.innerHTML = '<div class="cf-mixes-head"><span class="lbl">My mixes' + (cp.has() ? "" : ' <em class="cf-count">' + list.length + ' of 1 free</em>') + '</span><button class="cf-save' + (canSave ? "" : " cf-save--locked") + '" type="button" id="cfSaveMix">' + (canSave ? "" : LOCK) + 'Save mix</button></div>' +
       (list.length ? '<div class="cf-mix-row">' + list.map(function (m) { return '<button class="cf-mix" type="button" data-mix="' + m.id + '"><b>' + escapeHtml(m.name) + '</b><small>' + escapeHtml(m.summary || "") + '</small></button>'; }).join("") + '</div>' : '<p class="cf-mixes-empty">Start a few tones, then save the mix to come back to it.</p>');
     $("#cfSaveMix").addEventListener("click", function () {
       var mix = captureMix();
@@ -316,7 +350,7 @@
 
   /* ---- boot ---- */
   function hideSplash() { try { if (P.SplashScreen) P.SplashScreen.hide({ fadeOutDuration: 220 }); } catch (e) {} }
-  window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify } };
+  window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify }, lockBadge: lockBadge, gate: gate, icons: { lock: LOCK, check: CHECK } };
   function ready() {
     buildTabBar();
     if (page === "index.html") wirePlates();
