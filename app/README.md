@@ -55,7 +55,7 @@ Regenerating art (needs a Chromium with `--remote-debugging-port=9333`, e.g. hea
 
 ```bash
 npm run assets         # app icon + launch image → ios/App/App/Assets.xcassets
-npm run screenshots    # five App Store screenshots → store/screenshots
+npm run screenshots    # eight App Store screenshots → store/screenshots (PNG without alpha; asc-upload.js pushes them to ASC)
 npm run fonts          # re-download the self-hosted fonts
 ```
 

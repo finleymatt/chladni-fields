@@ -78,7 +78,7 @@ async function screenshots() {
     if (!files.length) { console.log(type + ": no files with prefix " + prefix); continue; }
     let set = sets.data.find((s) => s.attributes.screenshotDisplayType === type);
     if (!set) set = (await api("POST", "/v1/appScreenshotSets", { data: { type: "appScreenshotSets", attributes: { screenshotDisplayType: type }, relationships: { appStoreVersionLocalization: { data: { type: "appStoreVersionLocalizations", id: loc.id } } } } })).data;
-    const existing = (set.relationships && set.relationships.appScreenshots && set.relationships.appScreenshots.data) || [];
+    const existing = (await api("GET", "/v1/appScreenshotSets/" + set.id + "/appScreenshots?limit=50")).data || [];
     for (const e of existing) await api("DELETE", "/v1/appScreenshots/" + e.id);
     console.log(type + ": removed " + existing.length + ", uploading " + files.length);
     const ids = [];
