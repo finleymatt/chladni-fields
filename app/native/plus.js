@@ -130,7 +130,7 @@
       '</ul>' +
       '<div class="cf-plans" role="radiogroup" aria-label="Plan">' + planButtons(selected) + '</div>' +
       '<button class="cf-cta" type="button" data-cta disabled><span>Connecting to the App Store…</span></button>' +
-      (store.get("sleepTrial") ? '<p class="cf-try cf-try--used">Your free lock has been used: the room played on with the screen off. Plus does that every night.</p>'
+      (store.get("sleepTrialUsed") ? '<p class="cf-try cf-try--used">Your free lock has been used: the room played on with the screen off. Plus does that every night.</p>'
         : '<div class="cf-try"><b>Try sleep mode first, free.</b> Start a tone, lock your phone: your first lock keeps the room playing for twenty minutes. <button class="cf-link" type="button" data-try>Try it now</button></div>') +
       '<p class="cf-fine">Payment is charged to your Apple ID at confirmation. Subscriptions renew automatically at the same price until cancelled at least 24 hours before the end of the period, in Settings → Apple ID → Subscriptions. <a href="' + EULA + '">Terms of Use</a> · <a href="privacy.html">Privacy</a></p>' +
       '<div class="cf-row"><button class="cf-link" type="button" data-restore>Restore purchases</button></div>' +
@@ -255,7 +255,7 @@
   function toast(t, opts) { var n = N(); if (n.toast) n.toast(t, opts); }
 
   /* ---- boot ---- */
-  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded", "sleepTrial", "reminders", "sleepLog"]).then(function () {
+  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded", "sleepTrialUsed", "reminders", "sleepLog"]).then(function () {
     ent = store.get("ent", ent); account = store.get("account", account);
     return refresh();
   });

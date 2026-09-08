@@ -409,7 +409,7 @@
             or the one free trial lock). Coming back, the native player stops and the engine resumes. ---- */
     var room = window.ChladniRoom;
     var hand = { file: "", key: "", rendering: null, active: false, trial: false, since: 0, timer: null, wasLive: false, armedEnds: 0 };
-    function canSleep() { var cp = CP(); return !!(cp && (cp.has() || !cp.store.get("sleepTrial"))); }
+    function canSleep() { var cp = CP(); return !!(cp && (cp.has() || !cp.store.get("sleepTrialUsed"))); }
     function slog(s) { var cp = CP(); if (!cp) return; var l = cp.store.get("sleepLog", []); l.push(new Date().toTimeString().slice(0, 8) + " js " + s); if (l.length > 40) l = l.slice(-40); cp.store.set("sleepLog", l); }
     function wavBase64(buf) {
       var ch = buf.numberOfChannels, n = buf.length, sr = buf.sampleRate, bytes = 44 + n * ch * 2, ab = new ArrayBuffer(bytes), dv = new DataView(ab);
@@ -425,19 +425,25 @@
        itself when the app goes to the background, so nothing here has to run at the moment of the lock */
     function armNative() {
       var cp = CP(); if (!SA || !cp || !hand.file || !room || !room.live()) return Promise.resolve();
-      var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrial");
+      var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrialUsed");
       if (!plus && !trial) return disarmNative();
       var title = ((status && status.textContent) || "").replace(/^playing\s+/i, "").split(" · ")[0] || "Resonance Room";
       var endsAt = room.timerEnds() ? room.timerEnds() / 1000 : 0;
       return SA.arm({ path: hand.file, title: title, subtitle: trial ? "Sleep mode · your free lock" : "Sleep mode", volume: 1, endsAt: endsAt, maxSeconds: trial ? 1200 : 0, trial: trial })
-        .then(function () { hand.armedEnds = endsAt; hand.trial = trial; }).catch(function (e) { slog("arm failed " + (e && e.message)); });
+        .then(function () { hand.armedEnds = endsAt; hand.trial = trial; hand.armed = true; slog("armed " + (trial ? "(free lock) " : "") + hand.file.split("/").pop()); paintSleepState(); }).catch(function (e) { hand.armed = false; slog("arm failed " + (e && e.message)); paintSleepState(); });
     }
-    function disarmNative() { hand.trial = false; if (!SA) return Promise.resolve(); return SA.disarm().catch(function () {}); }
+    function disarmNative() { hand.trial = false; hand.armed = false; paintSleepState(); if (!SA) return Promise.resolve(); return SA.disarm().catch(function () {}); }
+    function paintSleepState() {
+      var live = room && room.live(), cp = CP(), plus = cp && cp.has(), state = !live ? "" : hand.armed ? "ready" : (hand.rendering || hand.timer) ? "preparing" : "";
+      var texts = { ready: plus ? "Ready · lock the phone any time" : "Ready · your free lock is waiting", preparing: "Getting the mix ready…" };
+      Array.prototype.forEach.call(document.querySelectorAll("#cfSleep small"), function (el) { if (!el.getAttribute("data-orig")) el.setAttribute("data-orig", el.textContent); el.textContent = state ? texts[state] : el.getAttribute("data-orig"); });
+      var chip = document.querySelector(".cf-lock-chip"); if (chip) chip.setAttribute("data-state", state);
+    }
     function prerender() {
       if (!room || !SA || !P.Filesystem || !room.live()) { hand.file = ""; hand.key = ""; return disarmNative().then(function () { return false; }); }
       var key = room.key(); if (key === hand.key && hand.file) return armNative().then(function () { return true; });
       if (hand.rendering) return hand.rendering;
-      var t0 = Date.now();
+      var t0 = Date.now(); slog("rendering " + room.ids().join("+")); paintSleepState();
       hand.rendering = room.render(30).then(function (buf) {
         if (!buf) return false;
         var data = wavBase64(buf), name = "sleep-" + (hand.file.indexOf("sleep-a") >= 0 ? "b" : "a") + ".wav";
@@ -450,7 +456,8 @@
       var live = room ? room.live() : false;
       if (!live) { hand.wasLive = false; hand.file = ""; hand.key = ""; disarmNative(); return; }
       var first = !hand.wasLive; hand.wasLive = true;
-      hand.timer = setTimeout(function () { if (canSleep()) prerender(); }, first ? 300 : 2000);
+      if (!canSleep()) { paintSleepState(); return; }
+      hand.timer = setTimeout(function () { hand.timer = null; prerender(); }, first ? 300 : 2000); paintSleepState();
     }
     if (status) new MutationObserver(schedulePrerender).observe(status, { childList: true, characterData: true, subtree: true, attributes: true });
     document.addEventListener("input", function (e) { if (e.target && e.target.matches && e.target.matches("input[type=range], select")) schedulePrerender(); });
@@ -459,7 +466,7 @@
       var cp = CP(), live = room ? room.live() : (status && status.getAttribute("data-live") === "1");
       if (document.hidden) {
         if (!live || !cp) return;
-        var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrial");
+        var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrialUsed");
         if ((plus || trial) && SA && room) {
           hand.active = true; hand.since = Date.now(); slog("hidden, armed=" + !!hand.file);
           room.suspend();
@@ -478,7 +485,7 @@
           return (st && st.playing ? SA.stop({ fade: 0.4 }) : Promise.resolve()).then(function () {
             if (ran && (by === "timer" || by === "trial" || by === "remote" || by === "interrupted")) { room.stopAll(0); if (by === "timer") toast("Faded out while the screen was locked — the timer ended."); }
             else room.resume();
-            if (ran && wasTrial) { cp.store.set("sleepTrial", Date.now()); disarmNative(); setTimeout(function () { if (cp.trialEnded) cp.trialEnded(mins); }, 700); }
+            if (ran && wasTrial) { cp.store.set("sleepTrialUsed", Date.now()); disarmNative(); setTimeout(function () { if (cp.trialEnded) cp.trialEnded(mins); }, 700); }
             else if (!ran && wasTrial) toast("Sleep mode didn't start: " + ((st && st.error) || "the mix wasn't ready yet. Give it a few seconds after pressing play, then lock."), { ms: 7000 });
           });
         }).catch(function () { room.resume(); });
@@ -487,6 +494,8 @@
         toast("Faded out when the screen locked. Plus keeps playing.", { action: "See Plus", onAction: function () { if (cp) cp.paywall("Playing with the screen locked"); } });
       }
     });
+    if (SA) SA.state().then(function (st) { if (st && st.log && st.log.length) { var cp3 = CP(); if (cp3) cp3.store.set("sleepLog", (cp3.store.get("sleepLog", [])).concat(st.log.map(function (x) { return x + " (native)"; })).slice(-40)); } }).catch(function () {});
+    slog("room ready, plugin " + (SA ? "present" : "MISSING") + ", fs " + (P.Filesystem ? "present" : "MISSING"));
     if (/[?&]try=1/.test(location.search)) setTimeout(function () { toast("Now lock your phone. Your first lock keeps the room playing, free, for 20 minutes.", { ms: 7000 }); }, 1800);
     // pomodoro boundaries become notifications, so the turns land even with the screen off
     document.addEventListener("room:pomodoro", function (ev) { pomodoroNotify(ev.detail); });

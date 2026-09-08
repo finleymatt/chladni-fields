@@ -38,7 +38,8 @@ public class SleepAudioPlugin: CAPPlugin, CAPBridgedPlugin {
     private var lastRun: [String: Any] = [:]
     private var log: [String] = []
 
-    public override func load() {
+    public override func load() { observe(); note("plugin loaded") }
+    private func observe() {
         if observing { return }
         observing = true
         let nc = NotificationCenter.default
@@ -63,6 +64,7 @@ public class SleepAudioPlugin: CAPPlugin, CAPBridgedPlugin {
                       volume: Float(call.getDouble("volume") ?? 1.0), endsAt: call.getDouble("endsAt") ?? 0,
                       maxSeconds: call.getDouble("maxSeconds") ?? 0, trial: call.getBool("trial") ?? false)
         DispatchQueue.main.async {
+            self.observe()
             self.armed = a
             // keep the session active now, while we are still in the foreground and allowed to
             do { try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers]); try AVAudioSession.sharedInstance().setActive(true) } catch { self.note("session: \(error.localizedDescription)") }
