@@ -16,17 +16,21 @@
 <script>
 (function () {
   var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[p[0]] = decodeURIComponent(p[1] || ""); });
-  var art = q.art || "icon", S = art === "icon" ? 1024 : 2732;
+  // variant=dark: flat near-black ground for iOS 18's dark Home Screen; variant=tinted: white shapes on
+  // transparent, which iOS tints itself (grains and glow dropped so the mark stays crisp)
+  var art = q.art || "icon", S = art === "icon" ? 1024 : 2732, variant = q.variant || "";
   document.body.innerHTML = '<div class="' + art + '"><canvas width="' + S + '" height="' + S + '"></canvas></div>';
   var cv = document.querySelector("canvas"), ctx = cv.getContext("2d");
-  var c = S / 2, BR = "rgba(211,168,81,", CY = "rgba(100,186,200,";
+  if (variant === "tinted") { document.documentElement.style.background = "transparent"; document.body.style.background = "transparent"; document.querySelector("." + art).style.background = "transparent"; }
+  if (variant === "dark") { document.querySelector("." + art).style.background = "#0a0d0a"; }
+  var c = S / 2, BR = variant === "tinted" ? "rgba(255,255,255," : "rgba(211,168,81,", CY = variant === "tinted" ? "rgba(255,255,255," : "rgba(100,186,200,";
   // faint plate rings behind everything
-  ctx.lineWidth = S * 0.0016; ctx.strokeStyle = "rgba(139,149,104,.14)";
+  ctx.lineWidth = S * 0.0016; ctx.strokeStyle = variant === "tinted" ? "rgba(255,255,255,.18)" : "rgba(139,149,104,.14)";
   for (var i = 1; i <= 6; i++) { ctx.beginPath(); ctx.arc(c, c, (S * 0.07) * i, 0, Math.PI * 2); ctx.stroke(); }
   // a six-fold Chladni figure in sand: r(θ) lobes from cos(3θ) nodal curves, drawn as glowing strokes
   function lobe(k, phase, r0, r1, col, w) {
     ctx.save(); ctx.translate(c, c); ctx.rotate(phase);
-    ctx.shadowColor = col + ".85)"; ctx.shadowBlur = S * 0.02; ctx.strokeStyle = col + ".95)"; ctx.lineWidth = w; ctx.lineCap = "round";
+    ctx.shadowColor = col + ".85)"; ctx.shadowBlur = variant === "tinted" ? 0 : S * 0.02; ctx.strokeStyle = col + (variant === "tinted" ? "1)" : ".95)"); ctx.lineWidth = variant === "tinted" ? w * 1.25 : w; ctx.lineCap = "round";
     ctx.beginPath();
     for (var t = 0; t <= Math.PI * 2 + 0.01; t += 0.01) {
       var r = r0 + (r1 - r0) * (0.5 + 0.5 * Math.cos(k * t));
@@ -46,7 +50,7 @@
   ctx.restore();
   // sand grains along the outer figure
   ctx.fillStyle = "rgba(233,229,215,.9)";
-  for (var g = 0; g < (art === "icon" ? 420 : 700); g++) {
+  for (var g = 0; g < (variant === "tinted" ? 0 : art === "icon" ? 420 : 700); g++) {
     var t2 = Math.random() * Math.PI * 2, r2 = R * 0.62 + (R - R * 0.62) * (0.5 + 0.5 * Math.cos(6 * t2)) + (Math.random() - 0.5) * S * 0.012;
     var sz = S * (0.0012 + Math.random() * 0.0022);
     ctx.beginPath(); ctx.arc(c + r2 * Math.cos(t2), c + r2 * Math.sin(t2), sz, 0, Math.PI * 2); ctx.fill();

@@ -54,6 +54,7 @@ jobs:
             sed -i '' "s/GOOGLE_REVERSED_CLIENT_ID/$REV/; s/GOOGLE_IOS_CLIENT_ID/$GOOGLE_IOS_CLIENT_ID/" ios/App/App/Info.plist
             echo "Google sign-in configured"
           else
+            /usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes" -c "Delete :GIDClientID" ios/App/App/Info.plist || true
             echo "No GOOGLE_IOS_CLIENT_ID secret: the app offers Sign in with Apple only"
           fi
 

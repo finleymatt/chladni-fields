@@ -657,7 +657,8 @@
     cx.beginPath(); cx.arc(c[0], c[1], cr, 0, Math.PI * 2); cx.fill();
     if (!compact && ids.length && breathOn) {
       cx.fillStyle = "rgba(233,229,215,.7)"; cx.font = "10px " + getComputedStyle(document.body).getPropertyValue("--font-mono");
-      cx.textAlign = "center"; cx.fillText(phase > 0.5 ? "breathe in" : "breathe out", c[0], c[1] + R + 16);
+      // above the rings, clear of the now-playing line along the bottom edge
+      cx.textAlign = "center"; cx.textBaseline = "bottom"; cx.fillText(phase > 0.5 ? "breathe in" : "breathe out", c[0], c[1] - R - 10); cx.textBaseline = "alphabetic";
     }
   }
   function draw(now) {

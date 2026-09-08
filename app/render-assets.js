@@ -16,13 +16,16 @@ async function main() {
   await send("Page.enable");
   const jobs = [
     { art: "icon", size: 1024, out: path.join(CAT, "AppIcon.appiconset", "AppIcon-512@2x.png") },
+    { art: "icon", variant: "dark", size: 1024, out: path.join(CAT, "AppIcon.appiconset", "AppIcon-dark.png") },
+    { art: "icon", variant: "tinted", size: 1024, transparent: true, out: path.join(CAT, "AppIcon.appiconset", "AppIcon-tinted.png") },
     { art: "splash", size: 2732, out: path.join(CAT, "Splash.imageset", "splash-2732x2732.png") },
     { art: "splash", size: 2732, out: path.join(CAT, "Splash.imageset", "splash-2732x2732-1.png") },
     { art: "splash", size: 2732, out: path.join(CAT, "Splash.imageset", "splash-2732x2732-2.png") },
   ];
   for (const j of jobs) {
     await send("Emulation.setDeviceMetricsOverride", { width: j.size, height: j.size, deviceScaleFactor: 1, mobile: false });
-    await send("Page.navigate", { url: `file:///${SRC}?art=${j.art}&t=${Date.now()}` });
+    await send("Emulation.setDefaultBackgroundColorOverride", j.transparent ? { color: { r: 0, g: 0, b: 0, a: 0 } } : {});
+    await send("Page.navigate", { url: `file:///${SRC}?art=${j.art}${j.variant ? "&variant=" + j.variant : ""}&t=${Date.now()}` });
     await sleep(800);
     const r = await send("Page.captureScreenshot", { format: "png", clip: { x: 0, y: 0, width: j.size, height: j.size, scale: 1 } });
     fs.writeFileSync(j.out, Buffer.from(r.result.data, "base64"));

@@ -51,7 +51,9 @@ public class PurchasesPlugin: CAPPlugin, CAPBridgedPlugin {
                     }
                     var trial = ""
                     if let intro = p.subscription?.introductoryOffer, intro.paymentMode == .freeTrial {
-                        trial = "\(intro.period.value) \(intro.period.unit)"
+                        var unit = "day"
+                        switch intro.period.unit { case .day: unit = "day"; case .week: unit = "week"; case .month: unit = "month"; case .year: unit = "year"; @unknown default: unit = "day" }
+                        trial = "\(intro.period.value) \(unit)"
                     }
                     return ["id": p.id, "title": p.displayName, "description": p.description, "price": p.displayPrice, "kind": kind, "period": period, "trial": trial]
                 }

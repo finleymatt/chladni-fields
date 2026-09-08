@@ -15,7 +15,9 @@ async function main() {
   const send = (method, params = {}) => new Promise((res) => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
   await send("Page.enable");
   await send("Emulation.setDeviceMetricsOverride", { width: 440, height: 956, deviceScaleFactor: 3, mobile: true });
-  for (const n of ["1", "2", "3", "4", "5"]) {
+  // the framed pages get the app's own chrome (tab bar, native layout) through a stand-in bridge, in every frame
+  await send("Page.addScriptToEvaluateOnNewDocument", { source: fs.readFileSync(path.join(__dirname, "store", "fake-bridge.js"), "utf8") + "\ntry { localStorage.setItem('cf:onboarded', 'true'); localStorage.setItem('chladni-theme', 'dark'); localStorage.removeItem('chladni-vibe'); } catch (e) {}" });
+  for (const n of ["1", "2", "3", "4", "5", "6"]) {
     await send("Page.navigate", { url: `file:///${SRC}?shot=${n}&t=${Date.now()}` });
     await sleep(n === "1" ? 6000 : 4500); // the framed page boots its audio engine and settles its plate
     const r = await send("Page.captureScreenshot", { format: "png", clip: { x: 0, y: 0, width: 440, height: 956, scale: 1 } });

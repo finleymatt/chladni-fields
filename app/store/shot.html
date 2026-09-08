@@ -15,8 +15,8 @@
   h1 .amp { color: #d3a851; font-weight: 500; }
   h1 .cy { color: #64bac8; font-weight: 500; }
   p { font-size: 15px; line-height: 1.35; color: #b3b9a0; margin: 10px 0 0; max-width: 34ch; }
-  .phone { position: absolute; left: 22px; right: 22px; top: 264px; bottom: -40px; border-radius: 34px 34px 0 0; border: 3px solid #2c3326; border-bottom: 0; background: #0d120e; overflow: hidden; box-shadow: 0 0 0 7px #151b14, 0 -30px 60px -20px rgba(0,0,0,.7); }
-  .phone iframe { position: absolute; left: 0; top: 0; width: calc(100% + 20px); height: 1000px; border: 0; background: #0d120e; }
+  .phone { position: absolute; left: 22px; right: 22px; top: 264px; bottom: 0; border-radius: 34px 34px 0 0; border: 3px solid #2c3326; border-bottom: 0; background: #0d120e; overflow: hidden; box-shadow: 0 0 0 7px #151b14, 0 -30px 60px -20px rgba(0,0,0,.7); }
+  .phone iframe { position: absolute; left: 0; top: 0; width: calc(100% + 20px); height: 100%; border: 0; background: #0d120e; }
 </style>
 </head>
 <body>
@@ -28,13 +28,15 @@
     "2": { eyebrow: "Your own tone", h: 'Sing into it. The plate <span class="cy">answers</span>.', p: "Real plate physics: every mode responds to the pitch and overtones of your voice or instrument, live.", src: "../www/index.html?mode=free&freq=330#console" },
     "3": { eyebrow: "Twenty figures", h: 'From the Julia Set to the <span class="amp">Eye of Horus</span>.', p: "Fourteen formations and six ancient figures, each with its fundamental, its partials and its dossier of sources.", src: "../www/index.html?f=juliaset#console" },
     "4": { eyebrow: "The Resonance Room", h: 'Tones to <span class="amp">leave on</span>.', p: "432, 528, 174 Hz, binaural beats and brown noise — soft timbres, a fade-out timer, the evidence labelled honestly.", src: "../www/frequencies.html#player" },
-    "5": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" }
+    "5": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" },
+    "6": { eyebrow: "Free, with a Plus", h: 'Sleep mode, saved <span class="amp">mixes</span>, clean shares.', p: "Everything the site does is free. Plus keeps the room humming with the screen locked, from $0.99 a month.", src: "../www/you.html" }
   };
   var s = S[q.shot] || S["1"];
   // the framed page shares this file origin's storage: make sure it opens in the dark theme, as shipped
   try { localStorage.setItem("chladni-theme", "dark"); localStorage.removeItem("chladni-vibe"); } catch (e) {}
   document.body.innerHTML = '<div class="shot"><div class="grid"></div><div class="head"><p class="eyebrow">' + s.eyebrow + '</p><h1>' + s.h + '</h1><p>' + s.p + '</p></div>' +
     '<div class="phone"><iframe src="' + s.src + '"></iframe></div></div>';
+  if (q.shot === "6") { try { sessionStorage.removeItem("fakeplus"); } catch (e) {} }
   if (q.shot === "4") {
     // the Resonance Room with something playing: press the Wind down preset once the page is up
     var fr = document.querySelector("iframe");
