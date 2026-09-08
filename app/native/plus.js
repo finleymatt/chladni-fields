@@ -104,7 +104,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
   function planButtons() {
     return PLANS.map(function (p) {
-      return '<button class="cf-plan' + (p.best ? " cf-plan--best" : "") + '" type="button" data-buy="' + p.id + '"><b>' + esc(p.label) + '</b><span>' + esc(p.price) + ' <em>' + esc(p.per) + '</em></span><small>' + esc(p.trial ? "free for " + p.trial + " first" : p.note) + '</small>' + (p.best ? '<i>Best value</i>' : "") + '</button>';
+      return '<button class="cf-plan' + (p.best ? " cf-plan--best" : "") + '" type="button" data-buy="' + p.id + '"><b>' + esc(p.label) + '</b><span>' + esc(p.price) + ' <em>' + esc(p.per) + '</em></span><small>' + esc(p.trial ? p.trial.replace(/^(\d+)\s+(\w+)$/, "$1-$2 free trial") : p.note) + '</small>' + (p.best ? '<i>Best value</i>' : "") + '</button>';
     }).join("");
   }
   function paywall(reason, onSuccess) {
