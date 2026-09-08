@@ -73,4 +73,4 @@ Sign-in is optional (Sign in with Apple and Google); the app is fully usable wit
 
 ## Screenshots
 
-`store/screenshots/iphone-6.9-1.png … -5.png` (1320×2868). Upload them to the 6.9-inch iPhone slot; App Store Connect reuses them for the smaller sizes. iPad is not targeted, so no iPad screenshots are needed.
+`store/screenshots/iphone-6.9-1.png … -7.png` (1320×2868): 1 intro with the Eye of Ra, 2 plates, 3 sing (DMT theme), 4 figures, 5 Resonance Room (DMT theme), 6 Law of One, 7 Free vs Plus. Upload them in that order to the 6.9-inch iPhone slot; `iphone-6.5-*.png` are 1284×2778 copies for the 6.5-inch slot if it asks. iPad is not targeted, so no iPad screenshots are needed.

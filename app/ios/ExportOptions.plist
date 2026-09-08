@@ -7,7 +7,14 @@
   <key>destination</key>
   <string>upload</string>
   <key>signingStyle</key>
-  <string>automatic</string>
+  <string>manual</string>
+  <key>signingCertificate</key>
+  <string>Apple Distribution</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>lol.iamra.chladni</key>
+    <string>PROFILE_NAME_PLACEHOLDER</string>
+  </dict>
   <key>teamID</key>
   <string>TEAM_ID_PLACEHOLDER</string>
   <key>uploadSymbols</key>

@@ -168,7 +168,7 @@
     d.addEventListener("click", function (ev) {
       var b = ev.target.closest ? ev.target.closest("[data-buy]") : null;
       if (b) buy(b.getAttribute("data-buy"), b, function () {
-        d.querySelector(".info-text").innerHTML = '<div class="cf-thanks"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 1.8v3.4M12 18.8v3.4M1.8 12h3.4M18.8 12h3.4M4.8 4.8l2.4 2.4M16.8 16.8l2.4 2.4M19.2 4.8l-2.4 2.4M7.2 16.8l-2.4 2.4"/></g><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg><h2>Thank you.</h2><p class="info-blurb">That went straight into keeping the site and the app alive. You\'re a supporter now.</p><div class="cf-row"><button class="cf-primary" type="button" data-close>Back to the plates</button></div></div>';
+        d.querySelector(".info-text").innerHTML = '<div class="cf-thanks"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4"/><path d="M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z"/><circle cx="12" cy="12" r="2.9"/><path d="M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.7 18.5 5 19.7 4.1 20"/></g><circle cx="12" cy="12" r="1.1" fill="currentColor"/></svg><h2>Thank you.</h2><p class="info-blurb">That went straight into keeping the site and the app alive. You\'re a supporter now.</p><div class="cf-row"><button class="cf-primary" type="button" data-close>Back to the plates</button></div></div>';
         d.querySelector("[data-close]").addEventListener("click", function () { d.close(); });
       });
     });

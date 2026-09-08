@@ -118,12 +118,15 @@ jobs:
           printf '%s\n' "$ASC_KEY_P8" > ~/private_keys/AuthKey_${ASC_KEY_ID}.p8
           chmod 600 ~/private_keys/AuthKey_${ASC_KEY_ID}.p8
 
-      - name: Import a distribution certificate (only if provided)
-        if: ${{ env.HAS_P12 == 'true' }}
+      # Manual signing: an Apple Distribution certificate and an App Store profile made once with
+      # app/tools/asc-signing.js (automatic signing needs a registered device for its archive step).
+      - name: Install the distribution certificate and profile
         env:
           IOS_P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
           IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
         run: |
+          test -n "$IOS_P12_BASE64" || { echo "IOS_P12_BASE64 is missing: run app/tools/asc-signing.js and add the three signing secrets"; exit 1; }
           KC=$RUNNER_TEMP/build.keychain-db
           security create-keychain -p "" "$KC"
           security set-keychain-settings -lut 21600 "$KC"
@@ -132,23 +135,27 @@ jobs:
           security import $RUNNER_TEMP/dist.p12 -P "$IOS_P12_PASSWORD" -A -t cert -f pkcs12 -k "$KC"
           security set-key-partition-list -S apple-tool:,apple: -k "" "$KC"
           security list-keychain -d user -s "$KC" login.keychain-db
+          security find-identity -v -p codesigning "$KC"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/appstore.mobileprovision"
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< "$(security cms -D -i "$RUNNER_TEMP/appstore.mobileprovision")")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< "$(security cms -D -i "$RUNNER_TEMP/appstore.mobileprovision")")
+          cp "$RUNNER_TEMP/appstore.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID".mobileprovision
+          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "Installed profile '$NAME' ($UUID)"
 
       - name: Archive
         env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -o pipefail
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             MARKETING_VERSION="${{ steps.ver.outputs.version }}" \
             CURRENT_PROJECT_VERSION="${{ steps.ver.outputs.build }}" \
             archive | tee "$RUNNER_TEMP/archive.log" | grep -E "error|warning: (Code|Prov)|Archive Succeeded|BUILD" || true
@@ -160,7 +167,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          sed "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          sed -e "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" -e "s/PROFILE_NAME_PLACEHOLDER/$PROFILE_NAME/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \

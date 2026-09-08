@@ -5,7 +5,8 @@
 <title>App icon and splash (render source)</title>
 <style>
   /* ?art=icon → 1024x1024 app icon (no alpha; iOS rounds the corners itself)
-     ?art=splash → 2732x2732 launch image, centred mark, safe at any crop */
+     ?art=splash → 2732x2732 launch image, centred mark, safe at any crop
+     variant=dark: flat near-black ground for iOS 18's dark Home Screen; variant=tinted: white on transparent */
   html, body { margin: 0; background: #0d120e; }
   .icon { width: 1024px; height: 1024px; background: radial-gradient(circle at 50% 46%, #17201a 0, #0d120e 62%); display: grid; place-items: center; overflow: hidden; }
   .splash { width: 2732px; height: 2732px; background: #0d120e; display: grid; place-items: center; overflow: hidden; }
@@ -16,44 +17,43 @@
 <script>
 (function () {
   var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[p[0]] = decodeURIComponent(p[1] || ""); });
-  // variant=dark: flat near-black ground for iOS 18's dark Home Screen; variant=tinted: white shapes on
-  // transparent, which iOS tints itself (grains and glow dropped so the mark stays crisp)
   var art = q.art || "icon", S = art === "icon" ? 1024 : 2732, variant = q.variant || "";
   document.body.innerHTML = '<div class="' + art + '"><canvas width="' + S + '" height="' + S + '"></canvas></div>';
   var cv = document.querySelector("canvas"), ctx = cv.getContext("2d");
   if (variant === "tinted") { document.documentElement.style.background = "transparent"; document.body.style.background = "transparent"; document.querySelector("." + art).style.background = "transparent"; }
   if (variant === "dark") { document.querySelector("." + art).style.background = "#0a0d0a"; }
-  var c = S / 2, BR = variant === "tinted" ? "rgba(255,255,255," : "rgba(211,168,81,", CY = variant === "tinted" ? "rgba(255,255,255," : "rgba(100,186,200,";
-  // faint plate rings behind everything
-  ctx.lineWidth = S * 0.0016; ctx.strokeStyle = variant === "tinted" ? "rgba(255,255,255,.18)" : "rgba(139,149,104,.14)";
+  var tinted = variant === "tinted";
+  var BR = tinted ? "rgba(255,255,255," : "rgba(211,168,81,", CY = tinted ? "rgba(255,255,255," : "rgba(100,186,200,";
+  var c = S / 2;
+  // faint plate rings behind everything: the cymatics, quietly
+  ctx.lineWidth = S * 0.0016; ctx.strokeStyle = tinted ? "rgba(255,255,255,.16)" : "rgba(139,149,104,.16)";
   for (var i = 1; i <= 6; i++) { ctx.beginPath(); ctx.arc(c, c, (S * 0.07) * i, 0, Math.PI * 2); ctx.stroke(); }
-  // a six-fold Chladni figure in sand: r(θ) lobes from cos(3θ) nodal curves, drawn as glowing strokes
-  function lobe(k, phase, r0, r1, col, w) {
-    ctx.save(); ctx.translate(c, c); ctx.rotate(phase);
-    ctx.shadowColor = col + ".85)"; ctx.shadowBlur = variant === "tinted" ? 0 : S * 0.02; ctx.strokeStyle = col + (variant === "tinted" ? "1)" : ".95)"); ctx.lineWidth = variant === "tinted" ? w * 1.25 : w; ctx.lineCap = "round";
-    ctx.beginPath();
-    for (var t = 0; t <= Math.PI * 2 + 0.01; t += 0.01) {
-      var r = r0 + (r1 - r0) * (0.5 + 0.5 * Math.cos(k * t));
-      var x = r * Math.cos(t), y = r * Math.sin(t);
-      if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.stroke(); ctx.restore();
+  if (!tinted) {
+    // one cyan nodal ring, glowing, as the plates do
+    ctx.save(); ctx.shadowColor = CY + ".8)"; ctx.shadowBlur = S * 0.02; ctx.strokeStyle = CY + ".55)"; ctx.lineWidth = S * 0.006;
+    ctx.beginPath(); ctx.arc(c, c, S * (art === "icon" ? 0.40 : 0.22), 0, Math.PI * 2); ctx.stroke(); ctx.restore();
   }
-  var R = art === "icon" ? S * 0.33 : S * 0.17;
-  lobe(6, 0, R * 0.62, R, BR, S * 0.012);
-  lobe(6, Math.PI / 6, R * 0.30, R * 0.55, CY, S * 0.008);
-  // the sun-sigil at the centre
-  ctx.save(); ctx.translate(c, c); ctx.strokeStyle = BR + "1)"; ctx.lineWidth = S * 0.009; ctx.lineCap = "round";
-  ctx.beginPath(); ctx.arc(0, 0, R * 0.16, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = BR + "1)"; ctx.beginPath(); ctx.arc(0, 0, R * 0.055, 0, Math.PI * 2); ctx.fill();
-  for (var a = 0; a < 8; a++) { var ang = a * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(ang) * R * 0.21, Math.sin(ang) * R * 0.21); ctx.lineTo(Math.cos(ang) * R * 0.28, Math.sin(ang) * R * 0.28); ctx.stroke(); }
+  // the Eye of Ra: the app's mark. Same paths as the inline SVG on the pages (24-unit box).
+  var EYE = ["M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4", "M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z", "M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.7 18.5 5 19.7 4.1 20"];
+  var span = art === "icon" ? 0.62 : 0.34, k = S * span / 24, off = (S - 24 * k) / 2;
+  ctx.save(); ctx.translate(off, off + k * 0.5); ctx.scale(k, k);
+  ctx.strokeStyle = BR + "1)"; ctx.lineWidth = tinted ? 1.9 : 1.55; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  if (!tinted) { ctx.shadowColor = BR + ".55)"; ctx.shadowBlur = 1.4; }
+  EYE.forEach(function (d) { ctx.stroke(new Path2D(d)); });
+  ctx.beginPath(); ctx.arc(12, 12, 2.9, 0, Math.PI * 2); ctx.stroke();
+  ctx.shadowBlur = 0; ctx.fillStyle = BR + "1)"; ctx.beginPath(); ctx.arc(12, 12, 1.15, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
-  // sand grains along the outer figure
-  ctx.fillStyle = "rgba(233,229,215,.9)";
-  for (var g = 0; g < (variant === "tinted" ? 0 : art === "icon" ? 420 : 700); g++) {
-    var t2 = Math.random() * Math.PI * 2, r2 = R * 0.62 + (R - R * 0.62) * (0.5 + 0.5 * Math.cos(6 * t2)) + (Math.random() - 0.5) * S * 0.012;
-    var sz = S * (0.0012 + Math.random() * 0.0022);
-    ctx.beginPath(); ctx.arc(c + r2 * Math.cos(t2), c + r2 * Math.sin(t2), sz, 0, Math.PI * 2); ctx.fill();
+  // sand grains resting along the lower lid, as if the eye were laid by a plate
+  if (!tinted) {
+    ctx.fillStyle = "rgba(233,229,215,.85)";
+    var lid = new Path2D("M1.8 12C6 17.6 18 17.6 22.2 12");
+    for (var g = 0; g < (art === "icon" ? 140 : 220); g++) {
+      var t = Math.random(); // point on the lower lid bezier
+      var x = Math.pow(1 - t, 3) * 1.8 + 3 * Math.pow(1 - t, 2) * t * 6 + 3 * (1 - t) * t * t * 18 + t * t * t * 22.2;
+      var y = Math.pow(1 - t, 3) * 12 + 3 * Math.pow(1 - t, 2) * t * 17.6 + 3 * (1 - t) * t * t * 17.6 + t * t * t * 12;
+      var jitter = (Math.random() - 0.5) * 0.5, sz = S * (0.0012 + Math.random() * 0.002);
+      ctx.beginPath(); ctx.arc(off + (x + jitter) * k, off + k * 0.5 + (y + 0.7 + jitter) * k, sz, 0, Math.PI * 2); ctx.fill();
+    }
   }
 })();
 </script>

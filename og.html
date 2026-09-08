@@ -68,15 +68,18 @@
     });
     ctx.fillStyle = rgba(BRASS, 0.95); ctx.beginPath(); ctx.arc(c, c, R * 0.09, 0, Math.PI * 2); ctx.fill();
   }
+  // the Eye of Ra: the app's mark. Same paths as the inline SVG on the pages (24-unit box).
+  var EYE = ["M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4", "M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z", "M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.7 18.5 5 19.7 4.1 20"];
   function drawSigil(ctx, S, withRing) {
-    var c = S / 2, r = S * 0.17;
-    ctx.strokeStyle = rgba(BRASS, 0.95); ctx.lineWidth = S * 0.022; ctx.lineCap = "round";
-    ctx.shadowColor = rgba(BRASS, 0.55); ctx.shadowBlur = S * 0.05;
-    ctx.beginPath(); ctx.arc(c, c, r, 0, Math.PI * 2); ctx.stroke();
-    for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(c + Math.cos(a) * r * 1.5, c + Math.sin(a) * r * 1.5); ctx.lineTo(c + Math.cos(a) * r * 2.35, c + Math.sin(a) * r * 2.35); ctx.stroke(); }
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = rgba(BRASS, 1); ctx.beginPath(); ctx.arc(c, c, r * 0.32, 0, Math.PI * 2); ctx.fill();
-    if (withRing) { ctx.strokeStyle = rgba(BRASS, 0.3); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c, c, r * 2.7, 0, Math.PI * 2); ctx.stroke(); }
+    var span = withRing ? 0.52 : 0.66, k = S * span / 24, off = (S - 24 * k) / 2;
+    if (withRing) { ctx.strokeStyle = rgba(BRASS, 0.3); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(S / 2, S / 2, S * 0.44, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.save(); ctx.translate(off, off + k * 0.6); ctx.scale(k, k);
+    ctx.strokeStyle = rgba(BRASS, 0.96); ctx.lineWidth = 1.5; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.shadowColor = rgba(BRASS, 0.5); ctx.shadowBlur = 1.6;
+    EYE.forEach(function (d) { ctx.stroke(new Path2D(d)); });
+    ctx.beginPath(); ctx.arc(12, 12, 2.9, 0, Math.PI * 2); ctx.stroke();
+    ctx.shadowBlur = 0; ctx.fillStyle = rgba(BRASS, 1); ctx.beginPath(); ctx.arc(12, 12, 1.1, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
   }
 
   var CARDS = {

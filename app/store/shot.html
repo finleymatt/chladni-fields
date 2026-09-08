@@ -5,39 +5,63 @@
 <title>App Store screenshot (render source)</title>
 <link rel="stylesheet" href="../fonts/fonts.css" />
 <style>
-  /* Rendered at 440x956 CSS px with a device scale factor of 3 → 1320x2868, Apple's 6.9-inch iPhone size. */
+  /* Rendered at 440x956 CSS px with a device scale factor of 3 → 1320x2868, Apple's 6.9-inch iPhone size.
+     A complete phone frame sits inside the slide with air on every side; the framed page hides its scrollbar
+     (injected by render-screenshots.js) so it lays out exactly as on a phone. */
   html, body { margin: 0; background: #0d120e; }
   .shot { position: relative; width: 440px; height: 956px; overflow: hidden; background: #0d120e; color: #e9e5d7; font-family: 'Spectral', Georgia, serif; }
-  .grid { position: absolute; inset: 0; background-image: radial-gradient(circle at 50% 30%, rgba(100,186,200,.10), transparent 45%), repeating-radial-gradient(circle at 50% 30%, transparent 0 34px, rgba(139,149,104,.09) 34px 35px); }
-  .head { position: absolute; left: 28px; right: 28px; top: 62px; }
+  .shot.dmt { background: #0b0614; }
+  .grid { position: absolute; inset: 0; background-image: radial-gradient(circle at 50% 28%, rgba(100,186,200,.12), transparent 46%), repeating-radial-gradient(circle at 50% 28%, transparent 0 34px, rgba(139,149,104,.09) 34px 35px); }
+  .dmt .grid { background-image: radial-gradient(circle at 50% 28%, rgba(94,241,255,.14), transparent 46%), repeating-radial-gradient(circle at 50% 28%, transparent 0 34px, rgba(255,122,217,.10) 34px 35px); }
+  .head { position: absolute; left: 28px; right: 28px; top: 58px; }
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: #d3a851; margin: 0 0 8px; }
-  h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 34px; line-height: 1.02; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+  .dmt .eyebrow { color: #ff7ad9; }
+  h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 33px; line-height: 1.02; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
   h1 .amp { color: #d3a851; font-weight: 500; }
   h1 .cy { color: #64bac8; font-weight: 500; }
-  p { font-size: 15px; line-height: 1.35; color: #b3b9a0; margin: 10px 0 0; max-width: 34ch; }
-  .phone { position: absolute; left: 22px; right: 22px; top: 264px; bottom: 0; border-radius: 34px 34px 0 0; border: 3px solid #2c3326; border-bottom: 0; background: #0d120e; overflow: hidden; box-shadow: 0 0 0 7px #151b14, 0 -30px 60px -20px rgba(0,0,0,.7); }
-  .phone iframe { position: absolute; left: 0; top: 0; width: calc(100% + 20px); height: 100%; border: 0; background: #0d120e; }
+  .dmt h1 .amp { color: #ff7ad9; } .dmt h1 .cy { color: #5ef1ff; }
+  p { font-size: 14.5px; line-height: 1.35; color: #b3b9a0; margin: 9px 0 0; max-width: 34ch; }
+  .dmt p { color: #b58ae0; }
+  /* the phone: 388 x 664, every corner rounded, resting above the bottom edge */
+  .phone { position: absolute; left: 26px; right: 26px; top: 246px; bottom: 46px; border-radius: 42px; border: 3px solid #2c3326; background: #0d120e; overflow: hidden;
+    box-shadow: 0 0 0 8px #151b14, 0 40px 80px -30px rgba(0,0,0,.9); }
+  .dmt .phone { border-color: #3a1f5c; box-shadow: 0 0 0 8px #150b24, 0 40px 80px -30px rgba(0,0,0,.9), 0 0 60px -10px rgba(255,122,217,.25); }
+  .phone iframe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; background: #0d120e; }
+  /* the intro slide */
+  .intro { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+  .intro .inner { position: relative; padding-bottom: 40px; }
+  .intro svg { width: 190px; height: 190px; display: block; margin: 0 auto 26px; color: #d3a851; filter: drop-shadow(0 0 22px rgba(211,168,81,.35)); }
+  .intro h1 { font-size: 54px; }
+  .intro p { max-width: none; margin: 14px auto 0; font-size: 19px; color: #b3b9a0; }
+  .intro .url { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: #d3a851; margin-top: 30px; }
+  .intro .ring { position: absolute; left: 50%; top: 50%; width: 560px; height: 560px; margin: -300px 0 0 -280px; border-radius: 50%; border: 1px solid rgba(100,186,200,.18); box-shadow: 0 0 80px rgba(100,186,200,.08) inset; pointer-events: none; }
 </style>
 </head>
 <body>
 <script>
 (function () {
   var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ""); });
+  var EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4"/><path d="M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z"/><circle cx="12" cy="12" r="2.9"/><path d="M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.7 18.5 5 19.7 4.1 20"/></g><circle cx="12" cy="12" r="1.1" fill="currentColor"/></svg>';
   var S = {
-    "1": { eyebrow: "Cymatics · field register", h: 'Crop circles, <span class="amp">turned into sound</span>.', p: "Every famous formation read as a frequency, beside the pattern that tone raises in sand on a vibrating plate.", src: "../www/index.html?f=milkhill#console" },
-    "2": { eyebrow: "Your own tone", h: 'Sing into it. The plate <span class="cy">answers</span>.', p: "Real plate physics: every mode responds to the pitch and overtones of your voice or instrument, live.", src: "../www/index.html?mode=free&freq=330#console" },
-    "3": { eyebrow: "Twenty figures", h: 'From the Julia Set to the <span class="amp">Eye of Horus</span>.', p: "Fourteen formations and six ancient figures, each with its fundamental, its partials and its dossier of sources.", src: "../www/index.html?f=juliaset#console" },
-    "4": { eyebrow: "The Resonance Room", h: 'Tones to <span class="amp">leave on</span>.', p: "432, 528, 174 Hz, binaural beats and brown noise — soft timbres, a fade-out timer, the evidence labelled honestly.", src: "../www/frequencies.html#player" },
-    "5": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" },
-    "6": { eyebrow: "Free, with a Plus", h: 'Sleep mode, saved <span class="amp">mixes</span>, clean shares.', p: "Everything the site does is free. Plus keeps the room humming with the screen locked, from $0.99 a month.", src: "../www/you.html" }
+    "1": { intro: true },
+    "2": { eyebrow: "Cymatics · field register", h: 'Crop circles, <span class="amp">turned into sound</span>.', p: "Every famous formation read as a frequency, beside the pattern that tone raises in sand on a vibrating plate.", src: "../www/index.html?f=milkhill#console" },
+    "3": { dmt: true, eyebrow: "Your own tone", h: 'Sing into it. The plate <span class="cy">answers</span>.', p: "Real plate physics: every mode responds to the pitch and overtones of your voice or instrument, live.", src: "../www/index.html?mode=free&freq=330#console" },
+    "4": { eyebrow: "Twenty figures", h: 'From the Julia Set to the <span class="amp">Eye of Horus</span>.', p: "Fourteen formations and six ancient figures, each with its fundamental, its partials and its dossier of sources.", src: "../www/index.html?f=juliaset#console" },
+    "5": { dmt: true, eyebrow: "The Resonance Room", h: 'Tones to <span class="amp">leave on</span>.', p: "432, 528, 174 Hz, binaural beats and brown noise — soft timbres, a fade-out timer, the evidence labelled honestly.", src: "../www/frequencies.html#player" },
+    "6": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" },
+    "7": { eyebrow: "Free, with a Plus", h: 'Sleep mode, saved <span class="amp">mixes</span>, clean shares.', p: "Everything the site does is free. Plus keeps the room humming with the screen locked, from $0.99 a month.", src: "../www/you.html" }
   };
   var s = S[q.shot] || S["1"];
-  // the framed page shares this file origin's storage: make sure it opens in the dark theme, as shipped
-  try { localStorage.setItem("chladni-theme", "dark"); localStorage.removeItem("chladni-vibe"); } catch (e) {}
-  document.body.innerHTML = '<div class="shot"><div class="grid"></div><div class="head"><p class="eyebrow">' + s.eyebrow + '</p><h1>' + s.h + '</h1><p>' + s.p + '</p></div>' +
+  // the framed page shares this file origin's storage: pick its theme here (dark as shipped, or the DMT palette)
+  try { localStorage.setItem("chladni-theme", "dark"); localStorage.setItem("chladni-vibe", s.dmt ? "dmt" : ""); localStorage.setItem("cf:onboarded", "true"); if (q.shot === "7") sessionStorage.removeItem("fakeplus"); } catch (e) {}
+  if (s.intro) {
+    document.body.innerHTML = '<div class="shot"><div class="grid"></div><div class="intro"><div class="ring"></div><div class="inner">' + EYE +
+      '<h1>Chladni <span class="amp">Fields</span></h1><p>Crop circles, turned to sound.</p><div class="url">iamra.lol</div></div></div></div>';
+    return;
+  }
+  document.body.innerHTML = '<div class="shot' + (s.dmt ? " dmt" : "") + '"><div class="grid"></div><div class="head"><p class="eyebrow">' + s.eyebrow + '</p><h1>' + s.h + '</h1><p>' + s.p + '</p></div>' +
     '<div class="phone"><iframe src="' + s.src + '"></iframe></div></div>';
-  if (q.shot === "6") { try { sessionStorage.removeItem("fakeplus"); } catch (e) {} }
-  if (q.shot === "4") {
+  if (q.shot === "5") {
     // the Resonance Room with something playing: press the Wind down preset once the page is up
     var fr = document.querySelector("iframe");
     fr.addEventListener("load", function () { setTimeout(function () {
