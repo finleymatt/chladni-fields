@@ -20,6 +20,10 @@
     "StatusBar": {
       "style": "DARK",
       "overlaysWebView": true
+    },
+    "SocialLogin": {
+      "providers": { "apple": true, "google": true, "facebook": false, "twitter": false },
+      "logLevel": 1
     }
   }
 }
