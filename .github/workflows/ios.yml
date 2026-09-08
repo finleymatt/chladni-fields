@@ -1,0 +1,128 @@
+# Builds the iOS app on a macOS runner, signs it with Apple's cloud-managed certificate through an
+# App Store Connect API key, and uploads the build to App Store Connect (TestFlight → App Store).
+#
+# Secrets (Settings → Secrets and variables → Actions):
+#   APPLE_TEAM_ID   your 10-character Team ID (developer.apple.com → Membership)
+#   ASC_KEY_ID      App Store Connect API key ID          (Users and Access → Integrations → App Store Connect API)
+#   ASC_ISSUER_ID   the Issuer ID shown on that same page
+#   ASC_KEY_P8      the full contents of the downloaded AuthKey_XXXX.p8 file (role: Admin)
+# Optional fallback if cloud signing is unavailable for your team:
+#   IOS_P12_BASE64  base64 of an Apple Distribution certificate + key (.p12);  IOS_P12_PASSWORD its password
+name: iOS · build and upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Marketing version (e.g. 1.0.1). Leave blank to use app/package.json."
+        required: false
+        default: ""
+  push:
+    tags: ["ios-v*"]
+
+concurrency:
+  group: ios-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install Capacitor
+        run: npm ci
+
+      - name: Bundle the site into www/ and sync the iOS project
+        run: |
+          node build-www.js
+          npx cap sync ios
+
+      - name: Work out version and build number
+        id: ver
+        run: |
+          V="${{ github.event.inputs.version }}"
+          if [ -z "$V" ]; then V=$(node -p "require('./package.json').version"); fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "build=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "Building $V ($GITHUB_RUN_NUMBER)"
+
+      - name: Install the App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s\n' "$ASC_KEY_P8" > ~/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          chmod 600 ~/private_keys/AuthKey_${ASC_KEY_ID}.p8
+
+      - name: Import a distribution certificate (only if provided)
+        if: ${{ secrets.IOS_P12_BASE64 != '' }}
+        env:
+          IOS_P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
+          IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+        run: |
+          KC=$RUNNER_TEMP/build.keychain-db
+          security create-keychain -p "" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "" "$KC"
+          echo "$IOS_P12_BASE64" | base64 --decode > $RUNNER_TEMP/dist.p12
+          security import $RUNNER_TEMP/dist.p12 -P "$IOS_P12_PASSWORD" -A -t cert -f pkcs12 -k "$KC"
+          security set-key-partition-list -S apple-tool:,apple: -k "" "$KC"
+          security list-keychain -d user -s "$KC" login.keychain-db
+
+      - name: Archive
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            MARKETING_VERSION="${{ steps.ver.outputs.version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.ver.outputs.build }}" \
+            archive | tee "$RUNNER_TEMP/archive.log" | grep -E "error|warning: (Code|Prov)|Archive Succeeded|BUILD" || true
+          test -d "$RUNNER_TEMP/App.xcarchive"
+
+      - name: Upload to App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          sed "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "Uploaded ${{ steps.ver.outputs.version }} (${{ steps.ver.outputs.build }}). It appears in App Store Connect → TestFlight after Apple processes it (5–20 min)."
+
+      - name: Keep the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: ${{ runner.temp }}/archive.log
+          if-no-files-found: ignore
