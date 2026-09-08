@@ -19,10 +19,10 @@ async function main() {
   await send("Page.enable"); await send("Runtime.enable");
   await send("Emulation.setDeviceMetricsOverride", { width: 402, height: 874, deviceScaleFactor: 3, mobile: true });
   const boot = fs.readFileSync(path.join(__dirname, "..", "store", "fake-bridge.js"), "utf8") +
-    "\ntry { localStorage.setItem('chladni-theme','dark'); localStorage.setItem('chladni-vibe', " + JSON.stringify(opt.vibe === "dmt" ? "dmt" : "") + "); localStorage.setItem('cf:onboarded','true'); sessionStorage.setItem('cf:launched','1'); " + (opt.plus ? "sessionStorage.setItem('fakeplus','1');" : "sessionStorage.removeItem('fakeplus');") + " } catch (e) {}" +
+    "\ntry { localStorage.setItem('chladni-theme','dark'); localStorage.setItem('chladni-vibe', " + JSON.stringify(opt.vibe === "dmt" ? "dmt" : "") + "); " + (opt.tour ? "localStorage.removeItem('cf:onboarded');" : "localStorage.setItem('cf:onboarded','true');") + " sessionStorage.setItem('cf:launched','1'); " + (opt.plus ? "sessionStorage.setItem('fakeplus','1');" : "sessionStorage.removeItem('fakeplus');") + " } catch (e) {}" +
     "\ndocument.addEventListener('DOMContentLoaded', function () { var s = document.createElement('style'); s.textContent = 'html{scrollbar-width:none}::-webkit-scrollbar{display:none}'; document.head.appendChild(s); });";
   await send("Page.addScriptToEvaluateOnNewDocument", { source: boot });
-  const q = (opt.sheet ? "?sheet=" + opt.sheet : "?snap=1") + "&t=" + Date.now();
+  const q = (opt.sheet ? "?sheet=" + opt.sheet : (opt.tour ? "?tour=1" : "?snap=1")) + "&t=" + Date.now();
   await send("Page.navigate", { url: "file:///" + WWW + "/" + PAGE + q + (opt.hash ? "#" + opt.hash : "") });
   await sleep(1800);
   if (opt.preset) {

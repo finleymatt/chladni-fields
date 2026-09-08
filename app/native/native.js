@@ -150,7 +150,126 @@
     };
   }
 
-  /* ---- first launch: three lines, one button ---- */
+  /* ---- explanations fold away: a small ⓘ opens a plain-language sheet with the full text underneath ---- */
+  var INFO_I = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>';
+  function infoSheet(title, html) {
+    var old = document.getElementById("cfInfo"); if (old) { try { old.close(); } catch (e) {} old.remove(); }
+    var d = document.createElement("dialog"); d.className = "info info--cf cf-infosheet"; d.id = "cfInfo";
+    d.innerHTML = '<div class="info-head"><p class="eyebrow">' + escapeHtml(title) + '</p><button class="info-close" type="button" data-close>Close</button></div><div class="info-text cf-text">' + html + '</div>';
+    document.body.appendChild(d); sheetify(d);
+    d.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", function () { d.close(); }); });
+    d.addEventListener("close", function () { setTimeout(function () { d.remove(); }, 50); });
+    if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", "");
+    hImpact("LIGHT");
+    return d;
+  }
+  function infoButton(title, eli5, source, label) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "cf-info" + (label ? " cf-info--row" : ""); b.setAttribute("aria-label", title);
+    b.innerHTML = INFO_I + (label ? "<span>" + escapeHtml(label) + "</span>" : "");
+    b.addEventListener("click", function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var body = (eli5 ? '<p class="cf-eli5">' + eli5 + '</p>' : "") + (source ? '<div class="cf-orig">' + source + '</div>' : "");
+      infoSheet(title, body);
+    });
+    return b;
+  }
+  /* hide `els`, put one ⓘ after `anchor` that opens their text (with an ELI5 line on top) */
+  function tuck(els, anchor, title, eli5, label) {
+    els = Array.prototype.filter.call(els || [], Boolean); if (!els.length || !anchor) return;
+    var html = els.map(function (el) { el.classList.add("cf-tucked"); return el.outerHTML; }).join("");
+    var b = infoButton(title, eli5, html, label);
+    anchor.insertAdjacentElement(label ? "afterend" : "beforeend", b);
+    return b;
+  }
+  /* wrap a section in a closed disclosure */
+  function fold(el, summary) {
+    if (!el) return;
+    var d = document.createElement("details"); d.className = "cf-fold";
+    d.innerHTML = '<summary>' + INFO_I + '<span>' + escapeHtml(summary) + '</span></summary>';
+    el.parentNode.insertBefore(d, el); d.appendChild(el);
+    d.addEventListener("toggle", function () { hSelect(); });
+    return d;
+  }
+  function simplifyRoom() {
+    var head = $(".head"), h1 = head && head.querySelector("h1");
+    tuck([head && head.querySelector(".lede"), head && head.querySelector(".legend")], h1, "The room, in short",
+      "Pick a sound, tap <b>Play</b>, and leave it on. Tones are steady notes. Sleep sounds are rain, sea, wind and so on. Binaural beats only work with headphones. The timer fades everything out so you can fall asleep to it. The small labels on each sound say how much science is behind it: <b>studied</b> means several studies agree, <b>pilot</b> one or two small ones, <b>mixed</b> the studies disagree, <b>tradition</b> people have used it for a long time and nobody has tested it.");
+    Array.prototype.forEach.call(document.querySelectorAll(".group-head"), function (g) {
+      var h2 = g.querySelector("h2"), p = g.querySelector("p"); if (!h2 || !p) return;
+      tuck([p], h2, h2.textContent.trim(), "", "");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".tone"), function (card) {
+      var p = card.querySelector("p"), h3 = card.querySelector("h3"), badge = card.querySelector(".badge"); if (!p || !h3) return;
+      var tier = badge ? badge.textContent.trim() : "", why = { studied: "several studies point the same way", pilot: "one or two small studies, promising", mixed: "the studies disagree", tradition: "used for a long time, never properly tested" }[tier] || "";
+      var name = (h3.firstChild && h3.firstChild.nodeType === 3 ? h3.firstChild.textContent : h3.textContent).trim();
+      p.classList.add("cf-tucked");
+      var b = infoButton(name, why ? "<b>" + escapeHtml(tier) + ":</b> " + why + "." : "", p.outerHTML, "What it is");
+      p.insertAdjacentElement("afterend", b);
+    });
+    var pomoLbl = document.querySelector(".pomo-ctl .lbl"), pomoHelp = $(".pomo-help");
+    if (pomoLbl && pomoHelp) tuck([pomoHelp], pomoLbl, "Pomodoro", "Work in sprints. The room plays while you work, goes quiet for the break, and chimes at each turn. Tap a sprint length to start; tap it again to stop.");
+    fold($(".notes"), "The science and the safety notes");
+  }
+  function simplifyPlates() {
+    var mast = $(".masthead"), h1 = mast && mast.querySelector("h1");
+    tuck([mast && mast.querySelector(".premise")], h1, "What is this?",
+      "Every crop circle here has been turned into a musical note. The plate next to it shows what that note does to a sprinkle of sand. Tap <b>Play tone</b> to hear it, or pick <b>Your own tone</b> and sing into the microphone to watch the sand follow your voice.");
+    fold($(".lower .method"), "How a crop circle becomes a sound");
+  }
+  function simplifyLaw() {
+    var head = $(".laws-head"), h1 = head && head.querySelector("h1");
+    tuck([head && head.querySelector(".laws-intro")], h1, "About these readings", "Nine short passages from the Ra Material, a set of channelled sessions from the 1980s. Each one is a big idea in a few lines, with the session it came from. Read one when you want something to sit with.");
+  }
+
+  /* ---- first launch: a short swipeable tour of the app, ending on an optional sign-in ---- */
+  function tour() {
+    var cp = CP(); if (!cp || cp.store.get("onboarded")) return;
+    var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>';
+    var slides = [
+      { ic: ICONS.law, eyebrow: "Welcome", h: 'Slow<span class="amp">tide</span>', p: "Sounds to help you sleep, settle and focus. Nothing to set up: pick a sound and press play." },
+      { ic: ICONS.room, eyebrow: "Resonance Room", h: 'Tap a sound, <span class="amp">leave it on</span>.', p: "Presets for winding down, sleep and work. A timer fades everything out so you can drift off." },
+      { ic: MOON, eyebrow: "Sleep mode", h: 'Lock the phone, it <span class="amp">keeps playing</span>.', p: "Your first lock is free. After that Plus keeps the room going every night, with lock-screen controls." },
+      { ic: ICONS.plates, eyebrow: "Plates", h: 'Crop circles, as <span class="amp">notes</span>.', p: "Each formation becomes a tone, and sand on a plate shows what that tone does. Or sing into the mic and watch your own voice." },
+      { ic: ICONS.law, eyebrow: "Law of One", h: 'Nine short <span class="amp">readings</span>.', p: "Big ideas from the Ra Material, a few lines each, for when you want something to think about." },
+      { ic: ICONS.you, eyebrow: "You", h: 'Keep what you <span class="amp">like</span>.', p: "Save mixes, set a wind-down reminder, add a Home Screen widget. Signing in keeps your mixes with you; it's optional.", signin: true }
+    ];
+    var d = document.createElement("dialog"); d.className = "cf-tour"; d.id = "cfTour";
+    var google = !!((window.CHLADNI_CONFIG || {}).googleIosClientId);
+    d.innerHTML = '<button class="cf-tour-skip" type="button" data-skip>Skip</button>' +
+      '<div class="cf-tour-track">' + slides.map(function (s, i) {
+        return '<section class="cf-tour-slide" data-i="' + i + '"><span class="cf-tour-ic">' + s.ic + '</span><p class="eyebrow">' + s.eyebrow + '</p><h2>' + s.h + '</h2><p class="cf-tour-p">' + s.p + '</p>' +
+          (s.signin ? '<div class="cf-signin"><button class="cf-apple" type="button" data-provider="apple"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.365 12.79c-.026-2.62 2.14-3.88 2.237-3.94-1.22-1.78-3.115-2.024-3.79-2.052-1.615-.164-3.15.95-3.97.95-.82 0-2.08-.927-3.42-.902-1.76.026-3.38 1.024-4.29 2.6-1.83 3.17-.47 7.87 1.31 10.44.87 1.26 1.91 2.67 3.27 2.62 1.31-.052 1.81-.85 3.4-.85 1.58 0 2.03.85 3.42.82 1.41-.026 2.3-1.28 3.16-2.55 1-1.46 1.41-2.87 1.43-2.94-.031-.013-2.74-1.05-2.767-4.19zM13.76 5.1c.72-.88 1.21-2.1 1.08-3.32-1.04.043-2.3.694-3.05 1.57-.67.774-1.26 2.02-1.1 3.21 1.16.09 2.35-.59 3.07-1.46z"/></svg>Sign in with Apple</button>' +
+            (google ? '<button class="cf-google" type="button" data-provider="google">Continue with Google</button>' : "") + '</div>' : "") + '</section>';
+      }).join("") + '</div>' +
+      '<div class="cf-tour-foot"><div class="cf-tour-dots">' + slides.map(function (s, i) { return '<i data-dot="' + i + '"' + (i === 0 ? ' data-on="1"' : "") + '></i>'; }).join("") + '</div>' +
+      '<button class="cf-primary cf-tour-next" type="button" data-next>Next</button></div>';
+    document.body.appendChild(d);
+    var track = d.querySelector(".cf-tour-track"), at = 0, n = slides.length;
+    function paint() {
+      d.querySelectorAll("[data-dot]").forEach(function (o) { o.setAttribute("data-on", parseInt(o.getAttribute("data-dot"), 10) === at ? "1" : "0"); });
+      d.querySelector("[data-next]").textContent = at === n - 1 ? "Start listening" : "Next";
+      d.querySelector("[data-skip]").hidden = at === n - 1;
+    }
+    function go(i) { at = Math.max(0, Math.min(n - 1, i)); track.scrollTo({ left: at * track.clientWidth, behavior: reduceMotion ? "auto" : "smooth" }); hSelect(); paint(); }
+    track.addEventListener("scroll", function () { var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth)); if (i !== at) { at = i; paint(); } }, { passive: true });
+    function finish() { cp.store.set("onboarded", true); d.setAttribute("data-closing", "1"); setTimeout(function () { try { d.close(); } catch (e) {} d.remove(); lockPage(false); }, 260); }
+    d.addEventListener("click", function (ev) {
+      if (ev.target.closest("[data-next]")) { if (at === n - 1) finish(); else go(at + 1); return; }
+      if (ev.target.closest("[data-skip]")) { finish(); return; }
+      var pb = ev.target.closest("[data-provider]");
+      if (pb && cp.account) { pb.disabled = true; cp.account.signIn(pb.getAttribute("data-provider")).then(function (a) { hNotify("SUCCESS"); toast("Signed in" + (a && a.name ? " as " + a.name : "") + "."); finish(); }).catch(function (e) { pb.disabled = false; var m = (e && e.message) || ""; if (!/cancel/i.test(m)) toast(m || "Sign-in didn't complete."); }); }
+    });
+    d.addEventListener("cancel", function (ev) { ev.preventDefault(); finish(); });
+    setTimeout(function () { if (typeof d.showModal === "function") d.showModal(); lockPage(true); paint(); }, 500);
+  }
+  /* a gentle word about signing in, on the third and eighth launch, if the account is still empty */
+  function signInNudge() {
+    var cp = CP(); if (!cp || !cp.store.get("onboarded")) return;
+    var n = (cp.store.get("launches", 0) || 0) + 1; cp.store.set("launches", n);
+    if ((n === 3 || n === 8) && !cp.account.get()) setTimeout(function () { toast("Sign in to keep your mixes with you. It's optional.", { action: "Sign in", ms: 7000, onAction: function () { cp.account.sheet(); } }); }, 2500);
+  }
+
+  /* ---- first launch: three lines, one button (kept for the ?sheet=welcome deep link) ---- */
   function welcome() {
     var cp = CP(); if (!cp || cp.store.get("onboarded")) return;
     var d = document.createElement("dialog"); d.className = "info info--cf"; d.id = "cfWelcome";
@@ -533,11 +652,11 @@
     mixThumb: mixThumb, mixCard: mixCard, paintThumbs: paintThumbs, reminders: { schedule: scheduleReminders, ask: notifAsk, allowed: notifAllowed }, widgetSync: widgetSync };
   function ready() {
     buildTabBar();
-    if (page === "index.html") wirePlates();
-    if (page === "frequencies.html") wireRoom();
+    if (page === "index.html") { wirePlates(); simplifyPlates(); }
+    if (page === "frequencies.html") { wireRoom(); simplifyRoom(); }
+    if (page === "law-of-one.html") simplifyLaw();
     wireNotifications(); wireDeepLinks();
-    var cp0 = CP(); if (cp0) cp0.ready.then(function () { widgetSync(); document.addEventListener("cf:mixes", widgetSync); });
-    if (!/[?&]sheet=/.test(location.search)) welcome();
+    var cp0 = CP(); if (cp0) cp0.ready.then(function () { widgetSync(); document.addEventListener("cf:mixes", widgetSync); if (!/[?&](sheet|snap)=/.test(location.search)) { tour(); signInNudge(); } });
     requestAnimationFrame(function () { requestAnimationFrame(hideSplash); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready); else ready();
