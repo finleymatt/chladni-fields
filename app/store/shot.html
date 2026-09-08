@@ -44,16 +44,17 @@
   var EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4"/><path d="M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z"/><circle cx="12" cy="12" r="2.9"/><path d="M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.6 18.4 4.9 19.3 4.5 19.6"/></g><circle cx="12" cy="12" r="1.1" fill="currentColor"/></svg>';
   var S = {
     "1": { intro: true },
-    "2": { eyebrow: "Cymatics · field register", h: 'Crop circles, <span class="amp">turned into sound</span>.', p: "Every famous formation read as a frequency, beside the pattern that tone raises in sand on a vibrating plate.", src: "../www/index.html?f=milkhill#console" },
-    "3": { dmt: true, eyebrow: "Your own tone", h: 'Sing into it. The plate <span class="cy">answers</span>.', p: "Real plate physics: every mode responds to the pitch and overtones of your voice or instrument, live.", src: "../www/index.html?mode=free&freq=330#console" },
-    "4": { eyebrow: "Twenty figures", h: 'From the Julia Set to the <span class="amp">Eye of Horus</span>.', p: "Fourteen formations and six ancient figures, each with its fundamental, its partials and its dossier of sources.", src: "../www/index.html?f=juliaset#console" },
-    "5": { dmt: true, eyebrow: "The Resonance Room", h: 'Tones to <span class="amp">leave on</span>.', p: "432, 528, 174 Hz, binaural beats and brown noise — soft timbres, a fade-out timer, the evidence labelled honestly.", src: "../www/frequencies.html#player" },
-    "6": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" },
-    "7": { eyebrow: "Free, with a Plus", h: 'Sleep mode, saved <span class="amp">mixes</span>, clean shares.', p: "Everything the site does is free. Plus keeps the room humming with the screen locked, from $0.99 a month.", src: "../www/you.html" }
+    "2": { dmt: true, eyebrow: "The Resonance Room", h: 'Tones to <span class="amp">leave on</span>.', p: "432, 528, 174 Hz, binaural beats and a breathing guide — soft timbres, a fade-out timer, the evidence labelled honestly.", src: "../www/frequencies.html?preset=winddown#player" },
+    "3": { eyebrow: "Sleep sounds", h: 'Rain, surf, wind, <span class="cy">fire</span>.', p: "Eight sleep sounds generated live, so they never loop. Layer one under a low hum, set the timer, and drift off.", src: "../www/frequencies.html?preset=rain#sleep" },
+    "4": { eyebrow: "Cymatics · field register", h: 'Crop circles, <span class="amp">turned into sound</span>.', p: "Every famous formation read as a frequency, beside the pattern that tone raises in sand on a vibrating plate.", src: "../www/index.html?f=milkhill#console" },
+    "5": { dmt: true, eyebrow: "Your own tone", h: 'Sing into it. The plate <span class="cy">answers</span>.', p: "Real plate physics: every mode responds to the pitch and overtones of your voice or instrument, live.", src: "../www/index.html?mode=free&freq=330#console" },
+    "6": { eyebrow: "Twenty figures", h: 'From the Julia Set to the <span class="amp">Eye of Horus</span>.', p: "Fourteen formations and six ancient figures, each with its fundamental, its partials and its dossier of sources.", src: "../www/index.html?f=juliaset#console" },
+    "7": { eyebrow: "Field guide", h: 'The Law of <span class="amp">One</span>, in nine readings.', p: "Densities, the Choice, harvest and the veil — the Ra Material, with the sessions they come from.", src: "../www/law-of-one.html?story=1" },
+    "8": { eyebrow: "Free, with a Plus", h: 'Sleep mode, saved <span class="amp">mixes</span>, clean shares.', p: "Everything the site does is free. Plus keeps the rain falling with the screen locked, from $0.99 a month.", src: "../www/you.html" }
   };
   var s = S[q.shot] || S["1"];
   // the framed page shares this file origin's storage: pick its theme here (dark as shipped, or the DMT palette)
-  try { localStorage.setItem("chladni-theme", "dark"); localStorage.setItem("chladni-vibe", s.dmt ? "dmt" : ""); localStorage.setItem("cf:onboarded", "true"); if (q.shot === "7") sessionStorage.removeItem("fakeplus"); } catch (e) {}
+  try { localStorage.setItem("chladni-theme", "dark"); localStorage.setItem("chladni-vibe", s.dmt ? "dmt" : ""); localStorage.setItem("cf:onboarded", "true"); sessionStorage.setItem("cf:launched", "1"); if (q.shot === "8") sessionStorage.removeItem("fakeplus"); } catch (e) {}
   if (s.intro) {
     document.body.innerHTML = '<div class="shot"><div class="grid"></div><div class="intro"><div class="ring"></div><div class="inner">' + EYE +
       '<h1>Chladni <span class="amp">Fields</span></h1><p>Crop circles, turned to sound.</p><div class="url">iamra.lol</div></div></div></div>';
@@ -61,13 +62,8 @@
   }
   document.body.innerHTML = '<div class="shot' + (s.dmt ? " dmt" : "") + '"><div class="grid"></div><div class="head"><p class="eyebrow">' + s.eyebrow + '</p><h1>' + s.h + '</h1><p>' + s.p + '</p></div>' +
     '<div class="phone"><iframe src="' + s.src + '"></iframe></div></div>';
-  if (q.shot === "5") {
-    // the Resonance Room with something playing: press the Wind down preset once the page is up
-    var fr = document.querySelector("iframe");
-    fr.addEventListener("load", function () { setTimeout(function () {
-      try { var d = fr.contentDocument, b = Array.prototype.find.call(d.querySelectorAll("button"), function (x) { return /wind down/i.test(x.textContent); }); if (b) b.click(); } catch (e) {}
-    }, 800); });
-  }
+  // the Resonance Room slides start a preset through the app's own ?preset= deep link (the frame is a
+  // separate file: origin, so nothing here can reach into it)
 })();
 </script>
 </body>

@@ -2956,6 +2956,8 @@
     $("#transportLbl").textContent = free ? "Your own tone · free plate" : "Playback";
     // desktop: bring the controls (and the console under them) into view; phones: the plates, with the controls right below
     var scrollTarget = window.innerWidth < 900 ? consoleEl : transportEl;
+    // in the app the plates sit right under the picker, so only scroll when they are actually out of view
+    if (scrollTo && document.documentElement.classList.contains("native")) { var box = scrollTarget.getBoundingClientRect(); scrollTo = box.top > window.innerHeight * 0.55 || box.bottom < 80; }
     if (scrollTo && !reduceMotion) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (scrollTo) scrollTarget.scrollIntoView();
     $("#fieldTag").textContent = free ? "Circular plate · the formation this sound would lay" : (f.group === "ancient" ? "Figure · in plan" : "Formation · aerial");

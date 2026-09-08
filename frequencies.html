@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0d120e" />
 <title>Resonance Room · Chladni Fields</title>
-<meta name="description" content="Calming tones to leave on: 432 Hz, 528 Hz, the Solfeggio set, binaural theta, brown noise — with soft timbres, a fade-out timer, and an honest note on what the evidence says." />
+<meta name="description" content="Calming tones to leave on: 432 Hz, 528 Hz, the Solfeggio set, binaural theta, rain, ocean waves and brown noise — with soft timbres, a fade-out timer, and an honest note on what the evidence says." />
 <link rel="canonical" href="https://iamra.lol/frequencies.html" />
 <link rel="icon" type="image/png" sizes="64x64" href="https://iamra.lol/favicon-64.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="https://iamra.lol/icon-512.png" />
@@ -14,14 +14,14 @@
 <meta property="og:site_name" content="Chladni Fields" />
 <meta property="og:url" content="https://iamra.lol/frequencies.html" />
 <meta property="og:title" content="The Resonance Room" />
-<meta property="og:description" content="Calming tones to sit inside — 432, 528, 174 Hz, binaural theta, brown noise — with warm timbres, a fade-out timer and the evidence labelled honestly." />
+<meta property="og:description" content="Calming tones to sit inside — 432, 528, 174 Hz, binaural theta, rain, surf and brown noise — with warm timbres, a fade-out timer and the evidence labelled honestly." />
 <meta property="og:image" content="https://iamra.lol/og-resonance.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Glowing concentric rings beside the words The Resonance Room." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="The Resonance Room" />
-<meta name="twitter:description" content="Calming tones to leave on — 432, 528, 174 Hz, binaural theta, brown noise — with the evidence labelled honestly." />
+<meta name="twitter:description" content="Calming tones to leave on — 432, 528, 174 Hz, binaural theta, rain, surf and brown noise — with the evidence labelled honestly." />
 <meta name="twitter:image" content="https://iamra.lol/og-resonance.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -312,6 +312,8 @@
         <div class="presets">
           <button class="preset" type="button" data-preset="winddown">Wind down<small>432 warm pad · theta beat · low</small></button>
           <button class="preset" type="button" data-preset="sleep">Deep sleep<small>136.1 Om · delta beat · brown noise</small></button>
+          <button class="preset" type="button" data-preset="rain">Rainy night<small>rain · 174 hum underneath</small></button>
+          <button class="preset" type="button" data-preset="shore">Shoreline<small>ocean waves · 136.1 Om · delta beat</small></button>
           <button class="preset" type="button" data-preset="reset">Reset<small>528 pad · 174 hum</small></button>
           <button class="preset" type="button" data-preset="focus">Focus<small>200 carrier · gamma 40 beat</small></button>
         </div>
@@ -341,20 +343,20 @@
     <div class="tones" id="tonesA"></div>
   </section>
 
+  <section class="group" aria-labelledby="g3" id="sleep">
+    <div class="group-head">
+      <h2 id="g3">Sleep sounds</h2>
+      <p>Not frequencies but beds: rain, surf, a stream, wind, a fire, a summer night, a fan, and the two noises. All of it is generated live, so it never loops. Layer one under a low hum, set the timer, and let it carry you off.</p>
+    </div>
+    <div class="tones" id="tonesC"></div>
+  </section>
+
   <section class="group" aria-labelledby="g2">
     <div class="group-head">
       <h2 id="g2">The Solfeggio set</h2>
       <p>Nine tones assigned meanings in the 1970s from a numerological reading of a mediaeval hymn. No controlled evidence apart from 528 Hz — but they sit well together, and the lower ones make good drones.</p>
     </div>
     <div class="tones" id="tonesB"></div>
-  </section>
-
-  <section class="group" aria-labelledby="g3">
-    <div class="group-head">
-      <h2 id="g3">Noise</h2>
-      <p>Not a frequency but a bed. Brown noise is the deepest and the kindest for long listening; pink noise is the classic sleep sound, with a recent caveat.</p>
-    </div>
-    <div class="tones" id="tonesC"></div>
   </section>
 
   <section class="notes">
@@ -435,8 +437,15 @@
     { id: "t741", hz: 741, group: "B", name: "741 Hz", tier: "tradition", text: "“Expression.” Getting bright — use the Warm pad timbre and short sessions." },
     { id: "t852", hz: 852, group: "B", name: "852 Hz", tier: "tradition", text: "“Intuition.” High and glassy; a short-sit tone, softly." },
     { id: "t963", hz: 963, group: "B", name: "963 Hz", tier: "tradition", text: "“Crown.” The highest of the set. Lovely for a minute over a low drone; not one to leave on." },
-    { id: "brown", hz: 0, kind: "brown", group: "C", name: "Brown noise", tier: "mixed", refs: [8], text: "Deep, rumbling, like surf from a distance. Masks a room well and is the gentlest bed for hours; sleep evidence is thin either way." },
-    { id: "pink", hz: 0, kind: "pink", group: "C", name: "Pink noise", tier: "mixed", refs: [8], text: "Rain-and-river noise, the classic sleep sound. Small older studies liked it; a 2025 study found it cut REM when left on all night. Use the timer." }
+    { id: "rain", hz: 0, kind: "rain", short: "rain", group: "C", name: "Rain", tier: "tradition", text: "Steady rain on a roof, with the drops picked out. The most-asked-for sleep sound there is: it sits over speech and traffic without ever asking for attention." },
+    { id: "ocean", hz: 0, kind: "ocean", short: "surf", group: "C", name: "Ocean waves", tier: "tradition", text: "Long swells breaking and drawing back about every eleven seconds — close to a slow breath, which is why it works. Deep, wide and unhurried." },
+    { id: "stream", hz: 0, kind: "stream", short: "brook", group: "C", name: "Stream", tier: "tradition", text: "A brook over stones: brighter than rain, with a burble that never repeats. Good for daytime focus as much as for sleep." },
+    { id: "wind", hz: 0, kind: "wind", short: "wind", group: "C", name: "Wind", tier: "tradition", text: "Wind moving through trees, rising and falling in slow gusts. Softer than the noises, and it pairs with any low hum." },
+    { id: "fire", hz: 0, kind: "fire", short: "fire", group: "C", name: "Fireplace", tier: "tradition", text: "A low fire with its crackle. Warm at the bottom, quiet at the top; leave it under 136.1 Hz for a winter room." },
+    { id: "night", hz: 0, kind: "night", short: "night", group: "C", name: "Summer night", tier: "tradition", text: "Crickets across a field, three of them, never quite in time. A sound most people last heard through an open window as a child." },
+    { id: "fan", hz: 0, kind: "fan", short: "fan", group: "C", name: "Fan", tier: "tradition", text: "A box fan on low: broad, even, with the faint whir of the blades. The sound half the world already sleeps to." },
+    { id: "brown", hz: 0, kind: "brown", short: "brown", group: "C", name: "Brown noise", tier: "mixed", refs: [8], text: "Deep, rumbling, like surf from a distance. Masks a room well and is the gentlest bed for hours; sleep evidence is thin either way." },
+    { id: "pink", hz: 0, kind: "pink", short: "pink", group: "C", name: "Pink noise", tier: "mixed", refs: [8], text: "Rain-and-river noise, the classic sleep sound. Small older studies liked it; a 2025 study found it cut REM when left on all night. Use the timer." }
   ];
 
   var actx = null, master = null, comp = null, playing = {}, timerHandle = null, timerEnds = 0;
@@ -475,7 +484,8 @@
       var d = buf.getChannelData(ch), last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
       for (var i = 0; i < len; i++) {
         var w = Math.random() * 2 - 1;
-        if (kind === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+        if (kind === "white") d[i] = w * 0.5;
+        else if (kind === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
         else { // pink: Paul Kellet's filter
           b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856; b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980;
           d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
@@ -485,13 +495,91 @@
     noiseBuf[kind] = buf; return buf;
   }
 
+  /* ---------- the sleep sounds: every one built live from noise and a few filters, nothing streamed ----------
+     Each builder wires its sources into `out` and records what it made on the voice so stopTone can clear it:
+     v.nodes for anything with a stop(), v.timers for the schedulers that place drops, crackles and chirps. */
+  function soundNodes(kind, out, v) {
+    v.timers = v.timers || [];
+    function noise(k) { var s = actx.createBufferSource(); s.buffer = noiseBuffer(k); s.loop = true; s.start(0, Math.random() * 3); v.nodes.push(s); return s; }
+    function filt(type, f, q) { var b = actx.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; return b; }
+    function gain(x) { var n = actx.createGain(); n.gain.value = x; return n; }
+    function chain() { for (var i = 0; i < arguments.length - 1; i++) arguments[i].connect(arguments[i + 1]); return arguments[arguments.length - 1]; }
+    function lfo(hz) { var o = actx.createOscillator(); o.frequency.value = hz; o.start(); v.nodes.push(o); return o; }
+    function mod(osc, depth, param) { var g = gain(depth); osc.connect(g); g.connect(param); }
+    function every(minMs, maxMs, fn) { var h = null; (function tick() { fn(actx.currentTime); h = setTimeout(tick, minMs + Math.random() * (maxMs - minMs)); })(); v.timers.push(function () { clearTimeout(h); }); }
+    function burst(g, peak, attack, decay, at) { try { g.gain.cancelScheduledValues(at); g.gain.setValueAtTime(0.001, at); g.gain.linearRampToValueAtTime(peak, at + attack); g.gain.exponentialRampToValueAtTime(0.001, at + attack + decay); } catch (e) {} }
+    var swell;
+    switch (kind) {
+      case "rain": {
+        // a wash of high noise for the body of the rain, gusting slowly; drops as short bright taps on top
+        var lp = filt("lowpass", 5200, 0.6); mod(lfo(0.06), 1400, lp.frequency);
+        chain(noise("white"), filt("highpass", 420), lp, gain(0.42), out);
+        var drops = gain(0.001); chain(noise("white"), filt("bandpass", 3600, 2.2), drops, out);
+        every(28, 95, function (t) { burst(drops, 0.18 + Math.random() * 0.45, 0.003, 0.02 + Math.random() * 0.05, t); });
+        break;
+      }
+      case "ocean": {
+        // one slow swell drives both the depth of the roar and the hiss of the foam: a wave every eleven seconds
+        swell = lfo(0.09);
+        var surfLp = filt("lowpass", 440, 0.8); mod(swell, 260, surfLp.frequency);
+        var surfG = gain(0.55); mod(swell, 0.38, surfG.gain);
+        chain(noise("brown"), surfLp, surfG, out);
+        var foam = gain(0.09); mod(swell, 0.08, foam.gain);
+        chain(noise("pink"), filt("highpass", 900), foam, out);
+        break;
+      }
+      case "stream": {
+        chain(noise("white"), filt("bandpass", 1400, 0.9), gain(0.34), out);
+        var bub = filt("bandpass", 3100, 3); mod(lfo(5.5), 900, bub.frequency);
+        chain(noise("white"), bub, gain(0.14), out);
+        chain(noise("brown"), filt("lowpass", 220), gain(0.35), out);
+        break;
+      }
+      case "wind": {
+        var bp = filt("bandpass", 520, 0.8), wg = gain(0.6);
+        chain(noise("pink"), bp, wg, out);
+        every(1400, 3200, function (t) { bp.frequency.setTargetAtTime(240 + Math.random() * 900, t, 1.4); wg.gain.setTargetAtTime(0.3 + Math.random() * 0.6, t, 1.6); });
+        break;
+      }
+      case "fire": {
+        var flame = gain(0.6); mod(lfo(0.37), 0.14, flame.gain);
+        chain(noise("brown"), filt("lowpass", 260), flame, out);
+        var crackle = gain(0.001); chain(noise("white"), filt("highpass", 1800), crackle, out);
+        every(40, 520, function (t) { burst(crackle, 0.15 + Math.random() * 0.7, 0.001, 0.01 + Math.random() * 0.03, t); });
+        break;
+      }
+      case "night": {
+        // three crickets at slightly different pitches, spread across the field, each chirping in its own time
+        [[3900, -0.6, 640, 1500], [4300, 0.05, 720, 1700], [4700, 0.6, 560, 1400]].forEach(function (c) {
+          var o = actx.createOscillator(); o.type = "sine"; o.frequency.value = c[0]; o.start(); v.nodes.push(o);
+          var cg = gain(0), pan = actx.createStereoPanner ? actx.createStereoPanner() : null; if (pan) pan.pan.value = c[1];
+          o.connect(cg); if (pan) { cg.connect(pan); pan.connect(out); } else cg.connect(out);
+          every(c[2], c[3], function (t) {
+            try { cg.gain.cancelScheduledValues(t); cg.gain.setValueAtTime(0, t); for (var k = 0; k < 11; k++) { cg.gain.linearRampToValueAtTime(0.11, t + k * 0.042 + 0.004); cg.gain.linearRampToValueAtTime(0, t + k * 0.042 + 0.024); } } catch (e) {}
+          });
+        });
+        chain(noise("pink"), filt("highpass", 2400), gain(0.035), out);
+        break;
+      }
+      case "fan": {
+        chain(noise("pink"), filt("lowpass", 1400, 0.7), gain(0.6), out);
+        [[60, 0.05], [120, 0.03]].forEach(function (h) { var o = actx.createOscillator(); o.frequency.value = h[0]; o.start(); v.nodes.push(o); chain(o, gain(h[1]), out); });
+        var whir = filt("bandpass", 900, 4); mod(lfo(21), 120, whir.frequency);
+        chain(noise("white"), whir, gain(0.07), out);
+        break;
+      }
+      default:
+        chain(noise(kind), out);
+    }
+  }
+
   function startTone(t) {
     ensureCtx(); unlockAudio();
     if (playing[t.id]) return;
     var now = actx.currentTime, g = actx.createGain(); g.gain.setValueAtTime(0.0001, now);
     var v = { t: t, gain: g, nodes: [], lfo: null };
     if (t.kind) {
-      var src = actx.createBufferSource(); src.buffer = noiseBuffer(t.kind); src.loop = true; src.connect(g); src.start(); v.nodes.push(src);
+      soundNodes(t.kind, g, v);
     } else {
       var timbre = $("#timbre").value, bin = $("#binBtn").getAttribute("data-on") === "1", beat = parseFloat($("#beat").value);
       var partials = timbre === "pure" ? [[1, 1]] : timbre === "bowl" ? [[1, 1], [1.003, 0.55], [2.71, 0.08], [2, 0.12]] : [[1, 1], [2, 0.18], [3, 0.07], [0.5, 0.12]];
@@ -522,6 +610,7 @@
     var v = playing[id]; if (!v) return;
     var now = actx.currentTime, f = fadeSec == null ? 2.5 : fadeSec;
     try { v.gain.gain.cancelScheduledValues(now); v.gain.gain.setValueAtTime(Math.max(0.0001, v.gain.gain.value), now); v.gain.gain.exponentialRampToValueAtTime(0.0001, now + f); } catch (e) {}
+    (v.timers || []).forEach(function (stop) { stop(); });
     setTimeout(function () { v.nodes.forEach(function (n) { try { n.stop(); n.disconnect(); } catch (e) {} }); if (v.lfo) try { v.lfo.stop(); } catch (e) {} try { v.gain.disconnect(); } catch (e) {} }, f * 1000 + 100);
     delete playing[id];
     document.getElementById("card-" + id).setAttribute("data-on", "0");
@@ -583,7 +672,7 @@
     var el = document.createElement("article"); el.className = "tone"; el.id = "card-" + t.id; el.setAttribute("data-on", "0");
     el.innerHTML =
       '<span class="badge" data-tier="' + t.tier + '">' + t.tier + '</span>' +
-      '<div class="hz">' + (t.kind ? '<span style="font-size:1.1rem">' + (t.kind === "brown" ? "brown" : "pink") + '</span>' : t.hz) + (t.kind ? "" : "<small>Hz</small>") + '</div>' +
+      '<div class="hz">' + (t.kind ? '<span style="font-size:1.1rem">' + (t.short || t.kind) + '</span>' : t.hz) + (t.kind ? "" : "<small>Hz</small>") + '</div>' +
       '<h3>' + t.name + refsHtml(t.refs || (t.group === "B" ? [10] : [])) + '</h3>' +
       '<p>' + t.text + '</p>' +
       '<div class="foot"><button class="go" id="go-' + t.id + '" type="button">Play</button>' +
@@ -608,6 +697,8 @@
   var PRESETS = {
     winddown: { tones: ["t432"], bin: true, beat: "6", timbre: "warm", master: 30 },
     sleep: { tones: ["t136", "brown"], bin: true, beat: "2", timbre: "warm", master: 28 },
+    rain: { tones: ["rain", "t174"], bin: false, beat: "2", timbre: "warm", master: 30 },
+    shore: { tones: ["ocean", "t136"], bin: true, beat: "2", timbre: "warm", master: 30 },
     reset: { tones: ["t528", "t174"], bin: false, beat: "6", timbre: "warm", master: 35 },
     focus: { tones: ["t285"], bin: true, beat: "40", timbre: "pure", master: 32 }
   };

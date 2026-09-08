@@ -22,7 +22,7 @@ Paste these into App Store Connect → My Apps → Chladni Fields → 1.0 Prepar
 
 ## Promotional text (170)
 
-Sing into your phone and watch a vibrating plate answer with a pattern. Twenty famous crop circles and ancient figures, each with its own note.
+Tones, rain and surf to fall asleep to, and a vibrating plate that answers your voice with a pattern. Twenty crop circles and ancient figures, each with its own note.
 
 ## Description (4000)
 
@@ -38,7 +38,8 @@ WHAT'S INSIDE
 • Real Chladni physics: forced-vibration modal superposition, Bessel modes on the round plate, and sand that settles along the nodal lines
 • A pitch detector and spectrum analyser that follow your voice or instrument live
 • "Why this shape" explains, for every figure, how close the plate can come to the original and why
-• The Resonance Room: 174, 432, 528 and 963 Hz and more, binaural beats, brown and pink noise, three timbres, a breathing guide and a fade-out timer, with the research behind each tone labelled honestly and footnoted
+• The Resonance Room: 174, 432, 528 and 963 Hz and more, binaural beats, three timbres, a breathing guide and a fade-out timer, with the research behind each tone labelled honestly and footnoted
+• Sleep sounds generated live so they never loop: rain, ocean waves, a stream, wind, a fireplace, a summer night of crickets, a fan, brown and pink noise — layer any of them under a tone
 • The Law of One in nine readings, with the sessions they come from
 • Three themes: dark, light, and a visionary palette
 
@@ -73,4 +74,4 @@ Sign-in is optional (Sign in with Apple and Google); the app is fully usable wit
 
 ## Screenshots
 
-`store/screenshots/iphone-6.9-1.png … -7.png` (1320×2868): 1 intro with the Eye of Ra, 2 plates, 3 sing (DMT theme), 4 figures, 5 Resonance Room (DMT theme), 6 Law of One, 7 Free vs Plus. Upload them in that order to the 6.9-inch iPhone slot; `iphone-6.5-*.png` are 1284×2778 copies for the 6.5-inch slot if it asks. iPad is not targeted, so no iPad screenshots are needed.
+`store/screenshots/iphone-6.9-1.png … -8.png` (1320×2868): 1 intro with the Eye of Ra, 2 Resonance Room (DMT theme), 3 sleep sounds, 4 plates, 5 sing (DMT theme), 6 figures, 7 Law of One, 8 Free vs Plus. `iphone-6.5-*.png` are 1284×2778 copies for the 6.5-inch slot. `node tools/asc-upload.js screenshots …` replaces both sets in App Store Connect through the API (or upload by hand in that order). iPad is not targeted, so no iPad screenshots are needed.

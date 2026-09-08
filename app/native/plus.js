@@ -37,14 +37,18 @@
     { id: "lol.iamra.chladni.tip.medium", label: "A lunch", price: "$2.99" },
     { id: "lol.iamra.chladni.tip.large", label: "A dinner", price: "$9.99" }
   ];
-  var productsLoaded = false;
+  var productsLoaded = false, productsLoading = null, productsError = "";
   function loadProducts() {
     if (productsLoaded || !Purchases) return Promise.resolve();
-    return Purchases.getProducts({}).then(function (r) {
+    if (productsLoading) return productsLoading;
+    productsLoading = Purchases.getProducts({}).then(function (r) {
       var by = {}; (r.products || []).forEach(function (p) { by[p.id] = p; });
       PLANS.concat(TIPS).forEach(function (x) { if (by[x.id]) { x.price = by[x.id].price; x.live = true; if (by[x.id].trial) x.trial = by[x.id].trial; } });
-      productsLoaded = true;
-    }).catch(function () {});
+      productsLoaded = PLANS.concat(TIPS).some(function (x) { return x.live; });
+      productsError = productsLoaded ? "" : "The App Store returned no products.";
+    }).catch(function (e) { productsError = (e && e.message) || "Couldn't reach the App Store."; })
+      .then(function () { productsLoading = null; });
+    return productsLoading;
   }
 
   /* ---- entitlements ---- */
@@ -102,50 +106,83 @@
     return d;
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
-  function planButtons() {
+  function trialText(p) { return p.trial ? p.trial.replace(/^(\d+)\s+(\w+)$/, function (m, n, u) { return n + " " + u + (n === "1" ? "" : "s") + " free"; }) : ""; }
+  function planButtons(selected) {
     return PLANS.map(function (p) {
-      return '<button class="cf-plan' + (p.best ? " cf-plan--best" : "") + '" type="button" data-buy="' + p.id + '"><b>' + esc(p.label) + '</b><span>' + esc(p.price) + ' <em>' + esc(p.per) + '</em></span><small>' + esc(p.trial ? p.trial.replace(/^(\d+)\s+(\w+)$/, "$1-$2 free trial") : p.note) + '</small>' + (p.best ? '<i>Best value</i>' : "") + '</button>';
+      return '<button class="cf-plan' + (p.best ? " cf-plan--best" : "") + '" type="button" role="radio" aria-pressed="' + (p.id === selected ? "true" : "false") + '" data-plan="' + p.id + '"><b>' + esc(p.label) + '</b><span>' + esc(p.price) + ' <em>' + esc(p.per) + '</em></span><small>' + esc(p.trial ? trialText(p) + ", then " + p.price : p.note) + '</small>' + (p.best ? '<i>Best value</i>' : "") + '</button>';
     }).join("");
   }
+  /* the paywall follows the iOS pattern: pick a plan, then one clear button does the buying; the button
+     also says plainly when the App Store hasn't answered, instead of a tap that does nothing */
   function paywall(reason, onSuccess) {
     var n = N(); if (n.haptic) n.haptic.impact("LIGHT");
+    var selected = PLANS[0].id;
     var d = sheet(
       '<div class="info-head"><p class="eyebrow">Chladni Plus</p><button class="info-close" type="button" data-close>Not now</button></div>' +
       '<div class="info-text cf-text">' +
       '<h2>Keep the room <span class="amp">humming</span>.</h2>' +
       (reason ? '<p class="cf-reason">' + esc(reason) + ' is part of Plus.</p>' : "") +
       '<ul class="cf-perks">' +
-      '<li><b>Sleep mode.</b> Tones keep playing with the screen locked, with lock-screen controls and timers up to 8 hours.</li>' +
+      '<li><b>Sleep mode.</b> Rain, surf and every tone keep playing with the screen locked, with lock-screen controls and timers up to 8 hours.</li>' +
       '<li><b>Saved mixes.</b> Keep as many as you like. Free keeps one.</li>' +
       '<li><b>Clean shares.</b> Plate stills for Instagram without the iamra.lol mark.</li>' +
       '<li><b>A supporter mark,</b> and a solo project that stays free for everyone else.</li>' +
       '</ul>' +
-      '<div class="cf-plans">' + planButtons() + '</div>' +
+      '<div class="cf-plans" role="radiogroup" aria-label="Plan">' + planButtons(selected) + '</div>' +
+      '<button class="cf-cta" type="button" data-cta disabled><span>Connecting to the App Store…</span></button>' +
       '<p class="cf-fine">Payment is charged to your Apple ID at confirmation. Subscriptions renew automatically at the same price until cancelled at least 24 hours before the end of the period, in Settings → Apple ID → Subscriptions. <a href="' + EULA + '">Terms of Use</a> · <a href="privacy.html">Privacy</a></p>' +
       '<div class="cf-row"><button class="cf-link" type="button" data-restore>Restore purchases</button></div>' +
       '</div>');
-    loadProducts().then(function () { var box = d.querySelector(".cf-plans"); if (box) box.innerHTML = planButtons(); });
+    var cta = d.querySelector("[data-cta]");
+    function plan() { return PLANS.filter(function (p) { return p.id === selected; })[0]; }
+    function paintCta() {
+      var p = plan();
+      cta.removeAttribute("data-error");
+      if (!Purchases) { cta.disabled = true; cta.innerHTML = "<span>Purchases aren't available in this build</span>"; return; }
+      if (productsLoading && !productsLoaded) { cta.disabled = true; cta.innerHTML = "<span>Connecting to the App Store…</span>"; return; }
+      if (!p.live) { cta.disabled = false; cta.setAttribute("data-error", "1"); cta.innerHTML = "<span>App Store unavailable · tap to retry</span><small>" + esc(productsError || "Check your connection") + "</small>"; return; }
+      cta.disabled = false;
+      cta.innerHTML = p.trial ? "<span>Try " + esc(trialText(p)) + "</span><small>then " + esc(p.price) + " " + esc(p.per) + " · cancel any time</small>"
+        : p.per === "once" ? "<span>Get Plus for " + esc(p.price) + "</span><small>one payment · yours for good</small>"
+        : "<span>Start Plus · " + esc(p.price) + " " + esc(p.per) + "</span><small>cancel any time in Settings</small>";
+    }
+    function paintPlans() { var box = d.querySelector(".cf-plans"); if (box) box.innerHTML = planButtons(selected); paintCta(); }
+    paintCta();
+    loadProducts().then(paintPlans);
     d.addEventListener("click", function (ev) {
-      var b = ev.target.closest ? ev.target.closest("[data-buy]") : null;
-      if (b) { buy(b.getAttribute("data-buy"), b, function () { d.close(); if (onSuccess) onSuccess(); }); return; }
+      var b = ev.target.closest ? ev.target.closest("[data-plan]") : null;
+      if (b) { selected = b.getAttribute("data-plan"); if (n.haptic) n.haptic.select(); paintPlans(); return; }
+      if (ev.target.closest && ev.target.closest("[data-cta]")) {
+        if (!plan().live) { cta.disabled = true; cta.innerHTML = "<span>Connecting to the App Store…</span>"; productsLoaded = false; loadProducts().then(paintPlans); return; }
+        buy(selected, cta, function () { d.close(); if (onSuccess) onSuccess(); }, "<span>Waiting for the App Store…</span>");
+        return;
+      }
       if (ev.target.closest && ev.target.closest("[data-restore]")) restore(ev.target.closest("[data-restore]"));
     });
     return d;
   }
-  function buy(id, btn, done) {
+  function buy(id, btn, done, busyHtml) {
     if (!Purchases) { toast("Purchases aren't available in this build."); return; }
     var n = N(); if (n.haptic) n.haptic.impact("LIGHT");
-    if (btn) { btn.setAttribute("data-busy", "1"); btn.disabled = true; }
-    Purchases.purchase({ id: id }).then(function (r) {
+    var was = btn ? btn.innerHTML : "";
+    if (btn) { btn.setAttribute("data-busy", "1"); btn.disabled = true; if (busyHtml) btn.innerHTML = busyHtml; }
+    var restoreBtn = function () { if (btn) { btn.removeAttribute("data-busy"); btn.disabled = false; if (busyHtml) btn.innerHTML = was; } };
+    var item = PLANS.concat(TIPS).filter(function (x) { return x.id === id; })[0];
+    var ready = item && item.live ? Promise.resolve() : loadProducts();
+    ready.then(function () {
+      if (item && !item.live) { restoreBtn(); toast(productsError ? "App Store: " + productsError : "The App Store didn't return that product. Try again in a moment."); return; }
+      return Purchases.purchase({ id: id }).then(function (r) {
+        restoreBtn();
       if (btn) { btn.removeAttribute("data-busy"); btn.disabled = false; }
-      if (r.state === "purchased") {
-        if (r.entitlements) setEnt(r.entitlements); else refresh();
-        if (TIPS.some(function (t) { return t.id === id; })) { store.set("tips", (store.get("tips", 0) || 0) + 1); document.dispatchEvent(new CustomEvent("cf:tips")); }
-        if (n.haptic) n.haptic.notify("SUCCESS");
-        if (done) done(r);
-      } else if (r.state === "pending") { toast("Waiting for approval — it unlocks once it's confirmed."); }
+        if (r.state === "purchased") {
+          if (r.entitlements) setEnt(r.entitlements); else refresh();
+          if (TIPS.some(function (t) { return t.id === id; })) { store.set("tips", (store.get("tips", 0) || 0) + 1); document.dispatchEvent(new CustomEvent("cf:tips")); }
+          if (n.haptic) n.haptic.notify("SUCCESS");
+          if (done) done(r);
+        } else if (r.state === "pending") { toast("Waiting for approval — it unlocks once it's confirmed."); }
+      });
     }).catch(function (e) {
-      if (btn) { btn.removeAttribute("data-busy"); btn.disabled = false; }
+      restoreBtn();
       toast((e && e.message) || "That didn't go through.");
     });
   }
@@ -201,6 +238,10 @@
     ent = store.get("ent", ent); account = store.get("account", account);
     return refresh();
   });
+  // warm the price list so the paywall opens with real prices, and honour ?sheet=paywall|tips|account
+  loadProducts();
+  var want = /[?&]sheet=(paywall|tips|account)/.exec(location.search);
+  if (want) booted.then(function () { setTimeout(function () { if (want[1] === "paywall") paywall(""); else if (want[1] === "tips") tipJar(); else accountSheet(); }, 500); });
 
   window.ChladniPlus = {
     ready: booted, has: has, ent: function () { return ent; }, refresh: refresh, paywall: paywall, tipJar: tipJar, restore: restore,

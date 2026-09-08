@@ -14,13 +14,16 @@ The consequence worth knowing: the Plus unlock is tied to the buyer's **Apple ID
 | | Free | Chladni Plus |
 |---|---|---|
 | All 20 figures, both plates, microphone, Resonance Room, Law of One | ✓ | ✓ |
+| All sleep sounds (rain, ocean, stream, wind, fire, summer night, fan, brown and pink noise), layered with any tone | ✓ | ✓ |
 | Plays while the app is open; fade-out timers to 90 min | ✓ | ✓ |
 | **Sleep mode:** keeps playing with the screen locked, lock-screen controls, timers to 8 h | – | ✓ |
 | **Saved mixes** | 1 | unlimited |
 | **Share plate stills** | with a small iamra.lol mark | clean |
 | Supporter mark in You | – | ✓ |
 
-Why these: sleep tones are the one thing people leave running for hours, so "keeps playing with the screen off" is the feature worth a dollar; the free tier stays exactly as generous as the website so nobody feels cheated; shares stay free because a watermarked share is marketing.
+Why these: sleep sounds are the one thing people leave running for hours, and nobody falls asleep with the screen on, so "keeps playing with the screen off" is the feature worth a dollar. The sounds themselves stay free so the app is genuinely useful (and reviewable) without paying: a free user hears rain for as long as the phone is awake, then the fade-out on lock is the honest nudge to Plus. The free tier stays exactly as generous as the website so nobody feels cheated; shares stay free because a watermarked share is marketing.
+
+**Products only reach the app once each one is "Ready to Submit".** StoreKit (sandbox and TestFlight included) returns nothing for a product in "Missing Metadata", and the usual missing piece is the App Review screenshot. `tools/asc-upload.js review-shots` uploads one to every product through the API.
 
 ### Prices and product IDs (create these in App Store Connect → the app → Subscriptions / In-App Purchases)
 

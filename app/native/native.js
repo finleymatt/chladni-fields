@@ -9,6 +9,11 @@
   root.classList.add("native");
   var P = cap.Plugins || {};
   var page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+  // the app opens on the Resonance Room; the plates page stays the site's front door, so deep links keep working
+  if (page === "index.html" && !location.search && !location.hash) {
+    var launched = false; try { launched = sessionStorage.getItem("cf:launched") === "1"; sessionStorage.setItem("cf:launched", "1"); } catch (e) {}
+    if (!launched) { location.replace("frequencies.html"); return; }
+  }
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var $ = function (s) { return document.querySelector(s); };
   var CP = function () { return window.ChladniPlus; };
@@ -37,17 +42,21 @@
     try { if (P.Browser) P.Browser.open({ url: href, presentationStyle: "popover" }); else window.open(href, "_blank"); } catch (e) { window.open(href, "_blank"); }
   }, true);
 
-  /* ---- toast: a pill above the tab bar ---- */
-  var toastTimer = null;
+  /* ---- toast: a pill above the tab bar. Shown as a popover so it stacks above an open sheet
+          (a modal dialog lives in the top layer; anything plain in the body would be hidden beneath it) ---- */
+  var toastTimer = null, toastHideTimer = null;
   function toast(text, opts) {
     opts = opts || {};
-    var t = $("#cfToast"); if (!t) { t = document.createElement("div"); t.id = "cfToast"; t.className = "cf-toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+    var t = $("#cfToast");
+    if (!t) { t = document.createElement("div"); t.id = "cfToast"; t.className = "cf-toast"; t.setAttribute("role", "status"); if ("popover" in t) t.setAttribute("popover", "manual"); document.body.appendChild(t); }
     t.innerHTML = "<span></span>" + (opts.action ? '<button type="button"></button>' : "");
     t.querySelector("span").textContent = text;
     if (opts.action) { var b = t.querySelector("button"); b.textContent = opts.action; b.addEventListener("click", function () { hide(); if (opts.onAction) opts.onAction(); }); }
-    t.setAttribute("data-show", "1");
+    clearTimeout(toastHideTimer);
+    try { if (t.showPopover && !t.matches(":popover-open")) t.showPopover(); } catch (e) {}
+    requestAnimationFrame(function () { t.setAttribute("data-show", "1"); });
     clearTimeout(toastTimer); toastTimer = setTimeout(hide, opts.ms || (opts.action ? 6000 : 3200));
-    function hide() { t.removeAttribute("data-show"); }
+    function hide() { t.removeAttribute("data-show"); toastHideTimer = setTimeout(function () { try { if (t.hidePopover) t.hidePopover(); } catch (e) {} }, 260); }
   }
 
   /* ---- tab bar: the sections, switched without piling up history (so the edge-swipe back gesture
@@ -59,8 +68,8 @@
     you: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9.25"/><circle cx="12" cy="10" r="3.2"/><path d="M5.8 18.6c1.4-2.6 3.6-3.9 6.2-3.9s4.8 1.3 6.2 3.9"/></svg>'
   };
   var TABS = [
-    { id: "plates", href: "index.html", label: "Plates" },
     { id: "room", href: "frequencies.html", label: "Resonance" },
+    { id: "plates", href: "index.html", label: "Plates" },
     { id: "law", href: "law-of-one.html", label: "Law of One" },
     { id: "you", href: "you.html", label: "You" }
   ];
@@ -84,6 +93,11 @@
   function paintPlusDot() { var a = $('.tabbar a[data-tab="you"]'), cp = CP(); if (a) a.setAttribute("data-plus", cp && cp.has() ? "1" : "0"); }
 
   /* ---- bottom sheets: the site's dialogs, with a grabber and a flick-down to dismiss ---- */
+  var openSheets = 0;
+  function lockPage(on) {
+    openSheets = Math.max(0, openSheets + (on ? 1 : -1));
+    root.classList.toggle("cf-locked", openSheets > 0);
+  }
   function sheetify(dlg) {
     if (dlg.getAttribute("data-sheet") === "1") return; dlg.setAttribute("data-sheet", "1");
     var startY = 0, dy = 0, dragging = false, scroller = null;
@@ -91,6 +105,9 @@
       while (el && el !== dlg) { if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) return el; el = el.parentElement; }
       return null;
     }
+    // the page behind a sheet holds still: no scroll chaining out of the sheet, no rubber-banding the document
+    var wasOpen = dlg.open; if (wasOpen) lockPage(true);
+    new MutationObserver(function () { if (dlg.open !== wasOpen) { wasOpen = dlg.open; lockPage(wasOpen); } }).observe(dlg, { attributes: true, attributeFilter: ["open"] });
     dlg.addEventListener("touchstart", function (e) {
       if (e.touches.length !== 1) return;
       scroller = scrollable(e.target); startY = e.touches[0].clientY; dy = 0; dragging = true;
@@ -99,8 +116,9 @@
     dlg.addEventListener("touchmove", function (e) {
       if (!dragging) return;
       var y = e.touches[0].clientY - startY;
-      if (scroller && scroller.scrollTop > 0) { dy = 0; return; }
-      if (y < 0) { dy = 0; dlg.style.transform = ""; return; }
+      var atEnd = scroller && scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+      if (scroller && scroller.scrollTop > 0) { dy = 0; if (y < 0 && atEnd && e.cancelable) e.preventDefault(); return; }
+      if (y < 0) { dy = 0; dlg.style.transform = ""; if ((!scroller || atEnd) && e.cancelable) e.preventDefault(); return; }
       dy = y; dlg.style.transform = "translateY(" + y + "px)";
       if (e.cancelable && y > 4) e.preventDefault();
     }, { passive: false });
@@ -129,9 +147,9 @@
     d.innerHTML = '<div class="info-head"><p class="eyebrow">Welcome</p><button class="info-close" type="button" data-close>Skip</button></div>' +
       '<div class="info-text cf-text"><h2>Sound you can <span class="amp">see</span>.</h2>' +
       '<ul class="cf-steps">' +
+      '<li><span class="cf-ic">' + ICONS.room + '</span><div><b>Leave a tone on</b>The Resonance Room: 432, 528, rain, surf, brown noise, a timer. Save the mixes you like.</div></li>' +
       '<li><span class="cf-ic">' + ICONS.plates + '</span><div><b>Pick a formation</b>Swipe the plates. Play its tone and watch the sand settle into the figure it raises.</div></li>' +
       '<li><span class="cf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><div><b>Sing into it</b>Your own tone, or the microphone: the free plate answers your voice, live.</div></li>' +
-      '<li><span class="cf-ic">' + ICONS.room + '</span><div><b>Leave a tone on</b>The Resonance Room: 432, 528, brown noise, a timer. Save the mixes you like.</div></li>' +
       '</ul><div class="cf-row"><button class="cf-primary" type="button" data-close>Let\'s go</button></div>' +
       '<p class="cf-fine">No account needed. The microphone is analysed on your phone and never recorded.</p></div>';
     document.body.appendChild(d); sheetify(d);
@@ -244,7 +262,9 @@
       presets.insertBefore(box, presets.firstChild);
       paintMixes(); document.addEventListener("cf:mixes", paintMixes); document.addEventListener("cf:plus", paintMixes);
     }
-    // deep link from the You tab: frequencies.html?mix=<id>
+    // deep links: frequencies.html?preset=<id> starts a preset; ?mix=<id> restores a saved mix from the You tab
+    var pm = /[?&]preset=([a-z]+)/.exec(location.search);
+    if (pm) setTimeout(function () { var b = document.querySelector('.preset[data-preset="' + pm[1] + '"]'); if (b) b.click(); }, 500);
     var m = /[?&]mix=([^&]+)/.exec(location.search);
     if (m) { var cp0 = CP(); if (cp0) cp0.ready.then(function () { var mix = cp0.mixes.list().filter(function (x) { return x.id === decodeURIComponent(m[1]); })[0]; if (mix) setTimeout(function () { applyMix(mix); }, 400); }); }
   }
@@ -267,7 +287,7 @@
       var id = card.id.replace(/^card-/, ""), on = card.getAttribute("data-on") === "1", want = mix.tones.indexOf(id) >= 0, go = $("#go-" + id);
       if (go && on !== want) go.click();
     });
-    var pl = $("#player"); if (pl && window.innerWidth < 900) pl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    var pl = $("#player"); if (pl && window.innerWidth < 900) { var box = pl.getBoundingClientRect(); if (box.top < 0 || box.top > window.innerHeight * 0.55) pl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }); }
   }
   function paintMixes() {
     var box = $("#cfMixes"), cp = CP(); if (!box || !cp) return;
@@ -299,8 +319,9 @@
   window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify } };
   function ready() {
     buildTabBar();
-    if (page === "index.html") { wirePlates(); welcome(); }
+    if (page === "index.html") wirePlates();
     if (page === "frequencies.html") wireRoom();
+    if (!/[?&]sheet=/.test(location.search)) welcome();
     requestAnimationFrame(function () { requestAnimationFrame(hideSplash); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready); else ready();

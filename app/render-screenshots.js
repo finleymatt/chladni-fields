@@ -18,7 +18,9 @@ async function main() {
   // the framed pages get the app's own chrome (tab bar, native layout) through a stand-in bridge, in every frame
   await send("Page.addScriptToEvaluateOnNewDocument", { source: fs.readFileSync(path.join(__dirname, "store", "fake-bridge.js"), "utf8") +
     "\ndocument.addEventListener('DOMContentLoaded', function () { var s = document.createElement('style'); s.textContent = 'html{scrollbar-width:none}::-webkit-scrollbar{display:none}'; document.head.appendChild(s); });" });
-  for (const n of ["1", "2", "3", "4", "5", "6", "7"]) {
+  const only = process.argv[2];
+  for (const n of ["1", "2", "3", "4", "5", "6", "7", "8"]) {
+    if (only && only !== n) continue;
     await send("Page.navigate", { url: `file:///${SRC}?shot=${n}&t=${Date.now()}` });
     await sleep(n === "1" ? 6000 : 4500); // the framed page boots its audio engine and settles its plate
     const r = await send("Page.captureScreenshot", { format: "png", clip: { x: 0, y: 0, width: 440, height: 956, scale: 1 } });
