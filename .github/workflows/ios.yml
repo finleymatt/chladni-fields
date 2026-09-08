@@ -13,19 +13,59 @@ name: iOS · build and upload
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: "upload: sign and send to App Store Connect · compile-check: build for the simulator, no Apple account needed"
+        type: choice
+        options: [upload, compile-check]
+        default: upload
       version:
         description: "Marketing version (e.g. 1.0.1). Leave blank to use app/package.json."
         required: false
         default: ""
   push:
     tags: ["ios-v*"]
+    branches: [main]
+    paths: ["app/**", ".github/workflows/ios.yml"]
 
 concurrency:
-  group: ios-release
+  group: ios-${{ github.event.inputs.mode || (github.ref_type == 'tag' && 'upload' || 'check') }}
   cancel-in-progress: false
 
 jobs:
+  # Compiles the app for the iOS Simulator with signing off: catches Swift and package errors without any secrets.
+  compile-check:
+    if: ${{ github.event.inputs.mode == 'compile-check' || (github.event_name == 'push' && github.ref_type == 'branch') }}
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: node build-www.js && npx cap sync ios
+      - name: Build for the simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tee "$RUNNER_TEMP/compile.log" | grep -E "error:|warning: .*\.swift|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/compile.log"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compile-log
+          path: ${{ runner.temp }}/compile.log
+          if-no-files-found: ignore
+
   build:
+    if: ${{ github.event.inputs.mode == 'upload' || github.ref_type == 'tag' }}
     runs-on: macos-15
     timeout-minutes: 60
     defaults:
