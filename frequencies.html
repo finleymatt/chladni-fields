@@ -127,6 +127,9 @@
   .preset small { display: block; font-size: 9.5px; letter-spacing: .08em; text-transform: none; color: var(--muted); }
   .help { margin: 0; padding: 12px 14px; border: 1px solid var(--sound); border-radius: var(--r); background: color-mix(in srgb, var(--sound) 10%, var(--panel)); font-size: .95rem; line-height: 1.5; display: none; }
   .help[data-show="1"] { display: block; }
+  .pomo-line { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); align-self: center; font-variant-numeric: tabular-nums; min-height: 1em; }
+  .pomo-line[data-phase="work"] { color: var(--sound); }
+  .pomo-line[data-phase="rest"] { color: var(--accent); }
   .help b { font-family: var(--font-display); color: var(--sound); }
 
   /* ---------- tone cards ---------- */
@@ -146,6 +149,11 @@
   .tone .go { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--sound); background: transparent; border: 1px solid var(--sound); border-radius: var(--r); padding: 9px 14px; min-height: 40px; cursor: pointer; }
   .tone[data-on="1"] .go { background: var(--sound); color: var(--plate-bg); }
   .tone .lvl { display: grid; grid-template-columns: 1fr 4ch; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .tone .tn { grid-column: 1 / -1; grid-template-columns: auto 1fr 8ch; }
+  .tone .tn span:last-child { white-space: nowrap; text-align: right; }
+  .tone .tn .tn-lbl { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; }
+  .tone .tn input::-webkit-slider-thumb { background: var(--accent); width: 18px; height: 18px; margin-top: -6px; }
+  .tone .tn input::-moz-range-thumb { background: var(--accent); }
   .tone .lvl input { accent-color: var(--sound); }
   .tone .lvl input::-webkit-slider-thumb { background: var(--sound); width: 22px; height: 22px; margin-top: -8px; }
   .tone .lvl input::-moz-range-thumb { background: var(--sound); }
@@ -198,15 +206,17 @@
     .ctl--slider { max-width: none; flex-basis: 100%; }
     .tones { grid-template-columns: 1fr; gap: 8px; }
     /* compact cards: pitch, name and Play within thumb reach; the note stays, smaller */
-    .tone { padding: 10px 12px 10px; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; grid-template-areas: "hz name go" "hz text go" "lvl lvl lvl"; gap: 2px 12px; align-items: center; }
+    .tone { padding: 10px 12px 10px; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto auto; grid-template-areas: "hz name go" "hz text go" "lvl lvl lvl" "tn tn tn"; gap: 2px 12px; align-items: center; }
     .tone .hz { grid-area: hz; font-size: 1.35rem; align-self: start; }
     .tone .hz small { display: block; margin: 2px 0 0; font-size: .5rem; }
     .tone h3 { grid-area: name; font-size: .95rem; padding-right: 64px; }
     .tone p { grid-area: text; font-size: .82rem; line-height: 1.4; }
     .tone .badge { top: 8px; right: 12px; }
     .tone .foot { display: contents; }
-    .tone .go { grid-area: go; align-self: center; padding: 9px 12px; }
+    /* Play sits under the tier badge, never on it, however short the card's note */
+    .tone .go { grid-area: go; align-self: start; margin-top: 30px; padding: 9px 12px; }
     .tone .lvl { grid-area: lvl; margin-top: 6px; }
+    .tone .tn { grid-area: tn; margin-top: 0; }
   }
   @media (prefers-reduced-motion: reduce) { .breath canvas { opacity: .9; } }
 </style>
@@ -298,6 +308,7 @@
               <option value="6" selected>Theta 6 Hz · calm</option>
               <option value="7.83">Schumann 7.83 Hz</option>
               <option value="10">Alpha 10 Hz · relaxed focus</option>
+              <option value="15">Beta 15 Hz · focus</option>
               <option value="40">Gamma 40 Hz · alert</option>
             </select>
           </div>
@@ -305,6 +316,18 @@
         <div class="ctl">
           <span class="lbl">Breathing swell</span>
           <button class="toggle" id="breathBtn" type="button" data-on="1" aria-pressed="true">On · 6 breaths / min</button>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Pomodoro · work sprints</span>
+          <div class="row" style="gap:8px">
+            <select id="pomo" aria-label="Pomodoro sprints">
+              <option value="0" selected>Off</option>
+              <option value="25-5">25 min work · 5 rest</option>
+              <option value="50-10">50 · 10</option>
+              <option value="90-15">90 · 15</option>
+            </select>
+            <span class="pomo-line" id="pomoLine" aria-live="polite"></span>
+          </div>
         </div>
       </div>
       <div class="ctl presets-ctl">
@@ -315,7 +338,8 @@
           <button class="preset" type="button" data-preset="rain">Rainy night<small>rain · 174 hum underneath</small></button>
           <button class="preset" type="button" data-preset="shore">Shoreline<small>ocean waves · 136.1 Om · delta beat</small></button>
           <button class="preset" type="button" data-preset="reset">Reset<small>528 pad · 174 hum</small></button>
-          <button class="preset" type="button" data-preset="focus">Focus<small>200 carrier · gamma 40 beat</small></button>
+          <button class="preset" type="button" data-preset="work">Work<small>stream · 174 carrier · beta 15 beat</small></button>
+          <button class="preset" type="button" data-preset="focus">Focus<small>285 carrier · gamma 40 beat</small></button>
         </div>
       </div>
       <p class="status" id="status" data-live="0">ready · sound starts on your first tap</p>
@@ -392,7 +416,7 @@
   </section>
 
   <div class="bottom">
-    <span>Web Audio · generated live, nothing streamed or recorded</span>
+    <span>Web Audio · generated live, nothing streamed or recorded · <a href="faq.html" style="color:var(--accent)">FAQ</a></span>
     <span>Designed by Matt Finley</span>
   </div>
 </div>
@@ -476,10 +500,12 @@
   function masterTarget() { return Math.pow(parseFloat($("#master").value) / 100, 1.8) * 0.9; }
   function toneLevel(t) { var el = document.getElementById("lvl-" + t.id); return Math.pow(parseFloat(el.value) / 100, 2) * (t.kind ? 0.25 : 0.32); }
 
-  var noiseBuf = {};
-  function noiseBuffer(kind) {
-    if (noiseBuf[kind]) return noiseBuf[kind];
-    var len = actx.sampleRate * 4, buf = actx.createBuffer(2, len, actx.sampleRate);
+  /* every builder takes the context it should build in: the live one, or an offline one when the app
+     renders the current mix to a file for native background playback */
+  function noiseBuffer(kind, ctx) {
+    ctx = ctx || actx; var store = ctx.__noise || (ctx.__noise = {});
+    if (store[kind]) return store[kind];
+    var len = ctx.sampleRate * 4, buf = ctx.createBuffer(2, len, ctx.sampleRate);
     for (var ch = 0; ch < 2; ch++) {
       var d = buf.getChannelData(ch), last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
       for (var i = 0; i < len; i++) {
@@ -492,119 +518,162 @@
         }
       }
     }
-    noiseBuf[kind] = buf; return buf;
+    store[kind] = buf; return buf;
   }
 
   /* ---------- the sleep sounds: every one built live from noise and a few filters, nothing streamed ----------
      Each builder wires its sources into `out` and records what it made on the voice so stopTone can clear it:
-     v.nodes for anything with a stop(), v.timers for the schedulers that place drops, crackles and chirps. */
-  function soundNodes(kind, out, v) {
-    v.timers = v.timers || [];
-    function noise(k) { var s = actx.createBufferSource(); s.buffer = noiseBuffer(k); s.loop = true; s.start(0, Math.random() * 3); v.nodes.push(s); return s; }
-    function filt(type, f, q) { var b = actx.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; return b; }
-    function gain(x) { var n = actx.createGain(); n.gain.value = x; return n; }
+     v.nodes for anything with a stop(), v.timers for the schedulers that place drops, crackles and chirps.
+     `tone` is the sound's colour in Hz (the card's second slider): the centre of its main filter, or the
+     crickets' pitch. `sched` is null live; when rendering offline it carries the duration so the schedulers
+     place every drop and crackle ahead of time instead of on a timer. */
+  var TONE = { rain: [5200, 1500, 9000], ocean: [440, 150, 1200], stream: [1400, 400, 4000], wind: [520, 200, 1600], fire: [260, 100, 800], night: [4300, 3000, 6000], fan: [1400, 300, 4000], brown: [8000, 200, 8000], pink: [8000, 200, 8000] };
+  function soundNodes(kind, out, v, ctx, tone, sched) {
+    ctx = ctx || actx; v.timers = v.timers || []; var toneParams = [];
+    var T = tone || (TONE[kind] || [1000])[0];
+    function noise(k) { var s = ctx.createBufferSource(); s.buffer = noiseBuffer(k, ctx); s.loop = true; s.start(0, Math.random() * 3); v.nodes.push(s); return s; }
+    function filt(type, f, q) { var b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; return b; }
+    function tf(type, ratio, q) { var b = filt(type, T * ratio, q); toneParams.push([b.frequency, ratio]); return b; }
+    function gain(x) { var n = ctx.createGain(); n.gain.value = x; return n; }
     function chain() { for (var i = 0; i < arguments.length - 1; i++) arguments[i].connect(arguments[i + 1]); return arguments[arguments.length - 1]; }
-    function lfo(hz) { var o = actx.createOscillator(); o.frequency.value = hz; o.start(); v.nodes.push(o); return o; }
+    function lfo(hz) { var o = ctx.createOscillator(); o.frequency.value = hz; o.start(); v.nodes.push(o); return o; }
     function mod(osc, depth, param) { var g = gain(depth); osc.connect(g); g.connect(param); }
-    function every(minMs, maxMs, fn) { var h = null; (function tick() { fn(actx.currentTime); h = setTimeout(tick, minMs + Math.random() * (maxMs - minMs)); })(); v.timers.push(function () { clearTimeout(h); }); }
-    function burst(g, peak, attack, decay, at) { try { g.gain.cancelScheduledValues(at); g.gain.setValueAtTime(0.001, at); g.gain.linearRampToValueAtTime(peak, at + attack); g.gain.exponentialRampToValueAtTime(0.001, at + attack + decay); } catch (e) {} }
+    function every(minMs, maxMs, fn) {
+      if (sched) { for (var t = Math.random() * 0.3; t < sched.dur; t += (minMs + Math.random() * (maxMs - minMs)) / 1000) fn(t); return; }
+      var h = null; (function tick() { fn(ctx.currentTime); h = setTimeout(tick, minMs + Math.random() * (maxMs - minMs)); })(); v.timers.push(function () { clearTimeout(h); });
+    }
+    function burst(g, peak, attack, decay, at) { try { g.gain.setValueAtTime(0.001, at); g.gain.linearRampToValueAtTime(peak, at + attack); g.gain.exponentialRampToValueAtTime(0.001, at + attack + decay); } catch (e) {} }
     var swell;
     switch (kind) {
       case "rain": {
         // a wash of high noise for the body of the rain, gusting slowly; drops as short bright taps on top
-        var lp = filt("lowpass", 5200, 0.6); mod(lfo(0.06), 1400, lp.frequency);
+        var lp = tf("lowpass", 1, 0.6); mod(lfo(0.06), T * 0.27, lp.frequency);
         chain(noise("white"), filt("highpass", 420), lp, gain(0.42), out);
-        var drops = gain(0.001); chain(noise("white"), filt("bandpass", 3600, 2.2), drops, out);
+        var drops = gain(0.001); chain(noise("white"), tf("bandpass", 0.69, 2.2), drops, out);
         every(28, 95, function (t) { burst(drops, 0.18 + Math.random() * 0.45, 0.003, 0.02 + Math.random() * 0.05, t); });
         break;
       }
       case "ocean": {
         // one slow swell drives both the depth of the roar and the hiss of the foam: a wave every eleven seconds
         swell = lfo(0.09);
-        var surfLp = filt("lowpass", 440, 0.8); mod(swell, 260, surfLp.frequency);
+        var surfLp = tf("lowpass", 1, 0.8); mod(swell, T * 0.6, surfLp.frequency);
         var surfG = gain(0.55); mod(swell, 0.38, surfG.gain);
         chain(noise("brown"), surfLp, surfG, out);
         var foam = gain(0.09); mod(swell, 0.08, foam.gain);
-        chain(noise("pink"), filt("highpass", 900), foam, out);
+        chain(noise("pink"), tf("highpass", 2.05), foam, out);
         break;
       }
       case "stream": {
-        chain(noise("white"), filt("bandpass", 1400, 0.9), gain(0.34), out);
-        var bub = filt("bandpass", 3100, 3); mod(lfo(5.5), 900, bub.frequency);
+        chain(noise("white"), tf("bandpass", 1, 0.9), gain(0.34), out);
+        var bub = tf("bandpass", 2.2, 3); mod(lfo(5.5), T * 0.64, bub.frequency);
         chain(noise("white"), bub, gain(0.14), out);
         chain(noise("brown"), filt("lowpass", 220), gain(0.35), out);
         break;
       }
       case "wind": {
-        var bp = filt("bandpass", 520, 0.8), wg = gain(0.6);
+        var bp = tf("bandpass", 1, 0.8), wg = gain(0.6);
         chain(noise("pink"), bp, wg, out);
-        every(1400, 3200, function (t) { bp.frequency.setTargetAtTime(240 + Math.random() * 900, t, 1.4); wg.gain.setTargetAtTime(0.3 + Math.random() * 0.6, t, 1.6); });
+        every(1400, 3200, function (t) { var base = toneParams[0][2] || T; bp.frequency.setTargetAtTime(base * (0.46 + Math.random() * 1.75), t, 1.4); wg.gain.setTargetAtTime(0.3 + Math.random() * 0.6, t, 1.6); });
         break;
       }
       case "fire": {
         var flame = gain(0.6); mod(lfo(0.37), 0.14, flame.gain);
-        chain(noise("brown"), filt("lowpass", 260), flame, out);
+        chain(noise("brown"), tf("lowpass", 1), flame, out);
         var crackle = gain(0.001); chain(noise("white"), filt("highpass", 1800), crackle, out);
         every(40, 520, function (t) { burst(crackle, 0.15 + Math.random() * 0.7, 0.001, 0.01 + Math.random() * 0.03, t); });
         break;
       }
       case "night": {
         // three crickets at slightly different pitches, spread across the field, each chirping in its own time
-        [[3900, -0.6, 640, 1500], [4300, 0.05, 720, 1700], [4700, 0.6, 560, 1400]].forEach(function (c) {
-          var o = actx.createOscillator(); o.type = "sine"; o.frequency.value = c[0]; o.start(); v.nodes.push(o);
-          var cg = gain(0), pan = actx.createStereoPanner ? actx.createStereoPanner() : null; if (pan) pan.pan.value = c[1];
+        [[0.907, -0.6, 640, 1500], [1, 0.05, 720, 1700], [1.093, 0.6, 560, 1400]].forEach(function (c) {
+          var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = T * c[0]; o.start(); v.nodes.push(o); toneParams.push([o.frequency, c[0]]);
+          var cg = gain(0), pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null; if (pan) pan.pan.value = c[1];
           o.connect(cg); if (pan) { cg.connect(pan); pan.connect(out); } else cg.connect(out);
           every(c[2], c[3], function (t) {
-            try { cg.gain.cancelScheduledValues(t); cg.gain.setValueAtTime(0, t); for (var k = 0; k < 11; k++) { cg.gain.linearRampToValueAtTime(0.11, t + k * 0.042 + 0.004); cg.gain.linearRampToValueAtTime(0, t + k * 0.042 + 0.024); } } catch (e) {}
+            try { cg.gain.setValueAtTime(0, t); for (var k = 0; k < 11; k++) { cg.gain.linearRampToValueAtTime(0.11, t + k * 0.042 + 0.004); cg.gain.linearRampToValueAtTime(0, t + k * 0.042 + 0.024); } } catch (e) {}
           });
         });
         chain(noise("pink"), filt("highpass", 2400), gain(0.035), out);
         break;
       }
       case "fan": {
-        chain(noise("pink"), filt("lowpass", 1400, 0.7), gain(0.6), out);
-        [[60, 0.05], [120, 0.03]].forEach(function (h) { var o = actx.createOscillator(); o.frequency.value = h[0]; o.start(); v.nodes.push(o); chain(o, gain(h[1]), out); });
+        chain(noise("pink"), tf("lowpass", 1, 0.7), gain(0.6), out);
+        [[60, 0.05], [120, 0.03]].forEach(function (h) { var o = ctx.createOscillator(); o.frequency.value = h[0]; o.start(); v.nodes.push(o); chain(o, gain(h[1]), out); });
         var whir = filt("bandpass", 900, 4); mod(lfo(21), 120, whir.frequency);
         chain(noise("white"), whir, gain(0.07), out);
         break;
       }
       default:
-        chain(noise(kind), out);
+        chain(noise(kind), tf("lowpass", 1, 0.5), out);
     }
+    v.setTone = function (hz) { toneParams.forEach(function (p) { p[2] = hz; try { p[0].setTargetAtTime(hz * p[1], ctx.currentTime, 0.12); } catch (e) {} }); };
   }
 
-  function startTone(t) {
-    ensureCtx(); unlockAudio();
-    if (playing[t.id]) return;
-    var now = actx.currentTime, g = actx.createGain(); g.gain.setValueAtTime(0.0001, now);
-    var v = { t: t, gain: g, nodes: [], lfo: null };
+  /* one voice (a tone or a sound) in any context. opts: timbre, bin, beat, breath, level, tone, fadeIn */
+  function buildVoice(ctx, t, opts, dest, sched) {
+    var now = ctx.currentTime, g = ctx.createGain(); g.gain.setValueAtTime(opts.fadeIn ? 0.0001 : opts.level, now);
+    var v = { t: t, gain: g, nodes: [], lfo: null, timers: [] };
     if (t.kind) {
-      soundNodes(t.kind, g, v);
+      soundNodes(t.kind, g, v, ctx, opts.tone, sched);
     } else {
-      var timbre = $("#timbre").value, bin = $("#binBtn").getAttribute("data-on") === "1", beat = parseFloat($("#beat").value);
-      var partials = timbre === "pure" ? [[1, 1]] : timbre === "bowl" ? [[1, 1], [1.003, 0.55], [2.71, 0.08], [2, 0.12]] : [[1, 1], [2, 0.18], [3, 0.07], [0.5, 0.12]];
-      var ears = bin ? [[-1, -beat / 2], [1, beat / 2]] : [[0, 0]];
+      var partials = opts.timbre === "pure" ? [[1, 1]] : opts.timbre === "bowl" ? [[1, 1], [1.003, 0.55], [2.71, 0.08], [2, 0.12]] : [[1, 1], [2, 0.18], [3, 0.07], [0.5, 0.12]];
+      var ears = opts.bin ? [[-1, -opts.beat / 2], [1, opts.beat / 2]] : [[0, 0]];
       ears.forEach(function (ear) {
-        var pan = actx.createStereoPanner ? actx.createStereoPanner() : null; if (pan) pan.pan.value = ear[0];
+        var pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null; if (pan) pan.pan.value = ear[0];
         partials.forEach(function (p) {
-          var o = actx.createOscillator(); o.type = "sine"; o.frequency.value = (t.hz + ear[1]) * p[0];
-          var pg = actx.createGain(); pg.gain.value = p[1] * (bin ? 0.7 : 1) / partials.length * 1.4;
+          var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = (t.hz + ear[1]) * p[0];
+          var pg = ctx.createGain(); pg.gain.value = p[1] * (opts.bin ? 0.7 : 1) / partials.length * 1.4;
           o.connect(pg); if (pan) { pg.connect(pan); } else { pg.connect(g); } o.start(); v.nodes.push(o);
         });
         if (pan) pan.connect(g);
       });
     }
-    g.connect(master);
-    var target = toneLevel(t);
-    g.gain.linearRampToValueAtTime(target, now + 3.0);
-    if ($("#breathBtn").getAttribute("data-on") === "1" && !t.kind) {
-      var lfo = actx.createOscillator(), lg = actx.createGain(); lfo.frequency.value = 0.1; lg.gain.value = target * 0.28;
+    g.connect(dest);
+    if (opts.fadeIn) g.gain.linearRampToValueAtTime(opts.level, now + opts.fadeIn);
+    if (opts.breath && !t.kind) {
+      var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.1; lg.gain.value = opts.level * 0.28;
       lfo.connect(lg); lg.connect(g.gain); lfo.start(); v.lfo = lfo;
     }
+    return v;
+  }
+  function voiceOpts(t) {
+    var tn = document.getElementById("tn-" + t.id);
+    return { timbre: $("#timbre").value, bin: $("#binBtn").getAttribute("data-on") === "1", beat: parseFloat($("#beat").value), breath: $("#breathBtn").getAttribute("data-on") === "1", level: toneLevel(t), tone: tn ? parseFloat(tn.value) : 0 };
+  }
+
+  function startTone(t) {
+    ensureCtx(); unlockAudio();
+    if (playing[t.id]) return;
+    var opts = voiceOpts(t); opts.fadeIn = 3.0;
+    var v = buildVoice(actx, t, opts, master);
     playing[t.id] = v;
     document.getElementById("card-" + t.id).setAttribute("data-on", "1");
     document.getElementById("go-" + t.id).textContent = "Stop";
     armTimer(); paintStatus(); healthCheck();
+  }
+
+  /* ---------- the mix as a file: the same graph rendered offline, looped seamlessly ----------
+     The app plays this natively while the screen is locked (Web Audio is paused in the background). */
+  function renderMix(seconds) {
+    var ids = Object.keys(playing); if (!ids.length || !actx) return Promise.resolve(null);
+    var sr = 44100, dur = seconds || 40, tail = 4, octx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.round(sr * (dur + tail)), sr);
+    var c = octx.createDynamicsCompressor(); c.threshold.value = -18; c.knee.value = 12; c.ratio.value = 3; c.attack.value = 0.05; c.release.value = 0.4;
+    var m = octx.createGain(); m.gain.value = masterTarget(); m.connect(c); c.connect(octx.destination);
+    ids.forEach(function (id) { var t = playing[id].t, o = voiceOpts(t); o.fadeIn = 0; buildVoice(octx, t, o, m, { dur: dur + tail }); });
+    return octx.startRendering().then(function (buf) {
+      // fold the tail into the head so the loop point is a crossfade, not a cut
+      var n = Math.round(sr * tail), len = Math.round(sr * dur), out = actx.createBuffer(2, len, sr);
+      for (var ch = 0; ch < 2; ch++) {
+        var src = buf.getChannelData(ch), d = out.getChannelData(ch);
+        for (var i = 0; i < len; i++) d[i] = src[i];
+        for (var k = 0; k < n; k++) { var w = k / n; d[k] = src[k] * w + src[len + k] * (1 - w); }
+      }
+      return out;
+    });
+  }
+  function currentMixKey() {
+    var ids = Object.keys(playing).sort(); if (!ids.length) return "";
+    return ids.map(function (id) { var t = playing[id].t, o = voiceOpts(t); return id + ":" + o.level.toFixed(3) + ":" + o.tone; }).join("|") + "|" + $("#timbre").value + "|" + $("#binBtn").getAttribute("data-on") + "|" + $("#beat").value + "|" + $("#breathBtn").getAttribute("data-on") + "|" + $("#master").value;
   }
   function stopTone(id, fadeSec) {
     var v = playing[id]; if (!v) return;
@@ -676,12 +745,18 @@
       '<h3>' + t.name + refsHtml(t.refs || (t.group === "B" ? [10] : [])) + '</h3>' +
       '<p>' + t.text + '</p>' +
       '<div class="foot"><button class="go" id="go-' + t.id + '" type="button">Play</button>' +
-      '<label class="lvl"><input type="range" id="lvl-' + t.id + '" min="0" max="100" value="' + (t.kind ? 45 : 60) + '" aria-label="Level for ' + t.name + '" /><span id="lv-' + t.id + '">' + (t.kind ? 45 : 60) + '</span></label></div>';
+      '<label class="lvl"><input type="range" id="lvl-' + t.id + '" min="0" max="100" value="' + (t.kind ? 45 : 60) + '" aria-label="Level for ' + t.name + '" /><span id="lv-' + t.id + '">' + (t.kind ? 45 : 60) + '</span></label>' +
+      (t.kind && TONE[t.kind] ? '<label class="lvl tn"><span class="tn-lbl">tone</span><input type="range" id="tn-' + t.id + '" min="' + TONE[t.kind][1] + '" max="' + TONE[t.kind][2] + '" value="' + TONE[t.kind][0] + '" step="10" aria-label="Tone for ' + t.name + ', in hertz" /><span id="tv-' + t.id + '">' + TONE[t.kind][0] + ' Hz</span></label>' : "") + '</div>';
     document.getElementById("tones" + t.group).appendChild(el);
     el.querySelector(".go").addEventListener("click", function () { if (playing[t.id]) stopTone(t.id); else startTone(t); });
-    el.querySelector("input").addEventListener("input", function (e) {
+    el.querySelector("#lvl-" + t.id).addEventListener("input", function (e) {
       document.getElementById("lv-" + t.id).textContent = e.target.value;
       var v = playing[t.id]; if (v && actx) { var target = toneLevel(t); v.gain.gain.setTargetAtTime(target, actx.currentTime, 0.1); }
+    });
+    var tn = el.querySelector("#tn-" + t.id);
+    if (tn) tn.addEventListener("input", function (e) {
+      document.getElementById("tv-" + t.id).textContent = e.target.value + " Hz";
+      var v = playing[t.id]; if (v && v.setTone) v.setTone(parseFloat(e.target.value));
     });
   }
   TONES.forEach(card);
@@ -700,20 +775,78 @@
     rain: { tones: ["rain", "t174"], bin: false, beat: "2", timbre: "warm", master: 30 },
     shore: { tones: ["ocean", "t136"], bin: true, beat: "2", timbre: "warm", master: 30 },
     reset: { tones: ["t528", "t174"], bin: false, beat: "6", timbre: "warm", master: 35 },
+    // work: a brook for masking, a low carrier split into a 15 Hz beta beat (the alertness band), nothing bright
+    work: { tones: ["stream", "t174"], bin: true, beat: "15", timbre: "pure", master: 28 },
     focus: { tones: ["t285"], bin: true, beat: "40", timbre: "pure", master: 32 }
   };
-  Array.prototype.forEach.call(document.querySelectorAll(".preset"), function (b) {
-    b.addEventListener("click", function () {
-      var p = PRESETS[b.getAttribute("data-preset")];
-      ensureCtx(); unlockAudio();
-      stopAll(1.0);
-      $("#timbre").value = p.timbre; $("#beat").value = p.beat; $("#master").value = p.master; $("#masterVal").textContent = p.master;
-      var bb = $("#binBtn"); bb.setAttribute("data-on", p.bin ? "1" : "0"); bb.setAttribute("aria-pressed", p.bin ? "true" : "false"); bb.textContent = p.bin ? "On" : "Off";
-      if (master) master.gain.setTargetAtTime(masterTarget(), actx.currentTime, 0.05);
-      setTimeout(function () { p.tones.forEach(function (id) { startTone(TONES.filter(function (t) { return t.id === id; })[0]); }); }, 350);
-    });
-  });
+  function presetClick(id) {
+    var p = PRESETS[id]; if (!p) return;
+    ensureCtx(); unlockAudio();
+    stopAll(1.0);
+    $("#timbre").value = p.timbre; $("#beat").value = p.beat; $("#master").value = p.master; $("#masterVal").textContent = p.master;
+    var bb = $("#binBtn"); bb.setAttribute("data-on", p.bin ? "1" : "0"); bb.setAttribute("aria-pressed", p.bin ? "true" : "false"); bb.textContent = p.bin ? "On" : "Off";
+    if (master) master.gain.setTargetAtTime(masterTarget(), actx.currentTime, 0.05);
+    setTimeout(function () { p.tones.forEach(function (id) { startTone(TONES.filter(function (t) { return t.id === id; })[0]); }); }, 350);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".preset"), function (b) { b.addEventListener("click", function () { presetClick(b.getAttribute("data-preset")); }); });
   setInterval(paintStatus, 30000);
+
+  /* ---------- pomodoro: work sprints with the room ducked for the rests, a soft chime at each turn ----------
+     Phase ends are absolute times, so a phone that slept through a boundary catches up when it wakes. */
+  var pomo = { on: false, work: 25, rest: 5, phase: "", ends: 0, round: 0 };
+  function pomoStart(work, rest) {
+    pomo.on = true; pomo.work = work; pomo.rest = rest; pomo.round = 0;
+    if (!Object.keys(playing).length) presetClick("work");
+    pomoPhase("work", true);
+  }
+  function pomoStop(quiet) { if (!pomo.on) return; pomo.on = false; pomo.phase = ""; duck(false); paintPomo(); if (!quiet) chime("done"); pomoEvent(); }
+  function pomoPhase(ph, first) {
+    pomo.phase = ph; if (ph === "work") pomo.round++;
+    var mins = ph === "work" ? pomo.work : (pomo.round % 4 === 0 ? pomo.rest * 3 : pomo.rest);
+    pomo.ends = Date.now() + mins * 60000;
+    duck(ph === "rest"); if (!first) chime(ph); paintPomo(); pomoEvent();
+  }
+  function pomoTick() {
+    if (!pomo.on) return;
+    var guard = 0; while (pomo.on && Date.now() >= pomo.ends && guard++ < 8) pomoPhase(pomo.phase === "work" ? "rest" : "work");
+    paintPomo();
+  }
+  setInterval(pomoTick, 1000);
+  function paintPomo() {
+    var el = $("#pomoLine"); if (!el) return;
+    if (!pomo.on) { el.textContent = ""; el.removeAttribute("data-phase"); return; }
+    var left = Math.max(0, pomo.ends - Date.now()), m = Math.floor(left / 60000), s = Math.floor(left % 60000 / 1000);
+    el.setAttribute("data-phase", pomo.phase);
+    el.textContent = (pomo.phase === "work" ? "sprint " + pomo.round + " · " : "rest · ") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+  function duck(on) { if (master && actx) master.gain.setTargetAtTime(on ? masterTarget() * 0.3 : masterTarget(), actx.currentTime, 1.5); }
+  function chime(kind) {
+    ensureCtx(); if (!actx) return;
+    var now = actx.currentTime, notes = kind === "work" ? [880, 1320] : kind === "rest" ? [660, 990] : [660, 880, 1320];
+    notes.forEach(function (f, i) {
+      var o = actx.createOscillator(), g = actx.createGain(); o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, now + i * 0.22); g.gain.linearRampToValueAtTime(0.09, now + i * 0.22 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.22 + 1.8);
+      o.connect(g); g.connect(comp); o.start(now + i * 0.22); o.stop(now + i * 0.22 + 2);
+    });
+  }
+  function pomoEvent() { document.dispatchEvent(new CustomEvent("room:pomodoro", { detail: { on: pomo.on, phase: pomo.phase, ends: pomo.ends, work: pomo.work, rest: pomo.rest, round: pomo.round } })); }
+  $("#pomo").addEventListener("change", function () {
+    var v = this.value; if (v === "0") { pomoStop(true); return; }
+    var p = v.split("-"); pomoStart(parseInt(p[0], 10), parseInt(p[1], 10));
+  });
+  var _stopAll = stopAll; stopAll = function (f) { _stopAll(f); if (pomo.on && !Object.keys(playing).length) { $("#pomo").value = "0"; pomoStop(true); } };
+
+  /* what the app's native layer needs: render the mix, pause and resume the engine, read the state */
+  window.ChladniRoom = {
+    render: renderMix, key: currentMixKey,
+    ids: function () { return Object.keys(playing); }, live: function () { return !!Object.keys(playing).length; },
+    suspend: function () { try { if (actx) actx.suspend(); } catch (e) {} },
+    resume: function () { try { if (actx) actx.resume(); } catch (e) {} if (timerEnds && Date.now() > timerEnds && Object.keys(playing).length) { stopAll(0); setStatus("faded out while the screen was locked — the timer ended", false); } pomoTick(); },
+    stopAll: function (f) { stopAll(f == null ? 0 : f); }, timerEnds: function () { return timerEnds; },
+    tones: TONES.map(function (t) { return { id: t.id, hz: t.hz, kind: t.kind || "", name: t.name, short: t.short || "" }; }),
+    presets: Object.keys(PRESETS).map(function (id) { var b = document.querySelector('.preset[data-preset="' + id + '"]'); return { id: id, name: b ? b.firstChild.textContent : id, summary: b && b.querySelector("small") ? b.querySelector("small").textContent : "" }; }),
+    preset: presetClick, pomodoro: { start: pomoStart, stop: pomoStop, state: function () { return pomo; } }
+  };
 
   /* ---------- breathing visual ---------- */
   var t0 = performance.now();

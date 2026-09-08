@@ -3,7 +3,7 @@
 // sheets, haptics, account and Plus). GOOGLE_IOS_CLIENT_ID in the environment enables Google sign-in.
 const fs = require("fs"), path = require("path");
 const ROOT = path.join(__dirname, ".."), WWW = path.join(__dirname, "www");
-const PAGES = [["index.html", ROOT], ["frequencies.html", ROOT], ["law-of-one.html", ROOT], ["privacy.html", ROOT], ["you.html", path.join(__dirname, "native")]];
+const PAGES = [["index.html", ROOT], ["frequencies.html", ROOT], ["law-of-one.html", ROOT], ["privacy.html", ROOT], ["faq.html", ROOT], ["you.html", path.join(__dirname, "native")]];
 const ASSETS = ["favicon-64.png", "icon-512.png", "apple-touch-icon.png", "og-plates.png", "og-resonance.png", "og-law.png"];
 const FONT_LINK = /<link rel="preconnect" href="https:\/\/fonts\.googleapis\.com" \/>\s*<link rel="preconnect" href="https:\/\/fonts\.gstatic\.com" crossorigin \/>\s*<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/css2[^"]*" \/>/;
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));

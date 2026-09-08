@@ -108,7 +108,7 @@ jobs:
             sed -i '' "s/GOOGLE_REVERSED_CLIENT_ID/$REV/; s/GOOGLE_IOS_CLIENT_ID/$GOOGLE_IOS_CLIENT_ID/" ios/App/App/Info.plist
             echo "Google sign-in configured"
           else
-            /usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes" -c "Delete :GIDClientID" ios/App/App/Info.plist || true
+            /usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes:0" -c "Delete :GIDClientID" ios/App/App/Info.plist || true
             echo "No GOOGLE_IOS_CLIENT_ID secret: the app offers Sign in with Apple only"
           fi
 
@@ -137,6 +137,7 @@ jobs:
           IOS_P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
           IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
           IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+          IOS_PROFILE_WIDGET_BASE64: ${{ secrets.IOS_PROFILE_WIDGET_BASE64 }}
         run: |
           test -n "$IOS_P12_BASE64" || { echo "IOS_P12_BASE64 is missing: run app/tools/asc-signing.js and add the three signing secrets"; exit 1; }
           KC=$RUNNER_TEMP/build.keychain-db
@@ -155,6 +156,14 @@ jobs:
           cp "$RUNNER_TEMP/appstore.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID".mobileprovision
           echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
           echo "Installed profile '$NAME' ($UUID)"
+          # the widget extension has its own bundle ID and profile (made by app/tools/asc-widgets-signing.js)
+          test -n "$IOS_PROFILE_WIDGET_BASE64" || { echo "IOS_PROFILE_WIDGET_BASE64 is missing: run app/tools/asc-widgets-signing.js"; exit 1; }
+          echo "$IOS_PROFILE_WIDGET_BASE64" | base64 --decode > "$RUNNER_TEMP/widgets.mobileprovision"
+          WUUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< "$(security cms -D -i "$RUNNER_TEMP/widgets.mobileprovision")")
+          WNAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< "$(security cms -D -i "$RUNNER_TEMP/widgets.mobileprovision")")
+          cp "$RUNNER_TEMP/widgets.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/"$WUUID".mobileprovision
+          echo "WIDGET_PROFILE_NAME=$WNAME" >> "$GITHUB_ENV"
+          echo "Installed profile '$WNAME' ($WUUID)"
 
       - name: Archive
         env:
@@ -177,7 +186,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          sed -e "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" -e "s/PROFILE_NAME_PLACEHOLDER/$PROFILE_NAME/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          sed -e "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/" -e "s/PROFILE_NAME_PLACEHOLDER/$PROFILE_NAME/" -e "s/WIDGET_PROFILE_NAME_PLACEHOLDER/$WIDGET_PROFILE_NAME/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \

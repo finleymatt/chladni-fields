@@ -19,7 +19,35 @@
 		A1B2C3D4E5F60718293A4B5D /* ChladniViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* ChladniViewController.swift */; };
 		A1B2C3D4E5F60718293A4B61 /* PurchasesPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B60 /* PurchasesPlugin.swift */; };
 		A1B2C3D4E5F60718293A4B63 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B62 /* PrivacyInfo.xcprivacy */; };
+		A1B2C3D4E5F60718293A4B71 /* SleepAudioPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */; };
+		A1B2C3D4E5F60718293A4B73 /* WidgetBridgePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */; };
+		B1B2C3D4E5F60718293A4C0A /* ChladniWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */; };
+		B1B2C3D4E5F60718293A4C0F /* ChladniWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B1B2C3D4E5F60718293A4C10 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B1B2C3D4E5F60718293A4C02;
+			remoteInfo = ChladniWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B1B2C3D4E5F60718293A4C0E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B1B2C3D4E5F60718293A4C0F /* ChladniWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
@@ -37,6 +65,12 @@
 		A1B2C3D4E5F60718293A4B60 /* PurchasesPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasesPlugin.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B62 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B64 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAudioPlugin.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBridgePlugin.swift; sourceTree = "<group>"; };
+		B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChladniWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChladniWidgets.swift; sourceTree = "<group>"; };
+		B1B2C3D4E5F60718293A4C0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B1B2C3D4E5F60718293A4C0C /* ChladniWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChladniWidgets.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +82,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B1B2C3D4E5F60718293A4C04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -56,6 +97,7 @@
 			children = (
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
+				B1B2C3D4E5F60718293A4C0D /* ChladniWidgets */,
 				504EC3051FED79650016851F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -64,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,6 +117,8 @@
 				9582B6822FE993A50072D4E8 /* SceneDelegate.swift */,
 				A1B2C3D4E5F60718293A4B5C /* ChladniViewController.swift */,
 				A1B2C3D4E5F60718293A4B60 /* PurchasesPlugin.swift */,
+				A1B2C3D4E5F60718293A4B70 /* SleepAudioPlugin.swift */,
+				A1B2C3D4E5F60718293A4B72 /* WidgetBridgePlugin.swift */,
 				A1B2C3D4E5F60718293A4B62 /* PrivacyInfo.xcprivacy */,
 				A1B2C3D4E5F60718293A4B64 /* App.entitlements */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
@@ -88,6 +133,16 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		B1B2C3D4E5F60718293A4C0D /* ChladniWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				B1B2C3D4E5F60718293A4C09 /* ChladniWidgets.swift */,
+				B1B2C3D4E5F60718293A4C0B /* Info.plist */,
+				B1B2C3D4E5F60718293A4C0C /* ChladniWidgets.entitlements */,
+			);
+			path = ChladniWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -98,10 +153,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				B1B2C3D4E5F60718293A4C0E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B1B2C3D4E5F60718293A4C11 /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -110,6 +167,23 @@
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B1B2C3D4E5F60718293A4C02 /* ChladniWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1B2C3D4E5F60718293A4C06 /* Build configuration list for PBXNativeTarget "ChladniWidgets" */;
+			buildPhases = (
+				B1B2C3D4E5F60718293A4C03 /* Sources */,
+				B1B2C3D4E5F60718293A4C04 /* Frameworks */,
+				B1B2C3D4E5F60718293A4C05 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChladniWidgets;
+			productName = ChladniWidgets;
+			productReference = B1B2C3D4E5F60718293A4C01 /* ChladniWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -124,6 +198,11 @@
 						CreatedOnToolsVersion = 9.2;
 						DevelopmentTeam = 9V9SN33W93;
 						LastSwiftMigration = 1100;
+						ProvisioningStyle = Manual;
+					};
+					B1B2C3D4E5F60718293A4C02 = {
+						CreatedOnToolsVersion = 15.0;
+						DevelopmentTeam = 9V9SN33W93;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -145,6 +224,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				B1B2C3D4E5F60718293A4C02 /* ChladniWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -164,6 +244,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B1B2C3D4E5F60718293A4C05 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -175,10 +262,28 @@
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				A1B2C3D4E5F60718293A4B5D /* ChladniViewController.swift in Sources */,
 				A1B2C3D4E5F60718293A4B61 /* PurchasesPlugin.swift in Sources */,
+				A1B2C3D4E5F60718293A4B71 /* SleepAudioPlugin.swift in Sources */,
+				A1B2C3D4E5F60718293A4B73 /* WidgetBridgePlugin.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1B2C3D4E5F60718293A4C03 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2C3D4E5F60718293A4C0A /* ChladniWidgets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B1B2C3D4E5F60718293A4C11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B1B2C3D4E5F60718293A4C02 /* ChladniWidgets */;
+			targetProxy = B1B2C3D4E5F60718293A4C10 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -358,6 +463,60 @@
 			};
 			name = Release;
 		};
+		B1B2C3D4E5F60718293A4C07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChladniWidgets/ChladniWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9V9SN33W93;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ChladniWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = lol.iamra.chladni.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B1B2C3D4E5F60718293A4C08 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChladniWidgets/ChladniWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9V9SN33W93;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ChladniWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = lol.iamra.chladni.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Chladni Fields Widgets App Store";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -375,6 +534,15 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B1B2C3D4E5F60718293A4C06 /* Build configuration list for PBXNativeTarget "ChladniWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B1B2C3D4E5F60718293A4C07 /* Debug */,
+				B1B2C3D4E5F60718293A4C08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

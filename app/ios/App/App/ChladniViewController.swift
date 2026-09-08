@@ -10,6 +10,8 @@ class ChladniViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         super.capacitorDidLoad()
         bridge?.registerPluginInstance(PurchasesPlugin())
+        bridge?.registerPluginInstance(SleepAudioPlugin())
+        bridge?.registerPluginInstance(WidgetBridgePlugin())
         webView?.allowsBackForwardNavigationGestures = true
         webView?.scrollView.contentInsetAdjustmentBehavior = .never
         webView?.scrollView.bounces = true

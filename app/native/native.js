@@ -65,8 +65,11 @@
     plates: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 4.5c1.6 3.2 1.6 4.8 0 7.5c-1.6-2.7-1.6-4.3 0-7.5ZM12 19.5c-1.6-3.2-1.6-4.8 0-7.5c1.6 2.7 1.6 4.3 0 7.5ZM4.5 12c3.2-1.6 4.8-1.6 7.5 0c-2.7 1.6-4.3 1.6-7.5 0ZM19.5 12c-3.2 1.6-4.8 1.6-7.5 0c2.7-1.6 4.3-1.6 7.5 0Z"/></svg>',
     room: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="12" r="6.2" opacity=".75"/><circle cx="12" cy="12" r="9.6" opacity=".45"/></svg>',
     law: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 7.4C6.4 3.2 17.6 3.2 21.6 7.4"/><path d="M1.8 12C6 6.4 18 6.4 22.2 12C18 17.6 6 17.6 1.8 12Z"/><circle cx="12" cy="12" r="2.9"/><path d="M22.2 12L24 11.2M15 17.4L15.5 22.6M9 17.3C7.8 19.7 5.7 21.7 3.4 21C2 20.5 2.2 18.7 3.6 18.6C4.6 18.4 4.9 19.3 4.5 19.6"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>',
-    you: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9.25"/><circle cx="12" cy="10" r="3.2"/><path d="M5.8 18.6c1.4-2.6 3.6-3.9 6.2-3.9s4.8 1.3 6.2 3.9"/></svg>'
+    you: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9.25"/><circle cx="12" cy="10" r="3.2"/><path d="M5.8 18.6c1.4-2.6 3.6-3.9 6.2-3.9s4.8 1.3 6.2 3.9"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>'
   };
+  var SA = P.SleepAudio || (cap.registerPlugin ? cap.registerPlugin("SleepAudio") : null);
+  var WB = P.WidgetBridge || (cap.registerPlugin ? cap.registerPlugin("WidgetBridge") : null);
   var TABS = [
     { id: "room", href: "frequencies.html", label: "Resonance" },
     { id: "plates", href: "index.html", label: "Plates" },
@@ -282,13 +285,75 @@
       hint.addEventListener("click", function () { gate("Playing with the screen locked", function () { toast("Sleep mode is on. Lock the screen whenever you like."); }); });
       sleepHead.appendChild(hint);
     }
-    // sleep mode: free plays while the app is open; Plus keeps sounding with the screen locked
+    /* ---- sleep mode. Web Audio is paused whenever the app leaves the screen, so the room renders its mix to a
+            looping file ahead of time and, when the screen locks, hands that file to the native player (Plus,
+            or the one free trial lock). Coming back, the native player stops and the engine resumes. ---- */
+    var room = window.ChladniRoom;
+    var hand = { file: "", key: "", rendering: null, active: false, trial: false, since: 0, timer: null };
+    function canSleep() { var cp = CP(); return !!(cp && (cp.has() || !cp.store.get("sleepTrial"))); }
+    function wavBase64(buf) {
+      var ch = buf.numberOfChannels, n = buf.length, sr = buf.sampleRate, bytes = 44 + n * ch * 2, ab = new ArrayBuffer(bytes), dv = new DataView(ab);
+      function str(o, s) { for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); }
+      str(0, "RIFF"); dv.setUint32(4, bytes - 8, true); str(8, "WAVE"); str(12, "fmt "); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, ch, true);
+      dv.setUint32(24, sr, true); dv.setUint32(28, sr * ch * 2, true); dv.setUint16(32, ch * 2, true); dv.setUint16(34, 16, true); str(36, "data"); dv.setUint32(40, n * ch * 2, true);
+      var chans = []; for (var c = 0; c < ch; c++) chans.push(buf.getChannelData(c));
+      var o = 44; for (var i = 0; i < n; i++) for (var k = 0; k < ch; k++) { var s = Math.max(-1, Math.min(1, chans[k][i])); dv.setInt16(o, s < 0 ? s * 32768 : s * 32767, true); o += 2; }
+      var u8 = new Uint8Array(ab), parts = [], CH = 0x8000; for (var p = 0; p < u8.length; p += CH) parts.push(String.fromCharCode.apply(null, u8.subarray(p, p + CH)));
+      return btoa(parts.join(""));
+    }
+    function prerender() {
+      if (!room || !SA || !P.Filesystem || !room.live()) { hand.file = ""; hand.key = ""; return Promise.resolve(false); }
+      var key = room.key(); if (key === hand.key && hand.file) return Promise.resolve(true);
+      if (hand.rendering) return hand.rendering;
+      hand.rendering = room.render(40).then(function (buf) {
+        if (!buf) return false;
+        var data = wavBase64(buf), name = "sleep-" + (hand.file.indexOf("sleep-a") >= 0 ? "b" : "a") + ".wav";
+        return P.Filesystem.writeFile({ path: name, data: data, directory: "CACHE" }).then(function (r) { hand.file = r.uri; hand.key = key; return true; });
+      }).catch(function () { return false; }).then(function (ok) { hand.rendering = null; return ok; });
+      return hand.rendering;
+    }
+    function schedulePrerender() { clearTimeout(hand.timer); hand.timer = setTimeout(function () { if (canSleep()) prerender(); }, 2500); }
+    if (status) new MutationObserver(schedulePrerender).observe(status, { childList: true, characterData: true, subtree: true, attributes: true });
+    document.addEventListener("input", function (e) { if (e.target && e.target.matches && e.target.matches("input[type=range], select")) schedulePrerender(); });
+    function handOff(cp, trial) {
+      if (!document.hidden || !room.live() || !hand.file) return;
+      var left = room.timerEnds() ? Math.max(30, Math.round((room.timerEnds() - Date.now()) / 1000)) : 0;
+      var title = ((status && status.textContent) || "").replace(/^playing\s+/i, "").split(" · ")[0] || "Resonance Room";
+      SA.play({ path: hand.file, title: title, subtitle: trial ? "Sleep mode · your free lock" : "Sleep mode", volume: 1, fadeIn: 0.3, fadeOutAfter: left, maxSeconds: trial ? 1200 : 0 })
+        .then(function () { hand.active = true; hand.trial = trial; hand.since = Date.now(); room.suspend(); if (trial) cp.store.set("sleepTrial", Date.now()); })
+        .catch(function () {});
+    }
     var pausedByLock = false;
     document.addEventListener("visibilitychange", function () {
-      var cp = CP(), live = status && status.getAttribute("data-live") === "1";
-      if (document.hidden) { if (live && cp && !cp.has()) { var s = $("#stopAll"); if (s) s.click(); pausedByLock = true; } }
-      else if (pausedByLock) { pausedByLock = false; toast("Faded out when the screen locked. Plus keeps playing.", { action: "See Plus", onAction: function () { if (cp) cp.paywall("Playing with the screen locked"); } }); }
+      var cp = CP(), live = room ? room.live() : (status && status.getAttribute("data-live") === "1");
+      if (document.hidden) {
+        if (!live || !cp) return;
+        var plus = cp.has(), trial = !plus && !cp.store.get("sleepTrial");
+        if ((plus || trial) && SA && room) {
+          if (hand.file && hand.key === room.key()) handOff(cp, trial); else prerender().then(function () { handOff(cp, trial); });
+        } else {
+          if (room) room.stopAll(1.0); else { var s = $("#stopAll"); if (s) s.click(); }
+          pausedByLock = true;
+        }
+      } else if (hand.active) {
+        hand.active = false;
+        var wasTrial = hand.trial, mins = Math.max(1, Math.round((Date.now() - hand.since) / 60000)); hand.trial = false;
+        SA.state().then(function (st) {
+          var by = (st && st.stoppedBy) || "";
+          return SA.stop({ fade: 0.5 }).then(function () {
+            if (by) { room.stopAll(0); if (by === "timer") toast("Faded out while the screen was locked — the timer ended."); }
+            else room.resume();
+            if (wasTrial) setTimeout(function () { if (cp && cp.trialEnded) cp.trialEnded(mins); }, 700);
+          });
+        }).catch(function () { room.resume(); });
+      } else if (pausedByLock) {
+        pausedByLock = false;
+        toast("Faded out when the screen locked. Plus keeps playing.", { action: "See Plus", onAction: function () { if (cp) cp.paywall("Playing with the screen locked"); } });
+      }
     });
+    if (/[?&]try=1/.test(location.search)) setTimeout(function () { toast("Now lock your phone. Your first lock keeps the room playing, free, for 20 minutes.", { ms: 7000 }); }, 1800);
+    // pomodoro boundaries become notifications, so the turns land even with the screen off
+    document.addEventListener("room:pomodoro", function (ev) { pomodoroNotify(ev.detail); });
     // saved mixes
     var presets = $(".presets-ctl");
     if (presets) {
@@ -306,9 +371,11 @@
     var cards = Array.prototype.slice.call(document.querySelectorAll('.tone[data-on="1"]'));
     var on = cards.map(function (c) { return c.id.replace(/^card-/, ""); });
     if (!on.length) return null;
+    var meta = {}; ((window.ChladniRoom || {}).tones || []).forEach(function (t) { meta[t.id] = t; });
     var names = cards.map(function (c) { var h = c.querySelector("h3"); return h ? (h.firstChild && h.firstChild.nodeType === 3 ? h.firstChild.textContent : h.textContent).trim().split(" · ")[0] : c.id; });
     var bin = ($("#binBtn") || {}).getAttribute && $("#binBtn").getAttribute("data-on") === "1";
-    return { tones: on, timbre: ($("#timbre") || {}).value, beat: ($("#beat") || {}).value, bin: bin, breath: $("#breathBtn") ? $("#breathBtn").getAttribute("data-on") === "1" : true, master: ($("#master") || {}).value, timer: ($("#timer") || {}).value,
+    var voices = on.map(function (id) { var lv = $("#lvl-" + id), tn = $("#tn-" + id), m = meta[id] || {}; return { id: id, hz: m.hz || 0, kind: m.kind || "", lv: lv ? parseFloat(lv.value) : 60, tn: tn ? parseFloat(tn.value) : 0 }; });
+    return { tones: on, voices: voices, timbre: ($("#timbre") || {}).value, beat: ($("#beat") || {}).value, bin: bin, breath: $("#breathBtn") ? $("#breathBtn").getAttribute("data-on") === "1" : true, master: ($("#master") || {}).value, timer: ($("#timer") || {}).value,
       summary: (names.length ? names : on).join(" + ") + (bin ? " · binaural " + ($("#beat") || {}).value + " Hz" : "") };
   }
   function applyMix(mix) {
@@ -317,17 +384,41 @@
     set("#timbre", mix.timbre); set("#beat", mix.beat); set("#master", mix.master); set("#timer", mix.timer);
     var mv = $("#masterVal"); if (mv && mix.master != null) mv.textContent = mix.master;
     [["#binBtn", mix.bin], ["#breathBtn", mix.breath]].forEach(function (p) { var b = $(p[0]); if (b && (b.getAttribute("data-on") === "1") !== !!p[1]) b.click(); });
+    (mix.voices || []).forEach(function (v) { set("#lvl-" + v.id, v.lv); if (v.tn) set("#tn-" + v.id, v.tn); });
     Array.prototype.forEach.call(document.querySelectorAll(".tone"), function (card) {
       var id = card.id.replace(/^card-/, ""), on = card.getAttribute("data-on") === "1", want = mix.tones.indexOf(id) >= 0, go = $("#go-" + id);
       if (go && on !== want) go.click();
     });
     var pl = $("#player"); if (pl && window.innerWidth < 900) { var box = pl.getBoundingClientRect(); if (box.top < 0 || box.top > window.innerHeight * 0.55) pl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }); }
   }
+  /* a mix as a picture: the room's rings, one per voice, sized by pitch (sounds sit on the outer ring) */
+  function mixThumb(cv, mix) {
+    var S = cv.width, x = cv.getContext("2d"), c = S / 2, R = S * 0.42;
+    var cs = getComputedStyle(root), accent = cs.getPropertyValue("--accent").trim() || "#d3a851", sound = cs.getPropertyValue("--sound").trim() || "#64bac8", bg = cs.getPropertyValue("--plate-bg").trim() || "#090c09";
+    x.fillStyle = bg; x.fillRect(0, 0, S, S);
+    x.strokeStyle = sound; x.globalAlpha = 0.14; x.lineWidth = 1;
+    for (var i = 1; i <= 4; i++) { x.beginPath(); x.arc(c, c, R * i / 4, 0, Math.PI * 2); x.stroke(); }
+    x.globalAlpha = 1;
+    var voices = mix.voices || (mix.tones || []).map(function (id) { return { id: id, hz: /^t(\d+)/.test(id) ? parseFloat(id.slice(1)) : 0, kind: /^t\d/.test(id) ? "" : id }; });
+    voices.forEach(function (v) {
+      var base = v.kind ? 0.95 : Math.min(0.95, Math.max(0.2, (Math.log(v.hz || 200) - Math.log(100)) / (Math.log(1000) - Math.log(100)) * 0.75 + 0.2));
+      x.strokeStyle = v.kind ? accent : sound; x.lineWidth = v.kind ? S * 0.05 : S * 0.02;
+      x.shadowColor = x.strokeStyle; x.shadowBlur = S * 0.06;
+      x.beginPath(); x.arc(c, c, R * base, 0, Math.PI * 2); x.stroke(); x.shadowBlur = 0;
+    });
+    x.fillStyle = accent; x.beginPath(); x.arc(c, c, S * 0.05, 0, Math.PI * 2); x.fill();
+  }
+  function mixCard(m, href) {
+    var tag = href ? "a" : "button", attrs = href ? ' href="' + href + '"' : ' type="button"';
+    return '<' + tag + ' class="cf-mixcard"' + attrs + ' data-mix="' + escapeHtml(m.id) + '"><canvas width="144" height="144" data-mix-thumb="' + escapeHtml(JSON.stringify({ tones: m.tones, voices: m.voices || null })) + '"></canvas><b>' + escapeHtml(m.name) + '</b><small>' + escapeHtml(m.summary || "") + '</small><span class="cf-mixcard-play">' + ICONS.play + '</span></' + tag + '>';
+  }
+  function paintThumbs(scope) { Array.prototype.forEach.call((scope || document).querySelectorAll("canvas[data-mix-thumb]"), function (cv) { try { mixThumb(cv, JSON.parse(cv.getAttribute("data-mix-thumb"))); } catch (e) {} cv.removeAttribute("data-mix-thumb"); }); }
   function paintMixes() {
     var box = $("#cfMixes"), cp = CP(); if (!box || !cp) return;
     var list = cp.mixes.list(), canSave = cp.mixes.canSave();
     box.innerHTML = '<div class="cf-mixes-head"><span class="lbl">My mixes' + (cp.has() ? "" : ' <em class="cf-count">' + list.length + ' of 1 free</em>') + '</span><button class="cf-save' + (canSave ? "" : " cf-save--locked") + '" type="button" id="cfSaveMix">' + (canSave ? "" : LOCK) + 'Save mix</button></div>' +
-      (list.length ? '<div class="cf-mix-row">' + list.map(function (m) { return '<button class="cf-mix" type="button" data-mix="' + m.id + '"><b>' + escapeHtml(m.name) + '</b><small>' + escapeHtml(m.summary || "") + '</small></button>'; }).join("") + '</div>' : '<p class="cf-mixes-empty">Start a few tones, then save the mix to come back to it.</p>');
+      (list.length ? '<div class="cf-gallery">' + list.map(function (m) { return mixCard(m); }).join("") + '</div>' : '<p class="cf-mixes-empty">Start a few tones, then save the mix to come back to it. Saved mixes show here as a gallery, and on your Home Screen widget.</p>');
+    paintThumbs(box);
     $("#cfSaveMix").addEventListener("click", function () {
       var mix = captureMix();
       if (!mix) { toast("Start a tone first, then save."); return; }
@@ -340,6 +431,77 @@
       b.addEventListener("touchstart", function () { t = setTimeout(function () { hImpact("MEDIUM"); if (confirm("Delete “" + b.querySelector("b").textContent + "”?")) cp.mixes.remove(b.getAttribute("data-mix")); }, 650); }, { passive: true });
       ["touchend", "touchmove", "touchcancel"].forEach(function (n) { b.addEventListener(n, function () { clearTimeout(t); }, { passive: true }); });
     });
+    widgetSync();
+  }
+
+  /* ---- Home Screen widgets: the saved mixes and the presets, each a deep link the app plays on arrival ---- */
+  var PRESET_LIST = [["winddown", "Wind down", "432 warm pad · theta beat"], ["sleep", "Deep sleep", "136.1 Om · brown noise"], ["rain", "Rainy night", "rain · 174 hum"], ["shore", "Shoreline", "ocean waves · 136.1 Om"], ["work", "Work", "stream · beta 15 beat"], ["focus", "Focus", "285 carrier · gamma 40"], ["reset", "Reset", "528 pad · 174 hum"]];
+  function widgetSync() {
+    var cp = CP(); if (!WB || !cp) return;
+    var items = cp.mixes.list().map(function (m) { return { id: "m-" + m.id, name: m.name, summary: m.summary || "", url: "chladni://play?mix=" + encodeURIComponent(m.id), kind: "mix" }; })
+      .concat(PRESET_LIST.map(function (p) { return { id: "p-" + p[0], name: p[1], summary: p[2], url: "chladni://play?preset=" + p[0], kind: "preset" }; })).slice(0, 8);
+    try { WB.update({ items: items }).catch(function () {}); } catch (e) {}
+  }
+  function handleDeepLink(url) {
+    var m = /chladni:\/\/play\?(preset|mix)=([^&]+)/.exec(url || ""); if (!m) return false;
+    var target = "frequencies.html?" + m[1] + "=" + m[2];
+    try { if (sessionStorage.getItem("cf:lastLink") === url + "|" + Date.now().toString().slice(0, -4)) return true; sessionStorage.setItem("cf:lastLink", url + "|" + Date.now().toString().slice(0, -4)); } catch (e) {}
+    if (page === "frequencies.html" && window.ChladniRoom) {
+      if (m[1] === "preset") window.ChladniRoom.preset(m[2]);
+      else { var cp = CP(); if (cp) { var mix = cp.mixes.list().filter(function (x) { return x.id === decodeURIComponent(m[2]); })[0]; if (mix) applyMix(mix); } }
+    } else location.href = target;
+    return true;
+  }
+
+  /* ---- reminders: local notifications, scheduled on the phone, nothing sent anywhere ---- */
+  var LN = P.LocalNotifications;
+  function notifAllowed() { if (!LN) return Promise.resolve(false); return LN.checkPermissions().then(function (r) { return r.display === "granted"; }).catch(function () { return false; }); }
+  function notifAsk() { if (!LN) return Promise.resolve(false); return LN.requestPermissions().then(function (r) { return r.display === "granted"; }).catch(function () { return false; }); }
+  function scheduleReminders() {
+    var cp = CP(); if (!LN || !cp) return;
+    var r = cp.store.get("reminders", { bedtime: false, time: "22:00", nudges: true });
+    notifAllowed().then(function (ok) {
+      if (!ok) return;
+      LN.cancel({ notifications: [{ id: 1 }, { id: 2 }, { id: 3 }] }).catch(function () {}).then(function () {
+        var list = [];
+        if (r.bedtime) { var hm = (r.time || "22:00").split(":"); list.push({ id: 1, title: "Time to wind down", body: "The room is ready: rain, 174 Hz, a timer. Sleep well.", schedule: { on: { hour: parseInt(hm[0], 10), minute: parseInt(hm[1], 10) }, allowWhileIdle: true }, extra: { url: "frequencies.html?preset=sleep" } }); }
+        if (r.nudges !== false) {
+          var d3 = new Date(Date.now() + 3 * 864e5); d3.setHours(20, 30, 0, 0);
+          var d10 = new Date(Date.now() + 10 * 864e5); d10.setHours(20, 30, 0, 0);
+          list.push({ id: 2, title: "The room has been quiet", body: "Rain and a low hum are a tap away. Ten minutes before bed.", schedule: { at: d3, allowWhileIdle: true }, extra: { url: "frequencies.html?preset=rain" } });
+          list.push({ id: 3, title: "Your mixes are waiting", body: "Come and sit in the Resonance Room for a while.", schedule: { at: d10, allowWhileIdle: true }, extra: { url: "frequencies.html" } });
+        }
+        if (list.length) LN.schedule({ notifications: list }).catch(function () {});
+      });
+    });
+  }
+  var pomoIds = []; for (var pi = 10; pi < 30; pi++) pomoIds.push({ id: pi });
+  function pomodoroNotify(st) {
+    if (!LN) return;
+    LN.cancel({ notifications: pomoIds }).catch(function () {});
+    if (!st || !st.on) return;
+    notifAllowed().then(function (ok) { return ok || notifAsk(); }).then(function (ok) {
+      if (!ok) return;
+      var list = [], t = st.ends, phase = st.phase, round = st.round, id = 10;
+      for (var i = 0; i < 8; i++) {
+        var next = phase === "work" ? "rest" : "work";
+        list.push({ id: id++, title: next === "rest" ? "Sprint " + round + " done. Rest." : "Back to work", body: next === "rest" ? "The room dips for the break. A soft chime in the app." : "Sprint " + (round + 1) + ". The room comes back up.", schedule: { at: new Date(t), allowWhileIdle: true }, extra: { url: "frequencies.html" } });
+        var mins = next === "work" ? st.work : ((round % 4 === 0) ? st.rest * 3 : st.rest);
+        if (next === "work") round++;
+        t += mins * 60000; phase = next;
+      }
+      LN.schedule({ notifications: list }).catch(function () {});
+    });
+  }
+  function wireNotifications() {
+    if (!LN) return;
+    try { LN.addListener("localNotificationActionPerformed", function (e) { var url = e && e.notification && e.notification.extra && e.notification.extra.url; if (url) location.href = url; }); } catch (e) {}
+    var cp = CP(); if (cp) cp.ready.then(scheduleReminders);
+  }
+  function wireDeepLinks() {
+    var A = P.App; if (!A) return;
+    try { A.addListener("appUrlOpen", function (e) { handleDeepLink(e && e.url); }); } catch (e) {}
+    try { A.getLaunchUrl().then(function (r) { if (r && r.url) handleDeepLink(r.url); }).catch(function () {}); } catch (e) {}
   }
   function saveMix(mix) {
     var cp = CP(), name = prompt("Name this mix", mix.summary.length > 28 ? "Evening mix" : mix.summary);
@@ -350,11 +512,14 @@
 
   /* ---- boot ---- */
   function hideSplash() { try { if (P.SplashScreen) P.SplashScreen.hide({ fadeOutDuration: 220 }); } catch (e) {} }
-  window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify }, lockBadge: lockBadge, gate: gate, icons: { lock: LOCK, check: CHECK } };
+  window.ChladniNative = { sheetify: sheetify, toast: toast, haptic: { impact: hImpact, select: hSelect, notify: hNotify }, lockBadge: lockBadge, gate: gate, icons: { lock: LOCK, check: CHECK, play: ICONS.play },
+    mixThumb: mixThumb, mixCard: mixCard, paintThumbs: paintThumbs, reminders: { schedule: scheduleReminders, ask: notifAsk, allowed: notifAllowed }, widgetSync: widgetSync };
   function ready() {
     buildTabBar();
     if (page === "index.html") wirePlates();
     if (page === "frequencies.html") wireRoom();
+    wireNotifications(); wireDeepLinks();
+    var cp0 = CP(); if (cp0) cp0.ready.then(function () { widgetSync(); document.addEventListener("cf:mixes", widgetSync); });
     if (!/[?&]sheet=/.test(location.search)) welcome();
     requestAnimationFrame(function () { requestAnimationFrame(hideSplash); });
   }

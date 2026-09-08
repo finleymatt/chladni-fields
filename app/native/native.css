@@ -206,6 +206,23 @@ html.native.cf-plus .cf-hint { color: var(--sound); background: color-mix(in srg
 .cf-save--locked { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
 .cf-save .cf-lock-i { width: 13px; height: 13px; }
 
+/* the free-trial note on the paywall */
+.cf-try { margin: 14px 0 0; padding: 12px 14px; border: 1px dashed color-mix(in srgb, var(--sound) 55%, transparent); border-radius: 12px; font-size: .92rem; line-height: 1.45; color: var(--muted); }
+.cf-try b { color: var(--ink); font-family: var(--font-display); font-weight: 600; }
+.cf-try .cf-link { display: block; padding: 10px 0 0; text-align: left; }
+.cf-try--used { border-style: solid; border-color: var(--edge); }
+/* the mix gallery: a card per saved mix with its rings, in the room (a strip) and on the You page (a grid) */
+.cf-gallery { display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 4px 2px 6px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.cf-gallery::-webkit-scrollbar { display: none; }
+.cf-mixcard { position: relative; flex: 0 0 148px; display: grid; gap: 3px; text-align: left; text-decoration: none; background: var(--panel-2); color: var(--ink); border: 1px solid var(--edge); border-radius: 14px; padding: 10px; font: inherit; scroll-snap-align: start; }
+.cf-mixcard canvas { width: 100%; height: auto; aspect-ratio: 1; border-radius: 10px; display: block; margin-bottom: 4px; }
+.cf-mixcard b { font-family: var(--font-display); font-weight: 600; font-size: 14px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-mixcard small { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-mixcard-play { position: absolute; right: 16px; top: 16px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 88%, transparent); color: #0b0e0b; }
+.cf-mixcard-play svg { width: 16px; height: 16px; }
+.cf-gallery--grid { display: grid; grid-template-columns: repeat(2, 1fr); overflow: visible; }
+.cf-gallery--grid .cf-mixcard { flex: none; }
+
 /* saved mixes, in the Resonance Room's presets block */
 .cf-mixes { margin-bottom: 12px; }
 .cf-mixes-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }

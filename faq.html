@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d120e" />
+<title>FAQ · Chladni Fields</title>
+<meta name="description" content="Questions about Chladni Fields: what it is, sleep mode, the microphone, Plus, the evidence behind the tones, widgets, reminders and how to cancel." />
+<link rel="canonical" href="https://iamra.lol/faq.html" />
+<link rel="icon" type="image/png" sizes="64x64" href="https://iamra.lol/favicon-64.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://iamra.lol/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+<style>
+  :root { --bg:#e3e4db; --panel:#eef0e7; --panel-2:#e8eae0; --edge:#c4c7b4; --ink:#21261d; --muted:#59634c; --accent:#856611; --sound:#1f6472;
+    --font-display:'Chakra Petch','Bahnschrift',system-ui,sans-serif; --font-body:'Spectral',Georgia,serif; --font-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace; }
+  :root[data-theme="dark"] { --bg:#0d120e; --panel:#151b14; --panel-2:#1b2119; --edge:#2c3326; --ink:#e9e5d7; --muted:#8b9568; --accent:#d3a851; --sound:#64bac8; }
+  :root[data-vibe="dmt"] { --bg:#0b0614; --panel:#150b24; --panel-2:#1c0f30; --edge:#3a1f5c; --ink:#f3e9ff; --muted:#b58ae0; --accent:#ff7ad9; --sound:#5ef1ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.6; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(18px, 3.4vw, 44px) clamp(14px, 3.2vw, 40px) 64px; }
+  .site-nav { display:flex; align-items:center; justify-content:space-between; gap:12px 18px; flex-wrap:wrap; padding:0 0 14px; border-bottom:1px solid var(--edge); margin-bottom:26px; }
+  .brand { text-decoration:none; color:var(--ink); font-family:var(--font-display); font-weight:700; font-size:17px; }
+  .brand .amp { color:var(--accent); font-weight:500; }
+  .back { font-family:var(--font-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); text-decoration:none; border:1px solid var(--accent); border-radius:2px; padding:7px 10px; }
+  .eyebrow { font-family:var(--font-mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+  h1 { font-family:var(--font-display); font-weight:700; font-size:clamp(1.8rem, 4vw, 2.4rem); line-height:1.05; margin:0 0 10px; }
+  .lede { color:var(--muted); margin:0 0 26px; max-width:60ch; }
+  h2 { font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin:32px 0 10px; }
+  details { border:1px solid var(--edge); border-radius:12px; background:var(--panel); margin:0 0 8px; overflow:hidden; }
+  summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; font-family:var(--font-display); font-weight:600; font-size:15.5px; line-height:1.3; min-height:52px; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"+"; flex:0 0 auto; width:24px; height:24px; border-radius:50%; border:1px solid var(--edge); display:grid; place-items:center; color:var(--muted); font-family:var(--font-mono); font-size:15px; transition:transform .2s ease; }
+  details[open] summary::after { transform:rotate(45deg); color:var(--accent); border-color:var(--accent); }
+  details p { margin:0 16px 14px; color:var(--muted); max-width:62ch; }
+  details p b { color:var(--ink); font-weight:600; }
+  details p + p { margin-top:-4px; }
+  a { color: var(--accent); }
+  .note { font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:.04em; margin-top:36px; border-top:1px solid var(--edge); padding-top:14px; }
+</style>
+<script>
+  (function () { var t = "dark", v = ""; try { t = localStorage.getItem("chladni-theme") === "light" ? "light" : "dark"; v = localStorage.getItem("chladni-vibe") === "dmt" ? "dmt" : ""; } catch (e) {} document.documentElement.setAttribute("data-theme", t); if (v) document.documentElement.setAttribute("data-vibe", v); })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <nav class="site-nav" aria-label="Site">
+    <a class="brand" href="index.html">Chladni <span class="amp">Fields</span></a>
+    <a class="back" href="frequencies.html">← Back to the room</a>
+  </nav>
+  <p class="eyebrow">Questions</p>
+  <h1>Frequently asked.</h1>
+  <p class="lede">Short answers about what this is, what the sounds do, what Plus buys, and where the evidence stands. Anything missing: <a href="mailto:finley.matthewt@gmail.com">finley.matthewt@gmail.com</a>.</p>
+
+  <h2>The room</h2>
+  <details open><summary>What is this, in a sentence?</summary><p>A room of calm sounds to sit inside: steady tones (432, 528, 174 Hz and more), binaural beats for headphones, and sleep sounds like rain, surf and a fire, with a breathing guide and a timer that fades everything out. Beside it is the part the name comes from: crop circles and ancient figures read as sound, next to the pattern each tone raises in sand on a vibrating plate.</p></details>
+  <details><summary>Why "Chladni"?</summary><p>Ernst Chladni was the physicist who, in the 1780s, drew a violin bow along the edge of a sand-covered metal plate and watched the sand settle into figures along the lines where the plate held still. The Plates section runs that idea backwards: each formation sets a tone, and the plate beside it shows the figure that tone would raise.</p></details>
+  <details><summary>Does it work offline?</summary><p>Yes. Every sound is generated live on your phone; nothing is streamed or downloaded. The only time the app goes online is when you tap a source link or a reference image.</p></details>
+  <details><summary>What do the sleep sounds actually do?</summary><p>They mask a room. Rain, surf, a stream, wind, a fire, crickets and a fan are built from noise and a few filters and never loop, so there is nothing for the ear to catch on. The <b>tone</b> slider on each one sets its colour in hertz: lower is duller and further away, higher is brighter and closer.</p></details>
+  <details><summary>Binaural beats: do I need headphones?</summary><p>Yes. The beat is made from two slightly different tones, one in each ear, and only exists inside your head. Through a speaker it is just a faint wobble. Theta and delta beats have the best evidence for easing anxiety; the 15 Hz beta and 40 Hz gamma beats are for staying alert.</p></details>
+  <details><summary>Is any of this proven?</summary><p>Some of it, a little. Every tone carries a badge: <b>studied</b> means several controlled studies or a meta-analysis point the same way, <b>pilot</b> means one or two small studies, <b>mixed</b> means the evidence goes both ways, and <b>tradition</b> means a practice rather than a finding. The numbered studies are listed at the bottom of the Resonance Room. Nothing here diagnoses or treats anything.</p></details>
+  <details><summary>How loud should it be?</summary><p>Low. If someone talking normally beside you is easy to hear over it, you are fine. The room opens at a low level on purpose, and the timer is there so your ears get ten quiet minutes every hour.</p></details>
+
+  <h2>Sleep mode and Plus</h2>
+  <details><summary>Why did the sound stop when I locked my phone?</summary><p>Keeping the room playing with the screen locked is <b>sleep mode</b>, the main thing Chladni Plus is for. Your first lock is free: the room keeps playing for twenty minutes so you can hear what it is like. After that, free fades out when the screen locks and Plus keeps going, with lock-screen controls and timers up to eight hours.</p></details>
+  <details><summary>What does Plus include?</summary><p>Sleep mode, timers to eight hours, unlimited saved mixes (free keeps one) and plate stills without the small iamra.lol mark. Everything else, including every sound and every figure, is free for everyone.</p></details>
+  <details><summary>How much is it, and how do I cancel?</summary><p>$0.99 a month, $7.99 a year, or $14.99 once for good. Subscriptions are billed by Apple and renew until you cancel in <b>Settings → your name → Subscriptions</b>, at least 24 hours before the period ends. The app's <b>Manage subscription</b> button in the You tab opens the same screen.</p></details>
+  <details><summary>I bought Plus on another iPhone.</summary><p>Plus belongs to your Apple ID, not to the app. Tap <b>Restore purchases</b> in the You tab or on the Plus sheet and it comes across.</p></details>
+  <details><summary>What is the tip jar?</summary><p>A one-off thank-you. It unlocks nothing; it keeps a solo project going.</p></details>
+
+  <h2>Saved mixes, widgets and reminders</h2>
+  <details><summary>What is a mix?</summary><p>Whatever is playing right now, with its levels, tones, timbre, beat and timer: tap <b>Save mix</b> in the Resonance Room and name it. Saved mixes appear as a gallery in the room and in the You tab; tap one to bring it back. Free keeps one, Plus keeps as many as you like.</p></details>
+  <details><summary>How do I add a widget?</summary><p>Hold an empty part of your Home Screen, tap <b>+</b> and search for Chladni Fields. The small widget plays your first preset or mix; the medium one shows four. Tapping any of them opens the app and starts it playing.</p></details>
+  <details><summary>What is the pomodoro?</summary><p>Work sprints with the room. Pick 25·5, 50·10 or 90·15 in the Resonance Room: the room plays through each sprint, dips to a murmur for the rest with a soft chime at each turn, and takes a longer rest after four rounds. If nothing is playing it starts the <b>Work</b> preset: a brook for masking and a low 174 Hz carrier split into a 15 Hz beta beat.</p></details>
+  <details><summary>What are the reminders?</summary><p>Optional local notifications, set in the You tab: a wind-down reminder at a time you choose, and a nudge if the room has been quiet for a while. They are scheduled on your phone; nothing about you is sent anywhere. Turn them off in the same place, or in Settings → Notifications.</p></details>
+
+  <h2>The plates and the microphone</h2>
+  <details><summary>What does the microphone do with my voice?</summary><p>On the free plate, it listens live to find the pitch and overtones of whatever you sing, hum or play, drives the plate with them, and discards the sound in the same instant. Nothing is recorded, stored or sent. See the <a href="privacy.html">privacy page</a>.</p></details>
+  <details><summary>Are the crop circles real?</summary><p>They are real formations, photographed and mapped; every one has a dossier with its location, date and sources. What they mean is not a question this app answers. The reading into sound is a construction: the geometry sets a fundamental and a stack of partials, and the plate shows what that tone would do to sand.</p></details>
+  <details><summary>Why doesn't the plate match the formation exactly?</summary><p>Because a round plate can only ring in the modes a round plate has. <b>Why this shape</b>, on every figure, says how close the plate can come to the original and why.</p></details>
+
+  <p class="note">Chladni Fields · designed by Matt Finley · <a href="privacy.html">Privacy</a></p>
+</div>
+</body>
+</html>

@@ -130,6 +130,8 @@
       '</ul>' +
       '<div class="cf-plans" role="radiogroup" aria-label="Plan">' + planButtons(selected) + '</div>' +
       '<button class="cf-cta" type="button" data-cta disabled><span>Connecting to the App Store…</span></button>' +
+      (store.get("sleepTrial") ? '<p class="cf-try cf-try--used">Your free lock has been used: the room played on with the screen off. Plus does that every night.</p>'
+        : '<div class="cf-try"><b>Try sleep mode first, free.</b> Start a tone, lock your phone: your first lock keeps the room playing for twenty minutes. <button class="cf-link" type="button" data-try>Try it now</button></div>') +
       '<p class="cf-fine">Payment is charged to your Apple ID at confirmation. Subscriptions renew automatically at the same price until cancelled at least 24 hours before the end of the period, in Settings → Apple ID → Subscriptions. <a href="' + EULA + '">Terms of Use</a> · <a href="privacy.html">Privacy</a></p>' +
       '<div class="cf-row"><button class="cf-link" type="button" data-restore>Restore purchases</button></div>' +
       '</div>');
@@ -158,7 +160,25 @@
         return;
       }
       if (ev.target.closest && ev.target.closest("[data-restore]")) restore(ev.target.closest("[data-restore]"));
+      if (ev.target.closest && ev.target.closest("[data-try]")) {
+        d.close();
+        if (/frequencies\.html$/.test(location.pathname)) toast("Start a tone, then lock your phone. Your first lock plays free for 20 minutes.", { ms: 6000 });
+        else location.href = "frequencies.html?preset=sleep&try=1";
+      }
     });
+    return d;
+  }
+  /* after the free lock: the room played on with the screen off, and this is what that was */
+  function trialEnded(minutes) {
+    var d = sheet(
+      '<div class="info-head"><p class="eyebrow">Sleep mode</p><button class="info-close" type="button" data-close>Not now</button></div>' +
+      '<div class="info-text cf-text">' +
+      '<h2>That was <span class="amp">sleep mode</span>.</h2>' +
+      '<p class="info-blurb">Your first lock was on us: the room kept playing with the screen off' + (minutes ? " for " + minutes + " minute" + (minutes === 1 ? "" : "s") : "") + '. Plus does that every night, with lock-screen controls and timers up to eight hours, from $0.99 a month.</p>' +
+      '<div class="cf-row"><button class="cf-primary" type="button" data-see>See Plus</button></div>' +
+      '<p class="cf-fine">From now on, free fades out when the screen locks.</p>' +
+      '</div>');
+    d.addEventListener("click", function (ev) { if (ev.target.closest && ev.target.closest("[data-see]")) { d.close(); setTimeout(function () { paywall("Playing with the screen locked"); }, 120); } });
     return d;
   }
   function buy(id, btn, done, busyHtml) {
@@ -235,7 +255,7 @@
   function toast(t, opts) { var n = N(); if (n.toast) n.toast(t, opts); }
 
   /* ---- boot ---- */
-  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded"]).then(function () {
+  var booted = store.restore(["ent", "account", "mixes", "tips", "onboarded", "sleepTrial", "reminders"]).then(function () {
     ent = store.get("ent", ent); account = store.get("account", account);
     return refresh();
   });
@@ -245,7 +265,7 @@
   if (want) booted.then(function () { setTimeout(function () { if (want[1] === "paywall") paywall(""); else if (want[1] === "tips") tipJar(); else accountSheet(); }, 500); });
 
   window.ChladniPlus = {
-    ready: booted, has: has, ent: function () { return ent; }, refresh: refresh, paywall: paywall, tipJar: tipJar, restore: restore,
+    ready: booted, has: has, ent: function () { return ent; }, refresh: refresh, paywall: paywall, tipJar: tipJar, restore: restore, trialEnded: trialEnded,
     manage: function () { try { if (Purchases) Purchases.manageSubscriptions(); } catch (e) {} },
     account: { get: function () { return account; }, sheet: accountSheet, signIn: signIn, signOut: signOut, deleteData: deleteData },
     mixes: mixesApi, store: store, plans: PLANS, tips: TIPS, loadProducts: loadProducts, tipCount: function () { return store.get("tips", 0) || 0; },
