@@ -65,7 +65,7 @@ Chladni Plus — Monthly $0.99 · Yearly $7.99 · Lifetime $14.99. Tip jar $0.99
 - Microphone audio: processed in memory, never stored or sent — not "collected" under Apple's definition.
 - If the user signs in (optional): **Name** and **Email address**, linked to the user, not used for tracking, purpose App Functionality. Stored on the device only.
 - Purchases are handled by Apple; the app stores no payment data.
-- Answer "Yes, we collect data" → select Name and Email Address → Linked to user, not tracking, App Functionality. Everything else: not collected.
+- Answered on 2026-09-08: **No, we do not collect data.** Apple defines "collect" as transmitting off the device; the optional sign-in's name and email never leave the phone, and purchases are Apple's. The privacy manifest in the project matches (no collected data types).
 
 ## App review notes (add)
 

@@ -6,33 +6,10 @@
 	<false/>
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
+	<!-- Nothing is transmitted off the device: the optional sign-in's name and email stay in local storage,
+	     and purchases are handled by Apple. Under Apple's definition ("collect" = sent off the device) that is no data collected. -->
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array>
-		<dict>
-			<key>NSPrivacyCollectedDataType</key>
-			<string>NSPrivacyCollectedDataTypeEmailAddress</string>
-			<key>NSPrivacyCollectedDataTypeLinked</key>
-			<true/>
-			<key>NSPrivacyCollectedDataTypeTracking</key>
-			<false/>
-			<key>NSPrivacyCollectedDataTypePurposes</key>
-			<array>
-				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-			</array>
-		</dict>
-		<dict>
-			<key>NSPrivacyCollectedDataType</key>
-			<string>NSPrivacyCollectedDataTypeName</string>
-			<key>NSPrivacyCollectedDataTypeLinked</key>
-			<true/>
-			<key>NSPrivacyCollectedDataTypeTracking</key>
-			<false/>
-			<key>NSPrivacyCollectedDataTypePurposes</key>
-			<array>
-				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-			</array>
-		</dict>
-	</array>
+	<array/>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>
