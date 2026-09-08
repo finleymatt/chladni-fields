@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>App icon and splash (render source)</title>
+<style>
+  /* ?art=icon → 1024x1024 app icon (no alpha; iOS rounds the corners itself)
+     ?art=splash → 2732x2732 launch image, centred mark, safe at any crop */
+  html, body { margin: 0; background: #0d120e; }
+  .icon { width: 1024px; height: 1024px; background: radial-gradient(circle at 50% 46%, #17201a 0, #0d120e 62%); display: grid; place-items: center; overflow: hidden; }
+  .splash { width: 2732px; height: 2732px; background: #0d120e; display: grid; place-items: center; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+(function () {
+  var q = {}; location.search.replace(/^\?/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) q[p[0]] = decodeURIComponent(p[1] || ""); });
+  var art = q.art || "icon", S = art === "icon" ? 1024 : 2732;
+  document.body.innerHTML = '<div class="' + art + '"><canvas width="' + S + '" height="' + S + '"></canvas></div>';
+  var cv = document.querySelector("canvas"), ctx = cv.getContext("2d");
+  var c = S / 2, BR = "rgba(211,168,81,", CY = "rgba(100,186,200,";
+  // faint plate rings behind everything
+  ctx.lineWidth = S * 0.0016; ctx.strokeStyle = "rgba(139,149,104,.14)";
+  for (var i = 1; i <= 6; i++) { ctx.beginPath(); ctx.arc(c, c, (S * 0.07) * i, 0, Math.PI * 2); ctx.stroke(); }
+  // a six-fold Chladni figure in sand: r(θ) lobes from cos(3θ) nodal curves, drawn as glowing strokes
+  function lobe(k, phase, r0, r1, col, w) {
+    ctx.save(); ctx.translate(c, c); ctx.rotate(phase);
+    ctx.shadowColor = col + ".85)"; ctx.shadowBlur = S * 0.02; ctx.strokeStyle = col + ".95)"; ctx.lineWidth = w; ctx.lineCap = "round";
+    ctx.beginPath();
+    for (var t = 0; t <= Math.PI * 2 + 0.01; t += 0.01) {
+      var r = r0 + (r1 - r0) * (0.5 + 0.5 * Math.cos(k * t));
+      var x = r * Math.cos(t), y = r * Math.sin(t);
+      if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+  var R = art === "icon" ? S * 0.33 : S * 0.17;
+  lobe(6, 0, R * 0.62, R, BR, S * 0.012);
+  lobe(6, Math.PI / 6, R * 0.30, R * 0.55, CY, S * 0.008);
+  // the sun-sigil at the centre
+  ctx.save(); ctx.translate(c, c); ctx.strokeStyle = BR + "1)"; ctx.lineWidth = S * 0.009; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.16, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = BR + "1)"; ctx.beginPath(); ctx.arc(0, 0, R * 0.055, 0, Math.PI * 2); ctx.fill();
+  for (var a = 0; a < 8; a++) { var ang = a * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(ang) * R * 0.21, Math.sin(ang) * R * 0.21); ctx.lineTo(Math.cos(ang) * R * 0.28, Math.sin(ang) * R * 0.28); ctx.stroke(); }
+  ctx.restore();
+  // sand grains along the outer figure
+  ctx.fillStyle = "rgba(233,229,215,.9)";
+  for (var g = 0; g < (art === "icon" ? 420 : 700); g++) {
+    var t2 = Math.random() * Math.PI * 2, r2 = R * 0.62 + (R - R * 0.62) * (0.5 + 0.5 * Math.cos(6 * t2)) + (Math.random() - 0.5) * S * 0.012;
+    var sz = S * (0.0012 + Math.random() * 0.0022);
+    ctx.beginPath(); ctx.arc(c + r2 * Math.cos(t2), c + r2 * Math.sin(t2), sz, 0, Math.PI * 2); ctx.fill();
+  }
+})();
+</script>
+</body>
+</html>

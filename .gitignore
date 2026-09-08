@@ -1,1 +1,4 @@
 reel/
+app/node_modules/
+app/www/
+app/store/screenshots/*.tmp

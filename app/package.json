@@ -1,0 +1,25 @@
+{
+  "name": "chladni-fields-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chladni Fields for iOS: the iamra.lol site bundled as a native app with Capacitor.",
+  "author": "Matt Finley",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "scripts": {
+    "fonts": "node fetch-fonts.js",
+    "build": "node build-www.js",
+    "sync": "node build-www.js && npx cap sync ios",
+    "assets": "node render-assets.js",
+    "screenshots": "node render-screenshots.js"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.4",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  }
+}

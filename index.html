@@ -1333,7 +1333,7 @@
 
 
   <footer>
-    <span>Figures follow widely published accounts. Drawings are schematic, generated in-browser — not survey-accurate. Microphone audio never leaves your browser.</span>
+    <span>Figures follow widely published accounts. Drawings are schematic, generated in-browser — not survey-accurate. Microphone audio never leaves your browser · <a href="privacy.html">privacy</a>.</span>
     <span>Web Audio · additive synthesis · analytic Chladni model</span>
   </footer>
 </div>
@@ -2381,11 +2381,14 @@
   var UA = navigator.userAgent || "";
   var isIOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var isAndroid = /Android/.test(UA);
+  // the App Store build runs the same page inside a native shell (Capacitor); it has its own microphone permission
+  var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   // in-app browsers (Messages, Instagram, Facebook, TikTok…) never get the microphone; on iOS they lack "Safari" in the UA
-  var inApp = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|GSA\/|; wv\)/.test(UA) || (isIOS && !/Safari/.test(UA));
+  var inApp = !isNative && (/FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|GSA\/|; wv\)/.test(UA) || (isIOS && !/Safari/.test(UA)));
   var micHelp = $("#micHelp"), micDlg = $("#micDlg"), micPrimed = false, micSink = null;
   function showMicHelp(html) { micHelp.innerHTML = html; micHelp.setAttribute("data-show", html ? "1" : "0"); }
   function micDeniedHelp() {
+    if (isNative) return "<b>The microphone is switched off for Chladni Fields.</b> Open iPhone <b>Settings → Apps → Chladni Fields → Microphone</b>, switch it on, come back and tap <b>Use microphone</b> again. " + diagLine();
     if (inApp) return "<b>This page is open inside another app's browser</b>, which can't use the microphone. Tap the share or <b>···</b> button and choose <b>Open in Safari</b> (or <b>Open in browser</b>), then try again.";
     if (isIOS) return "<b>iPhone refused the microphone.</b> Two things fix this, in order:<ol><li><b>Open the page in the Safari app itself.</b> If you tapped a link in a message or another app, this is an in-app view, which never gets the microphone — tap the <b>Safari (compass) icon</b> in the bottom-right corner, or share → <b>Open in Safari</b>, then try again.</li><li>In Safari, tap the <b>ᴀᴀ</b> (or page icon) at the left of the address bar → <b>Website Settings</b> → <b>Microphone</b> → <b>Allow</b>, tap Done, then <b>Use microphone</b> again.</li></ol>Still refused: iPhone <b>Settings → Apps → Safari → Microphone → Ask</b>. " + diagLine();
     if (isAndroid) return "<b>The microphone is blocked for this site.</b> Tap the <b>lock</b> (or tune) icon at the left of the address bar → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>, then try again.";
@@ -2393,8 +2396,9 @@
   }
   function openMicPrimer() {
     var note = $("#micDlgNote");
-    if (!window.isSecureContext) { showMicHelp("<b>Browsers only offer the microphone on a secure (https) page.</b> Open <b>https://iamra.lol</b> and try there."); return; }
-    if (inApp) { note.textContent = "You seem to be inside another app's browser, which can't use the microphone. Open this page in Safari or Chrome first."; note.hidden = false; }
+    if (!window.isSecureContext && !isNative) { showMicHelp("<b>Browsers only offer the microphone on a secure (https) page.</b> Open <b>https://iamra.lol</b> and try there."); return; }
+    if (isNative) { note.textContent = "iPhone asks once. Tap Allow, and the plate starts listening."; note.hidden = false; }
+    else if (inApp) { note.textContent = "You seem to be inside another app's browser, which can't use the microphone. Open this page in Safari or Chrome first."; note.hidden = false; }
     else { note.textContent = isIOS ? "iPhone: this only works in the Safari app itself — if you opened the link from a message or another app, tap the Safari (compass) icon in the bottom-right corner first. The permission then appears at the bottom of the screen; if you tapped Don't Allow before, Safari remembers, and the help below says where to change it." : ""; note.hidden = !note.textContent; }
     if (typeof micDlg.showModal === "function") micDlg.showModal(); else startMic();
   }

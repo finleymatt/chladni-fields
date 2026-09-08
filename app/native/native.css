@@ -1,0 +1,17 @@
+/* Native-app layer: the web view runs edge to edge under the status bar and home indicator,
+   so the page keeps clear of both. Everything else is the site as published. */
+html.native { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+html.native body { overscroll-behavior-y: none; }
+html.native .wrap { padding-top: calc(env(safe-area-inset-top) + 12px) !important; padding-bottom: calc(env(safe-area-inset-bottom) + 44px) !important; }
+html.native .site-nav { padding-top: 2px; }
+/* things pinned to the top on phones sit below the status bar, with the page colour behind the bar */
+@media (max-width: 900px) {
+  html.native .console, html.native .mini-now { top: env(safe-area-inset-top) !important; }
+  html.native .console::before, html.native .mini-now::before {
+    content: ""; position: absolute; left: -1px; right: -1px; top: calc(-1 * env(safe-area-inset-top) - 1px); height: calc(env(safe-area-inset-top) + 2px);
+    background: var(--bg); pointer-events: none;
+  }
+}
+html.native dialog { max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px); }
+/* the app has no address bar or share sheet to point at; the web-only help lines are hidden */
+html.native .web-only { display: none !important; }
